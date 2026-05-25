@@ -273,7 +273,36 @@
   @keyframes mascotBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
   .speech-bubble { position:fixed; bottom:90px; right:20px; background:white; border-radius:18px; padding:12px 16px; font-weight:700; font-size:0.9rem; color:var(--navy); box-shadow:0 4px 20px var(--shadow); border:3px solid #E8EAF6; max-width:200px; display:none; z-index:100; animation:fadeIn 0.3s ease; }
 
-  /* ===== LOGIN SCREEN ===== */
+  /* ===== EDUCATORS SCREEN ===== */
+  .edu-dash { background:white; border-radius:24px; padding:24px; box-shadow:0 8px 30px var(--shadow); }
+  .edu-dash-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+  .edu-pin-input { width:160px; text-align:center; letter-spacing:8px; font-size:1.8rem; padding:12px 16px; border-radius:16px; border:3px solid #E0E0E0; font-family:'Fredoka One',cursive; color:#1A237E; outline:none; transition:border-color 0.2s; display:block; margin:0 auto 16px; }
+  .edu-pin-input:focus { border-color:#3F51B5; }
+  .edu-pin-btn { background:linear-gradient(135deg,#1A237E,#3949AB); color:white; border:none; border-radius:14px; padding:12px 28px; font-family:'Fredoka One',cursive; font-size:1.1rem; cursor:pointer; box-shadow:0 4px 16px rgba(26,35,126,0.3); transition:all 0.2s; }
+  .edu-pin-btn:hover { transform:translateY(-2px); }
+  .edu-pin-err { color:#E53935; font-weight:700; font-size:0.88rem; margin-top:10px; }
+  .edu-section-title { font-family:'Fredoka One',cursive; font-size:1.2rem; color:#1A237E; margin:0 0 14px; }
+  .edu-summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-bottom:28px; }
+  .edu-stat { background:#F5F5F5; border-radius:16px; padding:16px; text-align:center; border:2px solid #E8EAF6; }
+  .edu-stat-num { font-family:'Fredoka One',cursive; font-size:2rem; color:#3F51B5; }
+  .edu-stat-label { font-size:0.8rem; color:#78909C; font-weight:700; margin-top:2px; }
+  .edu-table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+  .edu-table th { background:#E8EAF6; color:#3949AB; font-weight:800; padding:10px 14px; text-align:left; }
+  .edu-table th:first-child { border-radius:12px 0 0 12px; }
+  .edu-table th:last-child  { border-radius:0 12px 12px 0; }
+  .edu-table td { padding:11px 14px; border-bottom:2px solid #F5F5F5; font-weight:700; color:#37474F; }
+  .edu-table tr:last-child td { border-bottom:none; }
+  .edu-table tr:hover td { background:#FAFAFA; }
+  .edu-grade-pill { display:inline-block; background:#E8EAF6; color:#3949AB; border-radius:50px; padding:3px 10px; font-size:0.8rem; font-weight:800; }
+  .edu-no-students { text-align:center; color:#90A4AE; font-weight:700; padding:32px; }
+  .edu-pin-row { display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; margin-bottom:8px; }
+  .edu-pin-field { flex:1; min-width:120px; }
+  .edu-pin-field label { display:block; font-size:0.82rem; font-weight:800; color:#546E7A; margin-bottom:5px; }
+  .edu-pin-field input { width:100%; padding:10px 14px; border-radius:12px; border:2px solid #E0E0E0; font-family:'Nunito',sans-serif; font-weight:700; font-size:0.95rem; outline:none; }
+  .edu-pin-field input:focus { border-color:#3F51B5; }
+  .edu-save-pin-btn { background:#43A047; color:white; border:none; border-radius:12px; padding:11px 18px; font-family:'Fredoka One',cursive; font-size:0.95rem; cursor:pointer; white-space:nowrap; }
+  .edu-save-pin-btn:hover { background:#2E7D32; }
+  .edu-msg { font-size:0.85rem; font-weight:700; min-height:20px; }
   .login-wrap {
     min-height: 100vh; display: flex; align-items: center; justify-content: center;
     padding: 24px;
@@ -350,6 +379,7 @@
 </head>
 <body>
 
+
 <header>
   <div class="logo">Math<span>Quest</span> 🚀</div>
   <div class="header-right">
@@ -366,6 +396,9 @@
 <div class="clouds" id="clouds"></div>
 <div class="mascot" id="mascot" onclick="showTip()">🐣</div>
 <div class="speech-bubble" id="speech-bubble">Pick a topic and let's go! 🎯</div>
+
+<!-- EDUCATORS BUTTON (always visible) -->
+<button id="edu-btn" onclick="openEducators()" style="position:fixed;top:16px;right:16px;z-index:9000;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:50px;padding:11px 22px;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer;box-shadow:0 4px 18px rgba(26,35,126,0.45);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🎓 Educators</button>
 
 <!-- LOGIN SCREEN -->
 <div id="login-screen" class="login-wrap">
@@ -526,6 +559,62 @@
     </div>
   </div>
 
+  <!-- EDUCATORS SCREEN -->
+  <div class="screen" id="screen-educators">
+    <div class="edu-dash">
+
+      <div class="edu-dash-header">
+        <button class="back-btn" onclick="closeEducators()">← Back</button>
+        <div style="font-family:'Fredoka One',cursive;font-size:1.6rem;color:#1A237E;">🎓 Educator Dashboard</div>
+        <div style="width:80px"></div>
+      </div>
+
+      <!-- PIN GATE -->
+      <div id="edu-pin-wrap" style="text-align:center;padding:48px 24px;">
+        <div style="font-size:3rem;margin-bottom:12px">🔐</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:1.5rem;color:#1A237E;margin-bottom:8px" id="edu-gate-title">Educator Access</div>
+        <div style="font-size:0.92rem;color:#90A4AE;font-weight:600;margin-bottom:24px" id="edu-gate-sub">Loading...</div>
+
+        <!-- password input (used for both setup and login) -->
+        <input class="edu-pin-input" type="password" id="edu-pin-input"
+          style="letter-spacing:2px;font-size:1.2rem;width:220px"
+          placeholder="Enter password" onkeydown="if(event.key==='Enter')checkEduPassword()">
+        <br>
+        <!-- confirm field (only shown during first-time setup) -->
+        <input class="edu-pin-input" type="password" id="edu-pin-confirm"
+          style="letter-spacing:2px;font-size:1.2rem;width:220px;display:none;margin-top:8px"
+          placeholder="Confirm password" onkeydown="if(event.key==='Enter')checkEduPassword()">
+        <br>
+        <button class="edu-pin-btn" id="edu-gate-btn" onclick="checkEduPassword()">Unlock 🔓</button>
+        <div class="edu-pin-err" id="edu-pin-err"></div>
+      </div>
+
+      <!-- DASHBOARD (unlocked) -->
+      <div id="edu-body" style="display:none">
+
+        <div class="edu-section-title">📊 Class Overview</div>
+        <div class="edu-summary-grid" id="edu-summary"></div>
+
+        <div class="edu-section-title">👩‍🎓 Students</div>
+        <div style="overflow-x:auto;margin-bottom:28px">
+          <table class="edu-table">
+            <thead><tr><th></th><th>Name</th><th>Grade</th><th>Level</th><th>⭐ Stars</th><th>🎮 Games</th><th>🔥 Streak</th></tr></thead>
+            <tbody id="edu-student-table"></tbody>
+          </table>
+        </div>
+
+        <div class="edu-section-title">🔑 Change Password</div>
+        <div class="edu-pin-row">
+          <div class="edu-pin-field"><label>New Password</label><input type="password" id="new-pin-input" placeholder="New password"></div>
+          <div class="edu-pin-field"><label>Confirm</label><input type="password" id="confirm-pin-input" placeholder="Repeat"></div>
+          <button class="edu-save-pin-btn" onclick="saveNewPin()">Save</button>
+        </div>
+        <div class="edu-msg" id="pin-change-msg"></div>
+
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- QUEST MODAL -->
@@ -540,6 +629,7 @@
     </div>
   </div>
 </div>
+
 
 <script>
 // ===================== AVATAR DATA =====================
@@ -557,18 +647,25 @@ function getAvatar(lvl){ let a=AVATARS[0]; for(const av of AVATARS){if(lvl>=av.l
 function nextAvatar(lvl){ for(const av of AVATARS){if(av.level>lvl)return av;} return null; }
 
 // ===================== LOGIN SYSTEM =====================
+const API = 'https://mathquest-api.energy-gaurav.workers.dev';
 let currentUser = null;
 let selectedAvatar = '🐣';
 let selectedGrade = 1;
 
-function getAllUsers(){
-  try{ return JSON.parse(localStorage.getItem('mq_users')||'{}'); }
-  catch(e){ return {}; }
+async function apiGet(path){ 
+  try{ const r=await fetch(API+path); return await r.json(); }
+  catch(e){ return null; }
 }
-function saveAllUsers(users){ localStorage.setItem('mq_users', JSON.stringify(users)); }
+async function apiPost(path, data){ 
+  try{ const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}); return await r.json(); }
+  catch(e){ return null; }
+}
 
-function userKey(u){ return 'mq_data_'+u; }
-function questKey(u){ return 'mq_quest_'+u; }
+function showLoginMsg(id, msg, isErr=true){
+  const el=document.getElementById(id);
+  el.style.color=isErr?'#E53935':'#43A047';
+  el.textContent=msg;
+}
 
 function switchTab(tab){
   document.getElementById('tab-login').classList.toggle('active', tab==='login');
@@ -591,61 +688,72 @@ function pickGrade(el){
   selectedGrade = parseInt(el.dataset.g);
 }
 
-function renderSavedUsers(){
-  const users = getAllUsers();
+async function renderSavedUsers(){
+  const res = await apiGet('/users');
   const list = document.getElementById('saved-users-list');
   const wrap = document.getElementById('saved-users-wrap');
-  const names = Object.keys(users);
-  if(names.length===0){ wrap.style.display='none'; return; }
+  if(!res || !res.users || res.users.length===0){ wrap.style.display='none'; return; }
   wrap.style.display='';
-  list.innerHTML = names.map(n=>`<span class="user-pill" onclick="quickLogin('${n}')">${users[n].avatar||'🐣'} ${n} <span style="font-size:0.75rem;opacity:0.7">Gr.${users[n].grade||1}</span></span>`).join('');
+  // fetch basic info for each user to show avatar/grade
+  const pills = await Promise.all(res.users.map(async n => {
+    const u = await apiGet('/user/'+encodeURIComponent(n));
+    const av = u?.avatar||'🐣';
+    const gr = u?.grade||1;
+    return `<span class="user-pill" onclick="quickLogin('${n}')">${av} ${n} <span style="font-size:0.75rem;opacity:0.7">Gr.${gr}</span></span>`;
+  }));
+  list.innerHTML = pills.join('');
 }
 
-function quickLogin(username){
-  const users = getAllUsers();
-  if(!users[username]) return;
-  currentUser = {username, ...users[username]};
-  enterApp();
+async function quickLogin(username){
+  showLoginMsg('login-err','Loading... ⏳', false);
+  const u = await apiGet('/user/'+encodeURIComponent(username));
+  if(!u){ showLoginMsg('login-err','Could not connect. Check internet!'); return; }
+  // quickLogin has no password — prompt for it
+  document.getElementById('login-username').value = username;
+  document.getElementById('login-err').textContent = '';
+  document.getElementById('login-password').focus();
 }
 
-function doLogin(){
+async function doLogin(){
   const u = document.getElementById('login-username').value.trim();
   const p = document.getElementById('login-password').value;
-  const err = document.getElementById('login-err');
-  if(!u||!p){ err.textContent='Please fill in both fields!'; return; }
-  const users = getAllUsers();
-  if(!users[u]){ err.textContent='Username not found. Try signing up!'; return; }
-  if(users[u].password !== btoa(p)){ err.textContent='Wrong password. Try again!'; return; }
-  currentUser = {username:u, ...users[u]};
+  if(!u||!p){ showLoginMsg('login-err','Please fill in both fields!'); return; }
+  showLoginMsg('login-err','Checking... ⏳', false);
+  const userData = await apiGet('/user/'+encodeURIComponent(u));
+  if(!userData || userData.error){ showLoginMsg('login-err','Username not found. Try signing up!'); return; }
+  if(userData.password !== btoa(p)){ showLoginMsg('login-err','Wrong password. Try again!'); return; }
+  currentUser = {username:u, ...userData};
   enterApp();
 }
 
-function doSignup(){
+async function doSignup(){
   const u = document.getElementById('signup-username').value.trim();
   const p = document.getElementById('signup-password').value;
-  const err = document.getElementById('signup-err');
-  if(!u||!p){ err.textContent='Please fill in both fields!'; return; }
-  if(u.length<2){ err.textContent='Username must be at least 2 characters!'; return; }
-  if(p.length<4){ err.textContent='Password must be at least 4 characters!'; return; }
-  if(!/^[a-zA-Z0-9_]+$/.test(u)){ err.textContent='Only letters, numbers, and _ allowed!'; return; }
-  const users = getAllUsers();
-  if(users[u]){ err.textContent='That username is taken. Try another!'; return; }
-  users[u] = { password: btoa(p), avatar: selectedAvatar, grade: selectedGrade };
-  saveAllUsers(users);
-  currentUser = {username:u, password:btoa(p), avatar:selectedAvatar, grade:selectedGrade};
+  const err = 'signup-err';
+  if(!u||!p){ showLoginMsg(err,'Please fill in both fields!'); return; }
+  if(u.length<2){ showLoginMsg(err,'Username must be at least 2 characters!'); return; }
+  if(p.length<4){ showLoginMsg(err,'Password must be at least 4 characters!'); return; }
+  if(!/^[a-zA-Z0-9_]+$/.test(u)){ showLoginMsg(err,'Only letters, numbers, and _ allowed!'); return; }
+  showLoginMsg(err,'Checking username... ⏳', false);
+  const existing = await apiGet('/user/'+encodeURIComponent(u));
+  if(existing && !existing.error){ showLoginMsg(err,'That username is taken. Try another!'); return; }
+  showLoginMsg(err,'Creating account... ⏳', false);
+  const userData = { password: btoa(p), avatar: selectedAvatar, grade: selectedGrade };
+  await apiPost('/user/'+encodeURIComponent(u), userData);
+  currentUser = {username:u, ...userData};
   enterApp();
 }
 
-function enterApp(){
+async function enterApp(){
   document.getElementById('login-screen').style.display='none';
   document.querySelector('.container').style.display='';
   document.querySelector('header').style.display='';
   document.getElementById('mascot').style.display='';
-  load();
-  loadQuests();
+  document.getElementById('edu-btn').style.display='none';
+  await load();
+  await loadQuests();
   updatePlayerUI();
   updateQuestNotif();
-  // Auto-set grade from profile
   setGrade(currentUser.grade || 1);
   setTimeout(()=>showTip(),1500);
 }
@@ -660,6 +768,7 @@ function doLogout(){
   document.querySelector('.container').style.display='none';
   document.querySelector('header').style.display='none';
   document.getElementById('mascot').style.display='none';
+  document.getElementById('edu-btn').style.display='';
   document.getElementById('login-username').value='';
   document.getElementById('login-password').value='';
   document.getElementById('login-err').textContent='';
@@ -668,16 +777,18 @@ function doLogout(){
 }
 
 // ===================== PERSISTENCE =====================
-function save(){
+async function save(){
   if(!currentUser) return;
-  localStorage.setItem(userKey(currentUser.username), JSON.stringify({totalStars,playerXP,playerLevel,streak,gamesPlayed}));
+  await apiPost('/progress/'+encodeURIComponent(currentUser.username), {totalStars,playerXP,playerLevel,streak,gamesPlayed});
 }
-function load(){
+async function load(){
   if(!currentUser) return;
   try{
-    const d=JSON.parse(localStorage.getItem(userKey(currentUser.username))||'{}');
-    totalStars=d.totalStars||0; playerXP=d.playerXP||0;
-    playerLevel=d.playerLevel||1; streak=d.streak||0; gamesPlayed=d.gamesPlayed||0;
+    const d = await apiGet('/progress/'+encodeURIComponent(currentUser.username));
+    if(d){
+      totalStars=d.totalStars||0; playerXP=d.playerXP||0;
+      playerLevel=d.playerLevel||1; streak=d.streak||0; gamesPlayed=d.gamesPlayed||0;
+    }
   }catch(e){}
 }
 
@@ -1222,23 +1333,25 @@ function pickDailyQuests(){
   dailyQuestDate = todayStr();
 }
 
-function saveQuests(){
+async function saveQuests(){
   if(!currentUser) return;
-  localStorage.setItem(questKey(currentUser.username), JSON.stringify({
+  await apiPost('/quests/'+encodeURIComponent(currentUser.username), {
     questProgress, perfectCount, totalCorrect,
     topicsPlayed: [...topicsPlayed], dailyQuestIds, dailyQuestDate
-  }));
+  });
 }
-function loadQuests(){
+async function loadQuests(){
   if(!currentUser) return;
   try{
-    const d = JSON.parse(localStorage.getItem(questKey(currentUser.username))||'{}');
-    questProgress  = d.questProgress  || {};
-    perfectCount   = d.perfectCount   || 0;
-    totalCorrect   = d.totalCorrect   || 0;
-    topicsPlayed   = new Set(d.topicsPlayed || []);
-    dailyQuestIds  = d.dailyQuestIds  || [];
-    dailyQuestDate = d.dailyQuestDate || '';
+    const d = await apiGet('/quests/'+encodeURIComponent(currentUser.username));
+    if(d){
+      questProgress  = d.questProgress  || {};
+      perfectCount   = d.perfectCount   || 0;
+      totalCorrect   = d.totalCorrect   || 0;
+      topicsPlayed   = new Set(d.topicsPlayed || []);
+      dailyQuestIds  = d.dailyQuestIds  || [];
+      dailyQuestDate = d.dailyQuestDate || '';
+    }
   }catch(e){}
   if(dailyQuestDate !== todayStr() || dailyQuestIds.length === 0){
     pickDailyQuests();
@@ -1363,16 +1476,168 @@ function updateQuestTrackers(gameScore, gameTopic){
 }
 
 // ===================== RESET =====================
-function confirmReset(){
+async function confirmReset(){
   if(confirm('Reset ALL progress for ' + currentUser.username + '? Stars, XP, level, quests — everything goes back to zero.')){
-    if(currentUser) localStorage.removeItem(userKey(currentUser.username));
-    if(currentUser) localStorage.removeItem(questKey(currentUser.username));
     totalStars=0;playerXP=0;playerLevel=1;streak=0;gamesPlayed=0;
     questProgress={};perfectCount=0;totalCorrect=0;topicsPlayed=new Set();
-    pickDailyQuests(); saveQuests();
+    pickDailyQuests();
+    await save();
+    await saveQuests();
     updatePlayerUI();
     updateQuestNotif();
   }
+}
+
+// ===================== EDUCATORS =====================
+let eduIsFirstTime = false;
+
+async function openEducators(){
+  clearInterval(timerInterval);
+  document.getElementById('login-screen').style.display='none';
+  document.querySelector('.container').style.display='';
+  document.querySelector('header').style.display='none';
+  document.getElementById('mascot').style.display='none';
+  document.getElementById('edu-pin-wrap').style.display='';
+  document.getElementById('edu-body').style.display='none';
+  document.getElementById('edu-pin-input').value='';
+  document.getElementById('edu-pin-confirm').value='';
+  document.getElementById('edu-pin-confirm').style.display='none';
+  document.getElementById('edu-pin-err').textContent='';
+  document.getElementById('edu-gate-sub').textContent='Checking... ⏳';
+  document.getElementById('edu-gate-btn').textContent='Unlock 🔓';
+  showScreen('screen-educators');
+
+  // Check if a password exists in the cloud
+  const res = await apiGet('/edupass');
+  if(!res){
+    document.getElementById('edu-gate-sub').textContent='Could not connect to server 😢';
+    return;
+  }
+  if(!res.exists){
+    // First time — ask to create a password
+    eduIsFirstTime = true;
+    document.getElementById('edu-gate-title').textContent='Create Educator Password';
+    document.getElementById('edu-gate-sub').textContent='No password set yet. Create one to protect the dashboard.';
+    document.getElementById('edu-pin-confirm').style.display='';
+    document.getElementById('edu-gate-btn').textContent='Create Password ✅';
+  } else {
+    eduIsFirstTime = false;
+    document.getElementById('edu-gate-title').textContent='Educator Access';
+    document.getElementById('edu-gate-sub').textContent='Enter your educator password to continue.';
+    document.getElementById('edu-gate-btn').textContent='Unlock 🔓';
+  }
+}
+
+function closeEducators(){
+  if(currentUser){
+    document.querySelector('header').style.display='';
+    document.getElementById('mascot').style.display='';
+    showScreen('screen-home');
+    updatePlayerUI();
+  } else {
+    document.querySelector('.container').style.display='none';
+    document.getElementById('login-screen').style.display='flex';
+    document.getElementById('edu-btn').style.display='';
+  }
+}
+
+async function checkEduPassword(){
+  const pass = document.getElementById('edu-pin-input').value.trim();
+  const confirm = document.getElementById('edu-pin-confirm').value.trim();
+  const err = document.getElementById('edu-pin-err');
+  err.textContent='';
+
+  if(!pass){ err.textContent='Please enter a password!'; return; }
+
+  if(eduIsFirstTime){
+    if(pass.length < 4){ err.textContent='Password must be at least 4 characters!'; return; }
+    if(pass !== confirm){ err.textContent="Passwords don't match!"; return; }
+    err.style.color='#43A047'; err.textContent='Creating password... ⏳';
+    const res = await apiPost('/edupass', { password: btoa(pass) });
+    if(!res || !res.ok){ err.style.color='#E53935'; err.textContent='Failed to save. Try again!'; return; }
+    unlockEduDashboard();
+  } else {
+    err.style.color='#90A4AE'; err.textContent='Checking... ⏳';
+    const res = await apiGet('/edupass');
+    if(!res || !res.exists){ err.style.color='#E53935'; err.textContent='Could not connect!'; return; }
+    if(res.password !== btoa(pass)){ err.style.color='#E53935'; err.textContent='❌ Wrong password, try again!'; document.getElementById('edu-pin-input').value=''; return; }
+    unlockEduDashboard();
+  }
+}
+
+function unlockEduDashboard(){
+  document.getElementById('edu-pin-wrap').style.display='none';
+  document.getElementById('edu-body').style.display='block';
+  renderEduDashboard();
+}
+
+async function renderEduDashboard(){
+  document.getElementById('edu-student-table').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:#90A4AE;font-weight:700">Loading students... ⏳</td></tr>';
+  document.getElementById('edu-summary').innerHTML = '';
+
+  const res = await apiGet('/users');
+  if(!res || !res.users){ 
+    document.getElementById('edu-student-table').innerHTML='<tr><td colspan="7" class="edu-no-students">Could not connect to server 😢</td></tr>';
+    return;
+  }
+
+  const students = await Promise.all(res.users.map(async n => {
+    const u = await apiGet('/user/'+encodeURIComponent(n));
+    const d = await apiGet('/progress/'+encodeURIComponent(n));
+    return {
+      name: n,
+      avatar: u?.avatar||'🐣',
+      grade: u?.grade||1,
+      level: d?.playerLevel||1,
+      stars: d?.totalStars||0,
+      games: d?.gamesPlayed||0,
+      streak: d?.streak||0,
+    };
+  }));
+  students.sort((a,b)=>b.stars-a.stars);
+
+  const total = students.length;
+  const avgLevel = total ? (students.reduce((s,x)=>s+x.level,0)/total).toFixed(1) : 0;
+  const totalGames = students.reduce((s,x)=>s+x.games,0);
+  const totalStarsAll = students.reduce((s,x)=>s+x.stars,0);
+
+  document.getElementById('edu-summary').innerHTML = `
+    <div class="edu-stat"><div class="edu-stat-num">${total}</div><div class="edu-stat-label">Students</div></div>
+    <div class="edu-stat"><div class="edu-stat-num">${avgLevel}</div><div class="edu-stat-label">Avg Level</div></div>
+    <div class="edu-stat"><div class="edu-stat-num">${totalGames}</div><div class="edu-stat-label">Total Games</div></div>
+    <div class="edu-stat"><div class="edu-stat-num">${totalStarsAll}</div><div class="edu-stat-label">Total Stars</div></div>
+  `;
+
+  const tbody = document.getElementById('edu-student-table');
+  if(!students.length){
+    tbody.innerHTML = `<tr><td colspan="7" class="edu-no-students">No students signed up yet! 🎒</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = students.map((s,i) => `
+    <tr>
+      <td style="font-size:1.4rem">${s.avatar}</td>
+      <td><strong>${s.name}</strong>${i===0?` <span style="font-size:0.75rem;background:#FFD54F;color:#BF360C;border-radius:50px;padding:2px 8px;margin-left:6px">🏆 Top</span>`:''}</td>
+      <td><span class="edu-grade-pill">Grade ${s.grade}</span></td>
+      <td>Lvl ${s.level}</td>
+      <td>⭐ ${s.stars}</td>
+      <td>${s.games}</td>
+      <td>🔥 ${s.streak}</td>
+    </tr>`).join('');
+}
+
+async function saveNewPin(){
+  const np = document.getElementById('new-pin-input').value.trim();
+  const cp = document.getElementById('confirm-pin-input').value.trim();
+  const msg = document.getElementById('pin-change-msg');
+  if(np.length < 4){ msg.style.color='#E53935'; msg.textContent='Password must be at least 4 characters!'; return; }
+  if(np !== cp){ msg.style.color='#E53935'; msg.textContent="Passwords don't match!"; return; }
+  msg.style.color='#90A4AE'; msg.textContent='Saving... ⏳';
+  const res = await apiPost('/edupass', { password: btoa(np) });
+  if(!res || !res.ok){ msg.style.color='#E53935'; msg.textContent='Failed to save. Try again!'; return; }
+  msg.style.color='#43A047'; msg.textContent='✅ Password updated successfully!';
+  document.getElementById('new-pin-input').value='';
+  document.getElementById('confirm-pin-input').value='';
+  setTimeout(()=>msg.textContent='', 3000);
 }
 
 // ===================== INIT =====================
