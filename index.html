@@ -305,7 +305,7 @@
   .edu-msg { font-size:0.85rem; font-weight:700; min-height:20px; }
   .login-wrap {
     min-height: 100vh; display: flex; align-items: center; justify-content: center;
-    padding: 24px;
+    padding: 24px; padding-top: 80px;
   }
   .login-card {
     background: white; border-radius: 28px; padding: 40px 36px;
@@ -398,7 +398,7 @@
 <div class="speech-bubble" id="speech-bubble">Pick a topic and let's go! 🎯</div>
 
 <!-- EDUCATORS BUTTON (always visible) -->
-<button id="edu-btn" onclick="openEducators()" style="position:fixed;top:16px;right:16px;z-index:9000;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:50px;padding:11px 22px;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer;box-shadow:0 4px 18px rgba(26,35,126,0.45);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🎓 Educators</button>
+<button id="edu-btn" onclick="openEducators()" style="position:fixed;top:16px;right:16px;z-index:99999;background:linear-gradient(135deg,#1A237E,#3949AB);color:white;border:none;border-radius:50px;padding:11px 22px;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer;box-shadow:0 4px 18px rgba(26,35,126,0.45);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🎓 Educators</button>
 
 <!-- LOGIN SCREEN -->
 <div id="login-screen" class="login-wrap">
@@ -406,20 +406,15 @@
     <div class="login-logo">Math<span>Quest</span> 🚀</div>
     <div class="login-subtitle">Your math adventure awaits!</div>
 
-    <div class="login-tabs">
-      <button class="login-tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
-      <button class="login-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
-    </div>
-
-    <!-- LOGIN FORM -->
+    <!-- LOGIN FORM ONLY -->
     <div id="form-login">
       <div class="login-field">
         <label>Username</label>
-        <input type="text" id="login-username" placeholder="Enter your username" autocomplete="off">
+        <input type="text" id="login-username" placeholder="Enter your username" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
       </div>
       <div class="login-field">
         <label>Password</label>
-        <input type="password" id="login-password" placeholder="Enter your password">
+        <input type="password" id="login-password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()">
       </div>
       <button class="login-btn" onclick="doLogin()">🚀 Let's Go!</button>
       <div class="login-err" id="login-err"></div>
@@ -428,47 +423,10 @@
         <div class="login-users-title">Or pick your profile:</div>
         <div id="saved-users-list"></div>
       </div>
-    </div>
 
-    <!-- SIGNUP FORM -->
-    <div id="form-signup" style="display:none">
-      <div class="login-field">
-        <label>Choose a Username</label>
-        <input type="text" id="signup-username" placeholder="e.g. MathWizard99" autocomplete="off" maxlength="16">
+      <div style="margin-top:20px;padding-top:16px;border-top:2px solid #F5F5F5;text-align:center;font-size:0.82rem;color:#B0BEC5;font-weight:600">
+        🎓 Accounts are created by your educator
       </div>
-      <div class="login-field">
-        <label>Create a Password</label>
-        <input type="password" id="signup-password" placeholder="Choose a password">
-      </div>
-      <div class="login-field">
-        <label>Your Grade</label>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px" id="signup-grade-btns">
-          <button type="button" class="grade-pick-btn active" data-g="1" onclick="pickGrade(this)">Grade 1</button>
-          <button type="button" class="grade-pick-btn" data-g="2" onclick="pickGrade(this)">Grade 2</button>
-          <button type="button" class="grade-pick-btn" data-g="3" onclick="pickGrade(this)">Grade 3</button>
-          <button type="button" class="grade-pick-btn" data-g="4" onclick="pickGrade(this)">Grade 4</button>
-          <button type="button" class="grade-pick-btn" data-g="5" onclick="pickGrade(this)">Grade 5</button>
-          <button type="button" class="grade-pick-btn" data-g="6" onclick="pickGrade(this)">Grade 6</button>
-          <button type="button" class="grade-pick-btn" data-g="7" onclick="pickGrade(this)">Grade 7</button>
-          <button type="button" class="grade-pick-btn" data-g="8" onclick="pickGrade(this)">Grade 8</button>
-          <button type="button" class="grade-pick-btn" data-g="9" onclick="pickGrade(this)">Grade 9</button>
-        </div>
-      </div>
-      <div class="login-field">
-        <label>Pick your avatar</label>
-        <div class="login-avatar-pick" id="avatar-pick">
-          <span class="av-opt picked" data-av="🐣" onclick="pickAv(this)">🐣</span>
-          <span class="av-opt" data-av="🐱" onclick="pickAv(this)">🐱</span>
-          <span class="av-opt" data-av="🐶" onclick="pickAv(this)">🐶</span>
-          <span class="av-opt" data-av="🦄" onclick="pickAv(this)">🦄</span>
-          <span class="av-opt" data-av="🐸" onclick="pickAv(this)">🐸</span>
-          <span class="av-opt" data-av="🦊" onclick="pickAv(this)">🦊</span>
-          <span class="av-opt" data-av="🐼" onclick="pickAv(this)">🐼</span>
-          <span class="av-opt" data-av="🐙" onclick="pickAv(this)">🐙</span>
-        </div>
-      </div>
-      <button class="login-btn" onclick="doSignup()">✨ Create Account!</button>
-      <div class="login-err" id="signup-err"></div>
     </div>
   </div>
 </div>
@@ -575,18 +533,56 @@
         <div style="font-family:'Fredoka One',cursive;font-size:1.5rem;color:#1A237E;margin-bottom:8px" id="edu-gate-title">Educator Access</div>
         <div style="font-size:0.92rem;color:#90A4AE;font-weight:600;margin-bottom:24px" id="edu-gate-sub">Loading...</div>
 
-        <!-- password input (used for both setup and login) -->
-        <input class="edu-pin-input" type="password" id="edu-pin-input"
-          style="letter-spacing:2px;font-size:1.2rem;width:220px"
-          placeholder="Enter password" onkeydown="if(event.key==='Enter')checkEduPassword()">
-        <br>
-        <!-- confirm field (only shown during first-time setup) -->
-        <input class="edu-pin-input" type="password" id="edu-pin-confirm"
-          style="letter-spacing:2px;font-size:1.2rem;width:220px;display:none;margin-top:8px"
-          placeholder="Confirm password" onkeydown="if(event.key==='Enter')checkEduPassword()">
-        <br>
-        <button class="edu-pin-btn" id="edu-gate-btn" onclick="checkEduPassword()">Unlock 🔓</button>
-        <div class="edu-pin-err" id="edu-pin-err"></div>
+        <!-- NORMAL LOGIN VIEW -->
+        <div id="edu-gate-login">
+          <input class="edu-pin-input" type="password" id="edu-pin-input"
+            style="letter-spacing:2px;font-size:1.2rem;width:220px"
+            placeholder="Enter password" onkeydown="if(event.key==='Enter')checkEduPassword()">
+          <br>
+          <input class="edu-pin-input" type="password" id="edu-pin-confirm"
+            style="letter-spacing:2px;font-size:1.2rem;width:220px;display:none;margin-top:8px"
+            placeholder="Confirm password" onkeydown="if(event.key==='Enter')checkEduPassword()">
+          <br>
+          <button class="edu-pin-btn" id="edu-gate-btn" onclick="checkEduPassword()">Unlock 🔓</button>
+          <div class="edu-pin-err" id="edu-pin-err"></div>
+          <div id="forgot-link-wrap" style="margin-top:14px;display:none">
+            <button onclick="showForgotView()" style="background:none;border:none;color:#90A4AE;font-size:0.85rem;font-weight:700;cursor:pointer;text-decoration:underline;">Forgot password?</button>
+          </div>
+        </div>
+
+        <!-- FORGOT PASSWORD VIEW -->
+        <div id="edu-gate-forgot" style="display:none">
+          <div style="font-size:0.9rem;color:#546E7A;font-weight:600;margin-bottom:16px;max-width:300px;margin-left:auto;margin-right:auto">
+            Enter your recovery key to reset your password.<br>
+            <span style="font-size:0.8rem;color:#B0BEC5">(Shown when you first created your password)</span>
+          </div>
+          <input class="edu-pin-input" type="text" id="edu-recovery-input"
+            style="letter-spacing:3px;font-size:1rem;width:260px;text-transform:uppercase"
+            placeholder="XXXX-XXXX-XXXX">
+          <br>
+          <input class="edu-pin-input" type="password" id="edu-new-pass-input"
+            style="letter-spacing:2px;font-size:1.2rem;width:220px;margin-top:8px"
+            placeholder="New password">
+          <br>
+          <input class="edu-pin-input" type="password" id="edu-new-pass-confirm"
+            style="letter-spacing:2px;font-size:1.2rem;width:220px;margin-top:8px"
+            placeholder="Confirm new password">
+          <br>
+          <button class="edu-pin-btn" onclick="doRecoverPassword()" style="margin-top:4px">Reset Password 🔑</button>
+          <div class="edu-pin-err" id="edu-recovery-err"></div>
+          <button onclick="showLoginView()" style="background:none;border:none;color:#90A4AE;font-size:0.85rem;font-weight:700;cursor:pointer;text-decoration:underline;margin-top:10px;display:block;margin-left:auto;margin-right:auto;">← Back to login</button>
+        </div>
+
+        <!-- RECOVERY KEY DISPLAY (shown after first-time setup) -->
+        <div id="edu-gate-recovery-show" style="display:none">
+          <div style="background:#E8F5E9;border:2px solid #A5D6A7;border-radius:16px;padding:20px;max-width:320px;margin:0 auto 16px">
+            <div style="font-family:'Fredoka One',cursive;color:#2E7D32;font-size:1.1rem;margin-bottom:8px">✅ Password Created!</div>
+            <div style="font-size:0.88rem;color:#388E3C;font-weight:600;margin-bottom:12px">Save this recovery key somewhere safe. It's the <strong>only way</strong> to reset your password if you forget it.</div>
+            <div id="recovery-key-display" style="font-family:monospace;font-size:1.3rem;background:white;border-radius:10px;padding:12px;color:#1A237E;font-weight:800;letter-spacing:4px;border:2px dashed #A5D6A7"></div>
+          </div>
+          <button class="edu-pin-btn" onclick="afterRecoveryKeySaved()">I've saved it — Continue 🚀</button>
+        </div>
+
       </div>
 
       <!-- DASHBOARD (unlocked) -->
@@ -595,10 +591,52 @@
         <div class="edu-section-title">📊 Class Overview</div>
         <div class="edu-summary-grid" id="edu-summary"></div>
 
-        <div class="edu-section-title">👩‍🎓 Students</div>
+        <div class="edu-section-title" style="margin-top:8px">👩‍🎓 Your Students
+          <button onclick="toggleAddStudent()" style="margin-left:auto;background:linear-gradient(135deg,#FF7043,#FF5722);color:white;border:none;border-radius:12px;padding:8px 16px;font-family:'Fredoka One',cursive;font-size:0.95rem;cursor:pointer;">+ Add Student</button>
+        </div>
+
+        <!-- ADD STUDENT FORM -->
+        <div id="add-student-form" style="display:none;background:#F8F9FF;border-radius:16px;padding:20px;margin-bottom:20px;border:2px solid #E8EAF6;">
+          <div style="font-family:'Fredoka One',cursive;font-size:1.05rem;color:#1A237E;margin-bottom:14px">➕ New Student</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+            <div class="edu-pin-field" style="min-width:140px">
+              <label>Username</label>
+              <input type="text" id="new-student-name" placeholder="e.g. alex123" maxlength="16">
+            </div>
+            <div class="edu-pin-field" style="min-width:140px">
+              <label>Password</label>
+              <input type="password" id="new-student-pass" placeholder="Min 4 chars">
+            </div>
+            <div class="edu-pin-field" style="min-width:120px">
+              <label>Grade</label>
+              <select id="new-student-grade" style="width:100%;padding:10px 14px;border-radius:12px;border:2px solid #E0E0E0;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.95rem;outline:none;">
+                <option value="1">Grade 1</option><option value="2">Grade 2</option>
+                <option value="3">Grade 3</option><option value="4">Grade 4</option>
+                <option value="5">Grade 5</option><option value="6">Grade 6</option>
+                <option value="7">Grade 7</option><option value="8">Grade 8</option>
+                <option value="9">Grade 9</option>
+              </select>
+            </div>
+            <div class="edu-pin-field" style="min-width:100px">
+              <label>Avatar</label>
+              <select id="new-student-avatar" style="width:100%;padding:10px 14px;border-radius:12px;border:2px solid #E0E0E0;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.95rem;outline:none;">
+                <option>🐣</option><option>🐱</option><option>🐶</option>
+                <option>🦄</option><option>🐸</option><option>🦊</option>
+                <option>🐼</option><option>🐙</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <button onclick="addStudent()" class="edu-save-pin-btn" style="background:linear-gradient(135deg,#43A047,#2E7D32);">✅ Create Account</button>
+            <button onclick="toggleAddStudent()" style="background:none;border:2px solid #CFD8DC;border-radius:10px;padding:9px 16px;cursor:pointer;font-weight:700;color:#90A4AE;">Cancel</button>
+            <span id="add-student-msg" style="font-size:0.85rem;font-weight:700"></span>
+          </div>
+        </div>
+
+        <!-- STUDENT TABLE -->
         <div style="overflow-x:auto;margin-bottom:28px">
           <table class="edu-table">
-            <thead><tr><th></th><th>Name</th><th>Grade</th><th>Level</th><th>⭐ Stars</th><th>🎮 Games</th><th>🔥 Streak</th></tr></thead>
+            <thead><tr><th></th><th>Name</th><th>Grade</th><th>Level</th><th>⭐ Stars</th><th>🎮 Games</th><th>🔥 Streak</th><th>Actions</th></tr></thead>
             <tbody id="edu-student-table"></tbody>
           </table>
         </div>
@@ -652,40 +690,24 @@ let currentUser = null;
 let selectedAvatar = '🐣';
 let selectedGrade = 1;
 
-async function apiGet(path){ 
+async function apiGet(path){
   try{ const r=await fetch(API+path); return await r.json(); }
   catch(e){ return null; }
 }
-async function apiPost(path, data){ 
+async function apiPost(path, data){
   try{ const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}); return await r.json(); }
+  catch(e){ return null; }
+}
+async function apiDelete(path){
+  try{ const r=await fetch(API+path,{method:'DELETE'}); return await r.json(); }
   catch(e){ return null; }
 }
 
 function showLoginMsg(id, msg, isErr=true){
   const el=document.getElementById(id);
+  if(!el) return;
   el.style.color=isErr?'#E53935':'#43A047';
   el.textContent=msg;
-}
-
-function switchTab(tab){
-  document.getElementById('tab-login').classList.toggle('active', tab==='login');
-  document.getElementById('tab-signup').classList.toggle('active', tab==='signup');
-  document.getElementById('form-login').style.display = tab==='login'?'':'none';
-  document.getElementById('form-signup').style.display = tab==='signup'?'':'none';
-  document.getElementById('login-err').textContent='';
-  document.getElementById('signup-err').textContent='';
-}
-
-function pickAv(el){
-  document.querySelectorAll('.av-opt').forEach(a=>a.classList.remove('picked'));
-  el.classList.add('picked');
-  selectedAvatar = el.dataset.av;
-}
-
-function pickGrade(el){
-  document.querySelectorAll('.grade-pick-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  selectedGrade = parseInt(el.dataset.g);
 }
 
 async function renderSavedUsers(){
@@ -694,7 +716,6 @@ async function renderSavedUsers(){
   const wrap = document.getElementById('saved-users-wrap');
   if(!res || !res.users || res.users.length===0){ wrap.style.display='none'; return; }
   wrap.style.display='';
-  // fetch basic info for each user to show avatar/grade
   const pills = await Promise.all(res.users.map(async n => {
     const u = await apiGet('/user/'+encodeURIComponent(n));
     const av = u?.avatar||'🐣';
@@ -705,13 +726,9 @@ async function renderSavedUsers(){
 }
 
 async function quickLogin(username){
-  showLoginMsg('login-err','Loading... ⏳', false);
-  const u = await apiGet('/user/'+encodeURIComponent(username));
-  if(!u){ showLoginMsg('login-err','Could not connect. Check internet!'); return; }
-  // quickLogin has no password — prompt for it
   document.getElementById('login-username').value = username;
-  document.getElementById('login-err').textContent = '';
   document.getElementById('login-password').focus();
+  document.getElementById('login-err').textContent = '';
 }
 
 async function doLogin(){
@@ -720,26 +737,8 @@ async function doLogin(){
   if(!u||!p){ showLoginMsg('login-err','Please fill in both fields!'); return; }
   showLoginMsg('login-err','Checking... ⏳', false);
   const userData = await apiGet('/user/'+encodeURIComponent(u));
-  if(!userData || userData.error){ showLoginMsg('login-err','Username not found. Try signing up!'); return; }
+  if(!userData || userData.error){ showLoginMsg('login-err','Username not found. Ask your educator!'); return; }
   if(userData.password !== btoa(p)){ showLoginMsg('login-err','Wrong password. Try again!'); return; }
-  currentUser = {username:u, ...userData};
-  enterApp();
-}
-
-async function doSignup(){
-  const u = document.getElementById('signup-username').value.trim();
-  const p = document.getElementById('signup-password').value;
-  const err = 'signup-err';
-  if(!u||!p){ showLoginMsg(err,'Please fill in both fields!'); return; }
-  if(u.length<2){ showLoginMsg(err,'Username must be at least 2 characters!'); return; }
-  if(p.length<4){ showLoginMsg(err,'Password must be at least 4 characters!'); return; }
-  if(!/^[a-zA-Z0-9_]+$/.test(u)){ showLoginMsg(err,'Only letters, numbers, and _ allowed!'); return; }
-  showLoginMsg(err,'Checking username... ⏳', false);
-  const existing = await apiGet('/user/'+encodeURIComponent(u));
-  if(existing && !existing.error){ showLoginMsg(err,'That username is taken. Try another!'); return; }
-  showLoginMsg(err,'Creating account... ⏳', false);
-  const userData = { password: btoa(p), avatar: selectedAvatar, grade: selectedGrade };
-  await apiPost('/user/'+encodeURIComponent(u), userData);
   currentUser = {username:u, ...userData};
   enterApp();
 }
@@ -773,7 +772,6 @@ function doLogout(){
   document.getElementById('login-password').value='';
   document.getElementById('login-err').textContent='';
   renderSavedUsers();
-  switchTab('login');
 }
 
 // ===================== PERSISTENCE =====================
@@ -1491,6 +1489,28 @@ async function confirmReset(){
 // ===================== EDUCATORS =====================
 let eduIsFirstTime = false;
 
+function genRecoveryKey(){
+  const seg = () => Math.random().toString(36).substring(2,6).toUpperCase();
+  return `${seg()}-${seg()}-${seg()}`;
+}
+
+function showLoginView(){
+  document.getElementById('edu-gate-login').style.display='';
+  document.getElementById('edu-gate-forgot').style.display='none';
+  document.getElementById('edu-gate-recovery-show').style.display='none';
+  document.getElementById('edu-pin-input').value='';
+  document.getElementById('edu-pin-err').textContent='';
+}
+
+function showForgotView(){
+  document.getElementById('edu-gate-login').style.display='none';
+  document.getElementById('edu-gate-forgot').style.display='';
+  document.getElementById('edu-recovery-input').value='';
+  document.getElementById('edu-new-pass-input').value='';
+  document.getElementById('edu-new-pass-confirm').value='';
+  document.getElementById('edu-recovery-err').textContent='';
+}
+
 async function openEducators(){
   clearInterval(timerInterval);
   document.getElementById('login-screen').style.display='none';
@@ -1499,45 +1519,31 @@ async function openEducators(){
   document.getElementById('mascot').style.display='none';
   document.getElementById('edu-pin-wrap').style.display='';
   document.getElementById('edu-body').style.display='none';
-  document.getElementById('edu-pin-input').value='';
-  document.getElementById('edu-pin-confirm').value='';
+  showLoginView();
+  document.getElementById('forgot-link-wrap').style.display='none';
   document.getElementById('edu-pin-confirm').style.display='none';
-  document.getElementById('edu-pin-err').textContent='';
   document.getElementById('edu-gate-sub').textContent='Checking... ⏳';
   document.getElementById('edu-gate-btn').textContent='Unlock 🔓';
   showScreen('screen-educators');
 
-  // Check if a password exists in the cloud
   const res = await apiGet('/edupass');
   if(!res){
     document.getElementById('edu-gate-sub').textContent='Could not connect to server 😢';
     return;
   }
   if(!res.exists){
-    // First time — ask to create a password
     eduIsFirstTime = true;
     document.getElementById('edu-gate-title').textContent='Create Educator Password';
-    document.getElementById('edu-gate-sub').textContent='No password set yet. Create one to protect the dashboard.';
+    document.getElementById('edu-gate-sub').textContent='First time? Create a password to protect the dashboard.';
     document.getElementById('edu-pin-confirm').style.display='';
     document.getElementById('edu-gate-btn').textContent='Create Password ✅';
+    document.getElementById('forgot-link-wrap').style.display='none';
   } else {
     eduIsFirstTime = false;
     document.getElementById('edu-gate-title').textContent='Educator Access';
     document.getElementById('edu-gate-sub').textContent='Enter your educator password to continue.';
     document.getElementById('edu-gate-btn').textContent='Unlock 🔓';
-  }
-}
-
-function closeEducators(){
-  if(currentUser){
-    document.querySelector('header').style.display='';
-    document.getElementById('mascot').style.display='';
-    showScreen('screen-home');
-    updatePlayerUI();
-  } else {
-    document.querySelector('.container').style.display='none';
-    document.getElementById('login-screen').style.display='flex';
-    document.getElementById('edu-btn').style.display='';
+    document.getElementById('forgot-link-wrap').style.display='';
   }
 }
 
@@ -1546,16 +1552,17 @@ async function checkEduPassword(){
   const confirm = document.getElementById('edu-pin-confirm').value.trim();
   const err = document.getElementById('edu-pin-err');
   err.textContent='';
-
   if(!pass){ err.textContent='Please enter a password!'; return; }
-
   if(eduIsFirstTime){
-    if(pass.length < 4){ err.textContent='Password must be at least 4 characters!'; return; }
-    if(pass !== confirm){ err.textContent="Passwords don't match!"; return; }
+    if(pass.length < 4){ err.style.color='#E53935'; err.textContent='Password must be at least 4 characters!'; return; }
+    if(pass !== confirm){ err.style.color='#E53935'; err.textContent="Passwords don't match!"; return; }
     err.style.color='#43A047'; err.textContent='Creating password... ⏳';
-    const res = await apiPost('/edupass', { password: btoa(pass) });
+    const key = genRecoveryKey();
+    const res = await apiPost('/edupass', { password: btoa(pass), recoveryKey: btoa(key) });
     if(!res || !res.ok){ err.style.color='#E53935'; err.textContent='Failed to save. Try again!'; return; }
-    unlockEduDashboard();
+    document.getElementById('edu-gate-login').style.display='none';
+    document.getElementById('recovery-key-display').textContent = key;
+    document.getElementById('edu-gate-recovery-show').style.display='';
   } else {
     err.style.color='#90A4AE'; err.textContent='Checking... ⏳';
     const res = await apiGet('/edupass');
@@ -1565,6 +1572,34 @@ async function checkEduPassword(){
   }
 }
 
+function afterRecoveryKeySaved(){
+  document.getElementById('edu-gate-recovery-show').style.display='none';
+  unlockEduDashboard();
+}
+
+async function doRecoverPassword(){
+  const key = document.getElementById('edu-recovery-input').value.trim().toUpperCase();
+  const newPass = document.getElementById('edu-new-pass-input').value;
+  const confirm = document.getElementById('edu-new-pass-confirm').value;
+  const err = document.getElementById('edu-recovery-err');
+  err.textContent='';
+  if(!key||!newPass||!confirm){ err.style.color='#E53935'; err.textContent='Please fill in all fields!'; return; }
+  if(newPass.length < 4){ err.style.color='#E53935'; err.textContent='Password must be at least 4 characters!'; return; }
+  if(newPass !== confirm){ err.style.color='#E53935'; err.textContent="Passwords don't match!"; return; }
+  err.style.color='#90A4AE'; err.textContent='Checking recovery key... ⏳';
+  const res = await apiGet('/edupass');
+  if(!res || !res.exists){ err.style.color='#E53935'; err.textContent='Could not connect!'; return; }
+  if(res.recoveryKey !== btoa(key)){ err.style.color='#E53935'; err.textContent='❌ Wrong recovery key!'; return; }
+  const newKey = genRecoveryKey();
+  const saveRes = await apiPost('/edupass', { password: btoa(newPass), recoveryKey: btoa(newKey) });
+  if(!saveRes || !saveRes.ok){ err.style.color='#E53935'; err.textContent='Failed to save. Try again!'; return; }
+  document.getElementById('edu-gate-forgot').style.display='none';
+  document.getElementById('edu-gate-title').textContent='Password Reset!';
+  document.getElementById('edu-gate-sub').textContent='Save your new recovery key:';
+  document.getElementById('recovery-key-display').textContent = newKey;
+  document.getElementById('edu-gate-recovery-show').style.display='';
+}
+
 function unlockEduDashboard(){
   document.getElementById('edu-pin-wrap').style.display='none';
   document.getElementById('edu-body').style.display='block';
@@ -1572,48 +1607,45 @@ function unlockEduDashboard(){
 }
 
 async function renderEduDashboard(){
-  document.getElementById('edu-student-table').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:#90A4AE;font-weight:700">Loading students... ⏳</td></tr>';
-  document.getElementById('edu-summary').innerHTML = '';
+  document.getElementById('edu-student-table').innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:#90A4AE;font-weight:700">Loading students... ⏳</td></tr>';
+  document.getElementById('edu-summary').innerHTML='';
 
-  const res = await apiGet('/users');
-  if(!res || !res.users){ 
-    document.getElementById('edu-student-table').innerHTML='<tr><td colspan="7" class="edu-no-students">Could not connect to server 😢</td></tr>';
+  // Fetch only educator-created students (prefix edu_student:)
+  const res = await apiGet('/students');
+  if(!res || !res.students){
+    document.getElementById('edu-student-table').innerHTML='<tr><td colspan="8" class="edu-no-students">Could not connect to server 😢</td></tr>';
     return;
   }
 
-  const students = await Promise.all(res.users.map(async n => {
+  const students = await Promise.all(res.students.map(async n => {
     const u = await apiGet('/user/'+encodeURIComponent(n));
     const d = await apiGet('/progress/'+encodeURIComponent(n));
     return {
-      name: n,
-      avatar: u?.avatar||'🐣',
-      grade: u?.grade||1,
-      level: d?.playerLevel||1,
-      stars: d?.totalStars||0,
-      games: d?.gamesPlayed||0,
-      streak: d?.streak||0,
+      name:n, avatar:u?.avatar||'🐣', grade:u?.grade||1,
+      level:d?.playerLevel||1, stars:d?.totalStars||0,
+      games:d?.gamesPlayed||0, streak:d?.streak||0,
     };
   }));
   students.sort((a,b)=>b.stars-a.stars);
 
-  const total = students.length;
-  const avgLevel = total ? (students.reduce((s,x)=>s+x.level,0)/total).toFixed(1) : 0;
-  const totalGames = students.reduce((s,x)=>s+x.games,0);
-  const totalStarsAll = students.reduce((s,x)=>s+x.stars,0);
+  const total=students.length;
+  const avgLevel=total?(students.reduce((s,x)=>s+x.level,0)/total).toFixed(1):0;
+  const totalGames=students.reduce((s,x)=>s+x.games,0);
+  const totalStarsAll=students.reduce((s,x)=>s+x.stars,0);
 
-  document.getElementById('edu-summary').innerHTML = `
+  document.getElementById('edu-summary').innerHTML=`
     <div class="edu-stat"><div class="edu-stat-num">${total}</div><div class="edu-stat-label">Students</div></div>
     <div class="edu-stat"><div class="edu-stat-num">${avgLevel}</div><div class="edu-stat-label">Avg Level</div></div>
     <div class="edu-stat"><div class="edu-stat-num">${totalGames}</div><div class="edu-stat-label">Total Games</div></div>
     <div class="edu-stat"><div class="edu-stat-num">${totalStarsAll}</div><div class="edu-stat-label">Total Stars</div></div>
   `;
 
-  const tbody = document.getElementById('edu-student-table');
+  const tbody=document.getElementById('edu-student-table');
   if(!students.length){
-    tbody.innerHTML = `<tr><td colspan="7" class="edu-no-students">No students signed up yet! 🎒</td></tr>`;
+    tbody.innerHTML='<tr><td colspan="8" class="edu-no-students">No students yet! Click "+ Add Student" to create accounts. 🎒</td></tr>';
     return;
   }
-  tbody.innerHTML = students.map((s,i) => `
+  tbody.innerHTML=students.map((s,i)=>`
     <tr>
       <td style="font-size:1.4rem">${s.avatar}</td>
       <td><strong>${s.name}</strong>${i===0?` <span style="font-size:0.75rem;background:#FFD54F;color:#BF360C;border-radius:50px;padding:2px 8px;margin-left:6px">🏆 Top</span>`:''}</td>
@@ -1622,7 +1654,50 @@ async function renderEduDashboard(){
       <td>⭐ ${s.stars}</td>
       <td>${s.games}</td>
       <td>🔥 ${s.streak}</td>
+      <td><button onclick="deleteStudent('${s.name}')" style="background:#FFEBEE;border:2px solid #EF9A9A;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:0.8rem;font-weight:800;color:#E53935;">🗑 Remove</button></td>
     </tr>`).join('');
+}
+
+function toggleAddStudent(){
+  const form = document.getElementById('add-student-form');
+  form.style.display = form.style.display==='none' ? '' : 'none';
+  document.getElementById('add-student-msg').textContent='';
+  document.getElementById('new-student-name').value='';
+  document.getElementById('new-student-pass').value='';
+}
+
+async function addStudent(){
+  const name = document.getElementById('new-student-name').value.trim();
+  const pass = document.getElementById('new-student-pass').value;
+  const grade = parseInt(document.getElementById('new-student-grade').value);
+  const avatar = document.getElementById('new-student-avatar').value;
+  const msg = document.getElementById('add-student-msg');
+
+  if(!name||!pass){ msg.style.color='#E53935'; msg.textContent='Fill in name and password!'; return; }
+  if(name.length<2){ msg.style.color='#E53935'; msg.textContent='Name too short!'; return; }
+  if(pass.length<4){ msg.style.color='#E53935'; msg.textContent='Password needs 4+ characters!'; return; }
+  if(!/^[a-zA-Z0-9_]+$/.test(name)){ msg.style.color='#E53935'; msg.textContent='Only letters, numbers, _ allowed!'; return; }
+
+  msg.style.color='#90A4AE'; msg.textContent='Creating... ⏳';
+  const existing = await apiGet('/user/'+encodeURIComponent(name));
+  if(existing && !existing.error){ msg.style.color='#E53935'; msg.textContent='That username is already taken!'; return; }
+
+  // Save user account
+  await apiPost('/user/'+encodeURIComponent(name), { password:btoa(pass), avatar, grade, createdByEducator:true });
+  // Register in educator's student list
+  await apiPost('/students/'+encodeURIComponent(name), {});
+
+  msg.style.color='#43A047'; msg.textContent=`✅ ${name} created!`;
+  document.getElementById('new-student-name').value='';
+  document.getElementById('new-student-pass').value='';
+  setTimeout(()=>{ msg.textContent=''; renderEduDashboard(); },1200);
+}
+
+async function deleteStudent(name){
+  if(!confirm(`Remove ${name}? This will delete their account and all progress permanently!`)) return;
+  await apiDelete('/user/'+encodeURIComponent(name));
+  await apiDelete('/students/'+encodeURIComponent(name));
+  renderEduDashboard();
 }
 
 async function saveNewPin(){
