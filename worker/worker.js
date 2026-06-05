@@ -64,51 +64,61 @@ export default {
       return json({ ok: true });
     }
 
-    // ── EDUCATOR STUDENT LIST ──
-    // GET /students — list educator-created students
-    if (method === 'GET' && path === '/students') {
-      const data = await env.MATHQUEST_DB.get('edu_students');
+    // ── EDUCATOR PROFILE AUTHENTICATION ──
+    if (method === 'GET' && path.startsWith('/educator/')) {
+      const edu = decodeURIComponent(path.slice(10));
+      const data = await env.MATHQUEST_DB.get('educator:' + edu);
+      if (!data) return json({ error: 'not_found' }, 404);
+      return json(JSON.parse(data));
+    }
+    if (method === 'POST' && path.startsWith('/educator/')) {
+      const edu = decodeURIComponent(path.slice(10));
+      const body = await request.json();
+      await env.MATHQUEST_DB.put('educator:' + edu, JSON.stringify(body));
+      return json({ ok: true });
+    }
+
+    // ── EDUCATOR STUDENT LISTS ──
+    // Matches: GET /edu-students/:educator_username
+    if (method === 'GET' && path.startsWith('/edu-students/')) {
+      const edu = decodeURIComponent(path.slice(14));
+      const data = await env.MATHQUEST_DB.get('edu_students:' + edu);
       return json(data ? JSON.parse(data) : { students: [] });
     }
-    // POST /students/:username — add a student to the list
-    if (method === 'POST' && path.startsWith('/students/')) {
-      const u = decodeURIComponent(path.slice(10));
-      const raw = await env.MATHQUEST_DB.get('edu_students');
+
+    // Matches: POST /edu-students/:educator_username/:student_username
+    if (method === 'POST' && path.startsWith('/edu-students/')) {
+      const parts = path.split('/'); 
+      const edu = decodeURIComponent(parts[2]);
+      const student = decodeURIComponent(parts[3]);
+
+      if (!edu || !student) return json({ error: 'bad_request' }, 400);
+
+      const raw = await env.MATHQUEST_DB.get('edu_students:' + edu);
       const list = raw ? JSON.parse(raw) : { students: [] };
-      if (!list.students.includes(u)) list.students.push(u);
-      await env.MATHQUEST_DB.put('edu_students', JSON.stringify(list));
-      return json({ ok: true });
-    }
-    // DELETE /students/:username — remove a student from the list
-    if (method === 'DELETE' && path.startsWith('/students/')) {
-      const u = decodeURIComponent(path.slice(10));
-      const raw = await env.MATHQUEST_DB.get('edu_students');
-      const list = raw ? JSON.parse(raw) : { students: [] };
-      list.students = list.students.filter(s => s !== u);
-      await env.MATHQUEST_DB.put('edu_students', JSON.stringify(list));
+      if (!list.students.includes(student)) list.students.push(student);
+      
+      await env.MATHQUEST_DB.put('edu_students:' + edu, JSON.stringify(list));
       return json({ ok: true });
     }
 
-    // ── EDUCATOR PASSWORD ──
-    if (method === 'GET' && path === '/edupass') {
-      const data = await env.MATHQUEST_DB.get('edupass');
-      if (!data) return json({ exists: false });
-      const parsed = JSON.parse(data);
-      return json({ exists: true, password: parsed.password, recoveryKey: parsed.recoveryKey });
-    }
-    if (method === 'POST' && path === '/edupass') {
-      const body = await request.json();
-      // Preserve existing recoveryKey if not provided
-      const existing = await env.MATHQUEST_DB.get('edupass');
-      const prev = existing ? JSON.parse(existing) : {};
-      const updated = {
-        password: body.password || prev.password,
-        recoveryKey: body.recoveryKey || prev.recoveryKey,
-      };
-      await env.MATHQUEST_DB.put('edupass', JSON.stringify(updated));
+    // Matches: DELETE /edu-students/:educator_username/:student_username
+    if (method === 'DELETE' && path.startsWith('/edu-students/')) {
+      const parts = path.split('/');
+      const edu = decodeURIComponent(parts[2]);
+      const student = decodeURIComponent(parts[3]);
+
+      if (!edu || !student) return json({ error: 'bad_request' }, 400);
+
+      const raw = await env.MATHQUEST_DB.get('edu_students:' + edu);
+      const list = raw ? JSON.parse(raw) : { students: [] };
+      list.students = list.students.filter(s => s !== student);
+      
+      await env.MATHQUEST_DB.put('edu_students:' + edu, JSON.stringify(list));
       return json({ ok: true });
     }
 
+    // Fallback 404 handler for unmatched routes
     return json({ error: 'not_found' }, 404);
   }
 };
