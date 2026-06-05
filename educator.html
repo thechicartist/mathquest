@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MathQuest — Educator</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:'Nunito',sans-serif;
+    background:linear-gradient(180deg,#1A237E 0%,#283593 50%,#1565C0 100%);
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    padding:24px;
+  }
+
+  /* AUTH CARD */
+  .auth-card {
+    background:white; border-radius:28px; padding:40px 36px;
+    width:100%; max-width:440px;
+    box-shadow:0 24px 60px rgba(0,0,0,0.3);
+    border:4px solid #E8EAF6; text-align:center;
+  }
+  .auth-logo { font-family:'Fredoka One',cursive; font-size:2rem; color:#1A237E; margin-bottom:4px; }
+  .auth-logo span { color:#FF7043; }
+  .auth-sub { font-size:0.92rem; color:#90A4AE; font-weight:600; margin-bottom:28px; }
+  .auth-tabs { display:flex; background:#F5F5F5; border-radius:14px; padding:4px; margin-bottom:24px; }
+  .auth-tab { flex:1; padding:10px; border:none; border-radius:10px; background:none; font-family:'Nunito',sans-serif; font-weight:800; font-size:1rem; cursor:pointer; color:#90A4AE; transition:all 0.2s; }
+  .auth-tab.active { background:white; color:#1A237E; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+  .field { margin-bottom:14px; text-align:left; }
+  .field label { display:block; font-weight:800; font-size:0.85rem; color:#546E7A; margin-bottom:6px; }
+  .field input { width:100%; padding:13px 16px; border-radius:14px; border:3px solid #E0E0E0; font-family:'Nunito',sans-serif; font-size:1rem; font-weight:700; color:#1A237E; outline:none; transition:border-color 0.2s; }
+  .field input:focus { border-color:#3F51B5; }
+  .auth-btn { width:100%; padding:15px; border:none; border-radius:16px; background:linear-gradient(135deg,#1A237E,#3949AB); color:white; font-family:'Fredoka One',cursive; font-size:1.3rem; cursor:pointer; box-shadow:0 6px 20px rgba(26,35,126,0.4); transition:all 0.2s; margin-top:4px; }
+  .auth-btn:hover { transform:translateY(-3px); box-shadow:0 10px 30px rgba(26,35,126,0.5); }
+  .auth-err { font-weight:700; font-size:0.88rem; margin-top:10px; min-height:20px; }
+
+  /* DASHBOARD PAGE */
+  .dash-page { display:none; background:linear-gradient(180deg,#B3E5FC 0%,#E1F5FE 40%,#F1F8E9 100%); min-height:100vh; padding:0; }
+  .dash-header { background:linear-gradient(135deg,#1A237E,#3949AB); padding:18px 30px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 20px rgba(26,35,126,0.4); }
+  .dash-logo { font-family:'Fredoka One',cursive; font-size:1.6rem; color:white; }
+  .dash-logo span { color:#FFD54F; }
+  .dash-user-info { display:flex; align-items:center; gap:12px; }
+  .dash-username { color:white; font-weight:800; font-size:0.95rem; }
+  .logout-btn { background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.35); border-radius:50px; padding:7px 16px; color:white; font-weight:800; font-size:0.85rem; cursor:pointer; font-family:'Nunito',sans-serif; transition:all 0.2s; }
+  .logout-btn:hover { background:rgba(255,255,255,0.35); }
+  .back-to-login { background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.3); border-radius:50px; padding:7px 16px; color:white; font-weight:800; font-size:0.85rem; cursor:pointer; font-family:'Nunito',sans-serif; }
+  .back-to-login:hover { background:rgba(255,255,255,0.25); }
+
+  .dash-container { max-width:900px; margin:0 auto; padding:28px 20px; }
+  .card { background:white; border-radius:24px; padding:28px; margin-bottom:20px; box-shadow:0 8px 30px rgba(0,0,0,0.1); border:2px solid #E8EAF6; }
+
+  .section-title { font-family:'Fredoka One',cursive; font-size:1.2rem; color:#1A237E; margin-bottom:16px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-bottom:4px; }
+  .stat-box { background:#F5F5F5; border-radius:16px; padding:16px; text-align:center; border:2px solid #E8EAF6; }
+  .stat-num { font-family:'Fredoka One',cursive; font-size:2rem; color:#3F51B5; }
+  .stat-label { font-size:0.8rem; color:#78909C; font-weight:700; margin-top:2px; }
+
+  .table-wrap { overflow-x:auto; margin-bottom:8px; }
+  table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+  th { background:#E8EAF6; color:#3949AB; font-weight:800; padding:10px 14px; text-align:left; }
+  th:first-child { border-radius:12px 0 0 12px; }
+  th:last-child  { border-radius:0 12px 12px 0; }
+  td { padding:11px 14px; border-bottom:2px solid #F5F5F5; font-weight:700; color:#37474F; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:#FAFAFA; }
+  .grade-pill { display:inline-block; background:#E8EAF6; color:#3949AB; border-radius:50px; padding:3px 10px; font-size:0.8rem; font-weight:800; }
+  .no-data { text-align:center; color:#90A4AE; font-weight:700; padding:32px; }
+  .del-btn { background:#FFEBEE; border:2px solid #EF9A9A; border-radius:8px; padding:5px 10px; cursor:pointer; font-size:0.8rem; font-weight:800; color:#E53935; }
+  .del-btn:hover { background:#E53935; color:white; }
+
+  .add-student-btn { background:linear-gradient(135deg,#FF7043,#FF5722); color:white; border:none; border-radius:12px; padding:8px 16px; font-family:'Fredoka One',cursive; font-size:0.95rem; cursor:pointer; margin-left:auto; }
+  .add-form { background:#F8F9FF; border-radius:16px; padding:20px; border:2px solid #E8EAF6; margin-bottom:20px; display:none; }
+  .add-form-title { font-family:'Fredoka One',cursive; font-size:1.05rem; color:#1A237E; margin-bottom:14px; }
+  .field-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+  .f { flex:1; min-width:130px; }
+  .f label { display:block; font-size:0.82rem; font-weight:800; color:#546E7A; margin-bottom:5px; }
+  .f input, .f select { width:100%; padding:10px 14px; border-radius:12px; border:2px solid #E0E0E0; font-family:'Nunito',sans-serif; font-weight:700; font-size:0.95rem; outline:none; }
+  .f input:focus, .f select:focus { border-color:#3F51B5; }
+  .form-btns { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .btn-green { background:linear-gradient(135deg,#43A047,#2E7D32); color:white; border:none; border-radius:12px; padding:11px 20px; font-family:'Fredoka One',cursive; font-size:0.95rem; cursor:pointer; }
+  .btn-cancel { background:none; border:2px solid #CFD8DC; border-radius:10px; padding:9px 16px; cursor:pointer; font-weight:700; color:#90A4AE; }
+  .form-msg { font-size:0.85rem; font-weight:700; }
+
+  .pass-row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:8px; }
+  .pf { flex:1; min-width:140px; }
+  .pf label { display:block; font-size:0.82rem; font-weight:800; color:#546E7A; margin-bottom:5px; }
+  .pf input { width:100%; padding:10px 14px; border-radius:12px; border:2px solid #E0E0E0; font-family:'Nunito',sans-serif; font-weight:700; font-size:0.95rem; outline:none; }
+  .pf input:focus { border-color:#3F51B5; }
+  .btn-save { background:#43A047; color:white; border:none; border-radius:12px; padding:11px 18px; font-family:'Fredoka One',cursive; font-size:0.95rem; cursor:pointer; white-space:nowrap; }
+  .msg { font-size:0.85rem; font-weight:700; min-height:20px; margin-top:8px; }
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div class="auth-card" id="auth-card">
+  <div class="auth-logo">🎓 Educator<span>Hub</span></div>
+  <div class="auth-sub">Manage your class on MathQuest</div>
+
+  <div class="auth-tabs">
+    <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
+    <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+  </div>
+
+  <!-- LOGIN FORM -->
+  <div id="form-login">
+    <div class="field"><label>Username</label><input type="text" id="login-user" placeholder="Your username" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="field"><label>Password</label><input type="password" id="login-pass" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="auth-btn" onclick="doLogin()">🔓 Log In</button>
+    <div class="auth-err" id="login-err"></div>
+  </div>
+
+  <!-- SIGNUP FORM -->
+  <div id="form-signup" style="display:none">
+    <div class="field"><label>Full Name / School Name</label><input type="text" id="signup-name" placeholder="e.g. Ms. Johnson" autocomplete="off"></div>
+    <div class="field"><label>Email</label><input type="email" id="signup-email" placeholder="your@email.com" autocomplete="off"></div>
+    <div class="field"><label>Username</label><input type="text" id="signup-user" placeholder="Choose a username" autocomplete="off" maxlength="20"></div>
+    <div class="field"><label>Password</label><input type="password" id="signup-pass" placeholder="Min 6 characters"></div>
+    <button class="auth-btn" onclick="doSignup()">✨ Create Account</button>
+    <div class="auth-err" id="signup-err"></div>
+  </div>
+
+  <div style="margin-top:16px;padding-top:14px;border-top:2px solid #F5F5F5">
+    <button onclick="location.href='index.html'" style="background:none;border:none;color:#90A4AE;font-size:0.85rem;font-weight:700;cursor:pointer;">← Back to Student Login</button>
+  </div>
+</div>
+
+<!-- DASHBOARD PAGE -->
+<div class="dash-page" id="dash-page">
+  <div class="dash-header">
+    <div class="dash-logo">Math<span>Quest</span> 🎓</div>
+    <div class="dash-user-info">
+      <span class="dash-username" id="dash-username">Educator</span>
+      <button class="logout-btn" onclick="doLogout()">↩ Log Out</button>
+    </div>
+  </div>
+
+  <div class="dash-container">
+    <div class="card">
+      <div class="section-title">📊 Class Overview</div>
+      <div class="summary-grid" id="summary"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">
+        👩‍🎓 My Students
+        <button class="add-student-btn" onclick="toggleAddForm()">+ Add Student</button>
+      </div>
+
+      <div class="add-form" id="add-form">
+        <div class="add-form-title">➕ New Student Account</div>
+        <div class="field-row">
+          <div class="f"><label>Username</label><input type="text" id="new-name" placeholder="e.g. alex123" maxlength="16"></div>
+          <div class="f"><label>Password</label><input type="password" id="new-pass-s" placeholder="Min 4 chars"></div>
+          <div class="f"><label>Grade</label>
+            <select id="new-grade">
+              <option>1</option><option>2</option><option>3</option><option>4</option>
+              <option>5</option><option>6</option><option>7</option><option>8</option><option>9</option>
+            </select>
+          </div>
+          <div class="f"><label>Avatar</label>
+            <select id="new-avatar">
+              <option>🐣</option><option>🐱</option><option>🐶</option><option>🦄</option>
+              <option>🐸</option><option>🦊</option><option>🐼</option><option>🐙</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-btns">
+          <button class="btn-green" onclick="addStudent()">✅ Create Account</button>
+          <button class="btn-cancel" onclick="toggleAddForm()">Cancel</button>
+          <span class="form-msg" id="add-msg"></span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>Name</th><th>Grade</th><th>Level</th><th>⭐ Stars</th><th>🎮 Games</th><th>🔥 Streak</th><th>Actions</th></tr></thead>
+          <tbody id="student-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">🔑 Change Password</div>
+      <div class="pass-row">
+        <div class="pf"><label>New Password</label><input type="password" id="chg-pass" placeholder="New password"></div>
+        <div class="pf"><label>Confirm</label><input type="password" id="chg-conf" placeholder="Repeat"></div>
+        <button class="btn-save" onclick="changePassword()">Save</button>
+      </div>
+      <div class="msg" id="chg-msg"></div>
+    </div>
+  </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+let currentEdu = null; // { username, name, email }
+
+// ── TABS ──
+function switchTab(t){
+  document.getElementById('tab-login').classList.toggle('active', t==='login');
+  document.getElementById('tab-signup').classList.toggle('active', t==='signup');
+  document.getElementById('form-login').style.display  = t==='login'  ? '' : 'none';
+  document.getElementById('form-signup').style.display = t==='signup' ? '' : 'none';
+  document.getElementById('login-err').textContent='';
+  document.getElementById('signup-err').textContent='';
+}
+
+function setErr(id, msg, ok=false){
+  const el = document.getElementById(id);
+  el.style.color = ok ? '#43A047' : '#E53935';
+  el.textContent = msg;
+}
+
+// ── LOGIN ──
+async function doLogin(){
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  if(!u||!p){ setErr('login-err','Please fill in both fields!'); return; }
+  setErr('login-err','Checking... ⏳', true);
+  const data = await apiGet('/educator/'+encodeURIComponent(u));
+  if(!data||data.error){ setErr('login-err','Username not found. Try signing up!'); return; }
+  if(data.password !== btoa(p)){ setErr('login-err','Wrong password. Try again!'); return; }
+  currentEdu = { username: u, name: data.name, email: data.email };
+  enterDashboard();
+}
+
+// ── SIGNUP ──
+async function doSignup(){
+  const name  = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim().toLowerCase();
+  const u     = document.getElementById('signup-user').value.trim();
+  const p     = document.getElementById('signup-pass').value;
+  if(!name||!email||!u||!p){ setErr('signup-err','Please fill in all fields!'); return; }
+  if(!email.includes('@')){ setErr('signup-err','Enter a valid email address!'); return; }
+  if(u.length<3){ setErr('signup-err','Username must be at least 3 characters!'); return; }
+  if(!/^[a-zA-Z0-9_]+$/.test(u)){ setErr('signup-err','Username: only letters, numbers, _ allowed!'); return; }
+  if(p.length<6){ setErr('signup-err','Password must be at least 6 characters!'); return; }
+  setErr('signup-err','Checking username... ⏳', true);
+  const existing = await apiGet('/educator/'+encodeURIComponent(u));
+  if(existing&&!existing.error){ setErr('signup-err','That username is already taken!'); return; }
+  setErr('signup-err','Creating account... ⏳', true);
+  const res = await apiPost('/educator/'+encodeURIComponent(u), { name, email, password: btoa(p) });
+  if(!res||!res.ok){ setErr('signup-err','Failed to create account. Try again!'); return; }
+  currentEdu = { username: u, name, email };
+  enterDashboard();
+}
+
+// ── ENTER DASHBOARD ──
+function enterDashboard(){
+  document.getElementById('auth-card').style.display = 'none';
+  document.body.style.background = 'none';
+  document.body.style.alignItems = 'flex-start';
+  const dash = document.getElementById('dash-page');
+  dash.style.display = 'block';
+  document.getElementById('dash-username').textContent = `👋 ${currentEdu.name || currentEdu.username}`;
+  renderDashboard();
+}
+
+function doLogout(){
+  if(!confirm('Log out of Educator Hub?')) return;
+  currentEdu = null;
+  document.getElementById('auth-card').style.display = '';
+  document.getElementById('dash-page').style.display = 'none';
+  document.body.style.background = 'linear-gradient(180deg,#1A237E 0%,#283593 50%,#1565C0 100%)';
+  document.body.style.alignItems = 'center';
+  document.getElementById('login-user').value='';
+  document.getElementById('login-pass').value='';
+  setErr('login-err','');
+}
+
+// ── DASHBOARD ──
+async function renderDashboard(){
+  document.getElementById('student-table').innerHTML='<tr><td colspan="8" class="no-data">Loading... ⏳</td></tr>';
+  document.getElementById('summary').innerHTML='';
+
+  const res = await apiGet('/edu-students/'+encodeURIComponent(currentEdu.username));
+  if(!res||!res.students){
+    document.getElementById('student-table').innerHTML='<tr><td colspan="8" class="no-data">Could not connect 😢</td></tr>';
+    return;
+  }
+
+  const students = await Promise.all(res.students.map(async n=>{
+    const u=await apiGet('/user/'+encodeURIComponent(n));
+    const d=await apiGet('/progress/'+encodeURIComponent(n));
+    return{name:n,avatar:u?.avatar||'🐣',grade:u?.grade||1,level:d?.playerLevel||1,stars:d?.totalStars||0,games:d?.gamesPlayed||0,streak:d?.streak||0};
+  }));
+  students.sort((a,b)=>b.stars-a.stars);
+
+  const total=students.length;
+  const avgLvl=total?(students.reduce((s,x)=>s+x.level,0)/total).toFixed(1):0;
+  document.getElementById('summary').innerHTML=`
+    <div class="stat-box"><div class="stat-num">${total}</div><div class="stat-label">Students</div></div>
+    <div class="stat-box"><div class="stat-num">${avgLvl}</div><div class="stat-label">Avg Level</div></div>
+    <div class="stat-box"><div class="stat-num">${students.reduce((s,x)=>s+x.games,0)}</div><div class="stat-label">Total Games</div></div>
+    <div class="stat-box"><div class="stat-num">${students.reduce((s,x)=>s+x.stars,0)}</div><div class="stat-label">Total Stars</div></div>
+  `;
+
+  const tbody=document.getElementById('student-table');
+  if(!students.length){
+    tbody.innerHTML='<tr><td colspan="8" class="no-data">No students yet! Click "+ Add Student" to get started 🎒</td></tr>';
+    return;
+  }
+  tbody.innerHTML=students.map((s,i)=>`
+    <tr>
+      <td style="font-size:1.4rem">${s.avatar}</td>
+      <td><strong>${s.name}</strong>${i===0?' <span style="font-size:0.75rem;background:#FFD54F;color:#BF360C;border-radius:50px;padding:2px 8px;margin-left:6px">🏆 Top</span>':''}</td>
+      <td><span class="grade-pill">Grade ${s.grade}</span></td>
+      <td>Lvl ${s.level}</td>
+      <td>⭐ ${s.stars}</td>
+      <td>${s.games}</td>
+      <td>🔥 ${s.streak}</td>
+      <td><button class="del-btn" onclick="deleteStudent('${s.name}')">🗑 Remove</button></td>
+    </tr>`).join('');
+}
+
+// ── ADD STUDENT ──
+function toggleAddForm(){
+  const f=document.getElementById('add-form');
+  f.style.display = f.style.display==='block' ? 'none' : 'block';
+  document.getElementById('add-msg').textContent='';
+  document.getElementById('new-name').value='';
+  document.getElementById('new-pass-s').value='';
+}
+
+async function addStudent(){
+  const name  = document.getElementById('new-name').value.trim();
+  const pass  = document.getElementById('new-pass-s').value;
+  const grade = parseInt(document.getElementById('new-grade').value);
+  const avatar= document.getElementById('new-avatar').value;
+  const msg   = document.getElementById('add-msg');
+  if(!name||!pass){ msg.style.color='#E53935'; msg.textContent='Fill in name and password!'; return; }
+  if(name.length<2){ msg.style.color='#E53935'; msg.textContent='Name too short!'; return; }
+  if(pass.length<4){ msg.style.color='#E53935'; msg.textContent='Password needs 4+ characters!'; return; }
+  if(!/^[a-zA-Z0-9_]+$/.test(name)){ msg.style.color='#E53935'; msg.textContent='Only letters, numbers, _ allowed!'; return; }
+  msg.style.color='#90A4AE'; msg.textContent='Checking username... ⏳';
+  const existing=await apiGet('/user/'+encodeURIComponent(name));
+  if(existing&&!existing.error){ msg.style.color='#E53935'; msg.textContent='Username already taken!'; return; }
+  msg.style.color='#90A4AE'; msg.textContent='Creating... ⏳';
+  const r1=await apiPost('/user/'+encodeURIComponent(name),{password:btoa(pass),avatar,grade,createdByEducator:true});
+  if(!r1||!r1.ok){ msg.style.color='#E53935'; msg.textContent='❌ Failed to create user. Is your Worker deployed?'; return; }
+  const r2=await apiPost('/edu-students/'+encodeURIComponent(currentEdu.username)+'/'+encodeURIComponent(name),{});
+  if(!r2||!r2.ok){ msg.style.color='#E53935'; msg.textContent='❌ Failed to add to class list.'; return; }
+  msg.style.color='#43A047'; msg.textContent=`✅ ${name} created!`;
+  document.getElementById('new-name').value='';
+  document.getElementById('new-pass-s').value='';
+  setTimeout(()=>{ msg.textContent=''; toggleAddForm(); renderDashboard(); },1500);
+}
+
+async function deleteStudent(name){
+  if(!confirm(`Remove ${name}? This deletes their account and all progress permanently!`)) return;
+  await apiDelete('/user/'+encodeURIComponent(name));
+  await apiDelete('/edu-students/'+encodeURIComponent(currentEdu.username)+'/'+encodeURIComponent(name));
+  renderDashboard();
+}
+
+// ── CHANGE PASSWORD ──
+async function changePassword(){
+  const np=document.getElementById('chg-pass').value;
+  const nc=document.getElementById('chg-conf').value;
+  const msg=document.getElementById('chg-msg');
+  if(np.length<6){ msg.style.color='#E53935'; msg.textContent='Password must be 6+ characters!'; return; }
+  if(np!==nc){ msg.style.color='#E53935'; msg.textContent="Passwords don't match!"; return; }
+  msg.style.color='#90A4AE'; msg.textContent='Saving... ⏳';
+  const existing=await apiGet('/educator/'+encodeURIComponent(currentEdu.username));
+  const res=await apiPost('/educator/'+encodeURIComponent(currentEdu.username),{...existing,password:btoa(np)});
+  if(!res||!res.ok){ msg.style.color='#E53935'; msg.textContent='Failed to save!'; return; }
+  msg.style.color='#43A047'; msg.textContent='✅ Password updated!';
+  document.getElementById('chg-pass').value='';
+  document.getElementById('chg-conf').value='';
+  setTimeout(()=>msg.textContent='',3000);
+}
+</script>
+</body>
+</html>
