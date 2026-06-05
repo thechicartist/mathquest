@@ -7,111 +7,105 @@ const CORS = {
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') return new Response(null, { headers: CORS });
+
     const url = new URL(request.url);
     const path = url.pathname;
+    const method = request.method;
 
-    if (request.method === 'GET' && path === '/users') {
+    // ── USERS ──
+    if (method === 'GET' && path === '/users') {
       const list = await env.MATHQUEST_DB.list({ prefix: 'user:' });
       const names = list.keys.map(k => k.name.replace('user:', ''));
       return json({ users: names });
     }
-
-    if (request.method === 'GET' && path.startsWith('/user/')) {
-      const username = decodeURIComponent(path.split('/user/')[1]);
-      const data = await env.MATHQUEST_DB.get('user:' + username);
+    if (method === 'GET' && path.startsWith('/user/')) {
+      const u = decodeURIComponent(path.slice(6));
+      const data = await env.MATHQUEST_DB.get('user:' + u);
       if (!data) return json({ error: 'not_found' }, 404);
       return json(JSON.parse(data));
     }
-
-    if (request.method === 'POST' && path.startsWith('/user/')) {
-      const username = decodeURIComponent(path.split('/user/')[1]);
+    if (method === 'POST' && path.startsWith('/user/')) {
+      const u = decodeURIComponent(path.slice(6));
       const body = await request.json();
-      await env.MATHQUEST_DB.put('user:' + username, JSON.stringify(body));
+      await env.MATHQUEST_DB.put('user:' + u, JSON.stringify(body));
+      return json({ ok: true });
+    }
+    if (method === 'DELETE' && path.startsWith('/user/')) {
+      const u = decodeURIComponent(path.slice(6));
+      await env.MATHQUEST_DB.delete('user:' + u);
+      await env.MATHQUEST_DB.delete('progress:' + u);
+      await env.MATHQUEST_DB.delete('quests:' + u);
       return json({ ok: true });
     }
 
-    if (request.method === 'DELETE' && path.startsWith('/user/')) {
-      const username = decodeURIComponent(path.split('/user/')[1]);
-      await env.MATHQUEST_DB.delete('user:' + username);
-      await env.MATHQUEST_DB.delete('progress:' + username);
-      await env.MATHQUEST_DB.delete('quests:' + username);
-      return json({ ok: true });
-    }
-
-    if (request.method === 'GET' && path.startsWith('/progress/')) {
-      const username = decodeURIComponent(path.split('/progress/')[1]);
-      const data = await env.MATHQUEST_DB.get('progress:' + username);
+    // ── PROGRESS ──
+    if (method === 'GET' && path.startsWith('/progress/')) {
+      const u = decodeURIComponent(path.slice(10));
+      const data = await env.MATHQUEST_DB.get('progress:' + u);
       return json(data ? JSON.parse(data) : {});
     }
-
-    if (request.method === 'POST' && path.startsWith('/progress/')) {
-      const username = decodeURIComponent(path.split('/progress/')[1]);
+    if (method === 'POST' && path.startsWith('/progress/')) {
+      const u = decodeURIComponent(path.slice(10));
       const body = await request.json();
-      await env.MATHQUEST_DB.put('progress:' + username, JSON.stringify(body));
+      await env.MATHQUEST_DB.put('progress:' + u, JSON.stringify(body));
       return json({ ok: true });
     }
 
-    if (request.method === 'GET' && path.startsWith('/quests/')) {
-      const username = decodeURIComponent(path.split('/quests/')[1]);
-      const data = await env.MATHQUEST_DB.get('quests:' + username);
+    // ── QUESTS ──
+    if (method === 'GET' && path.startsWith('/quests/')) {
+      const u = decodeURIComponent(path.slice(8));
+      const data = await env.MATHQUEST_DB.get('quests:' + u);
       return json(data ? JSON.parse(data) : {});
     }
-
-    if (request.method === 'POST' && path.startsWith('/quests/')) {
-      const username = decodeURIComponent(path.split('/quests/')[1]);
+    if (method === 'POST' && path.startsWith('/quests/')) {
+      const u = decodeURIComponent(path.slice(8));
       const body = await request.json();
-      await env.MATHQUEST_DB.put('quests:' + username, JSON.stringify(body));
+      await env.MATHQUEST_DB.put('quests:' + u, JSON.stringify(body));
       return json({ ok: true });
     }
 
-    if (request.method === 'GET' && path === '/students') {
-      const list = await env.MATHQUEST_DB.list({ prefix: 'student:' });
-      const names = list.keys.map(k => k.name.replace('student:', ''));
-      return json({ students: names });
+    // ── EDUCATOR STUDENT LIST ──
+    // GET /students — list educator-created students
+    if (method === 'GET' && path === '/students') {
+      const data = await env.MATHQUEST_DB.get('edu_students');
+      return json(data ? JSON.parse(data) : { students: [] });
     }
-
-    if (request.method === 'POST' && path.startsWith('/students/')) {
-      const username = decodeURIComponent(path.split('/students/')[1]);
-      await env.MATHQUEST_DB.put('student:' + username, '1');
+    // POST /students/:username — add a student to the list
+    if (method === 'POST' && path.startsWith('/students/')) {
+      const u = decodeURIComponent(path.slice(10));
+      const raw = await env.MATHQUEST_DB.get('edu_students');
+      const list = raw ? JSON.parse(raw) : { students: [] };
+      if (!list.students.includes(u)) list.students.push(u);
+      await env.MATHQUEST_DB.put('edu_students', JSON.stringify(list));
+      return json({ ok: true });
+    }
+    // DELETE /students/:username — remove a student from the list
+    if (method === 'DELETE' && path.startsWith('/students/')) {
+      const u = decodeURIComponent(path.slice(10));
+      const raw = await env.MATHQUEST_DB.get('edu_students');
+      const list = raw ? JSON.parse(raw) : { students: [] };
+      list.students = list.students.filter(s => s !== u);
+      await env.MATHQUEST_DB.put('edu_students', JSON.stringify(list));
       return json({ ok: true });
     }
 
-    if (request.method === 'DELETE' && path.startsWith('/students/')) {
-      const username = decodeURIComponent(path.split('/students/')[1]);
-      await env.MATHQUEST_DB.delete('student:' + username);
-      return json({ ok: true });
-    }
-
-    if (request.method === 'GET' && path === '/reset-edu') {
-      const secret = url.searchParams.get('secret');
-      const stored = await env.MATHQUEST_DB.get('reset_secret');
-      // First time: if no secret stored yet, set it and confirm
-      if (!stored) {
-        if (!secret) return new Response('No secret set yet. Visit /reset-edu?secret=YOURSECRET to set one.', { headers: CORS });
-        await env.MATHQUEST_DB.put('reset_secret', secret);
-        return new Response('✅ Secret saved! Use this URL to reset educator password anytime.', { headers: CORS });
-      }
-      if (secret !== stored) return new Response('❌ Wrong secret.', { status: 403, headers: CORS });
-      await env.MATHQUEST_DB.delete('educator_password');
-      return new Response('✅ Educator password reset! Open the dashboard to create a new one.', { headers: CORS });
-    }
-
-    if (request.method === 'GET' && path === '/edupass') {
-      const data = await env.MATHQUEST_DB.get('educator_password');
+    // ── EDUCATOR PASSWORD ──
+    if (method === 'GET' && path === '/edupass') {
+      const data = await env.MATHQUEST_DB.get('edupass');
       if (!data) return json({ exists: false });
-      try {
-        const parsed = JSON.parse(data);
-        return json({ exists: true, ...parsed });
-      } catch(e) {
-        // legacy: plain password string
-        return json({ exists: true, password: data });
-      }
+      const parsed = JSON.parse(data);
+      return json({ exists: true, password: parsed.password, recoveryKey: parsed.recoveryKey });
     }
-
-    if (request.method === 'POST' && path === '/edupass') {
+    if (method === 'POST' && path === '/edupass') {
       const body = await request.json();
-      if (!body.password) return json({ error: 'no_password' }, 400);
-      await env.MATHQUEST_DB.put('educator_password', JSON.stringify({ password: body.password, recoveryKey: body.recoveryKey || '' }));
+      // Preserve existing recoveryKey if not provided
+      const existing = await env.MATHQUEST_DB.get('edupass');
+      const prev = existing ? JSON.parse(existing) : {};
+      const updated = {
+        password: body.password || prev.password,
+        recoveryKey: body.recoveryKey || prev.recoveryKey,
+      };
+      await env.MATHQUEST_DB.put('edupass', JSON.stringify(updated));
       return json({ ok: true });
     }
 
@@ -122,6 +116,6 @@ export default {
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { ...CORS, 'Content-Type': 'application/json' }
+    headers: { ...CORS, 'Content-Type': 'application/json' },
   });
 }
