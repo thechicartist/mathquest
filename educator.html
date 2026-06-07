@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MathQuest — Educator</title>
+<title>MathQuest — Educator Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
+
   body {
     font-family:'Nunito',sans-serif;
     background:linear-gradient(180deg,#1A237E 0%,#283593 50%,#1565C0 100%);
@@ -14,7 +15,7 @@
     padding:24px;
   }
 
-  /* AUTH CARD */
+  /* ── AUTH ── */
   .auth-card {
     background:white; border-radius:28px; padding:40px 36px;
     width:100%; max-width:440px;
@@ -25,42 +26,121 @@
   .auth-logo span { color:#FF7043; }
   .auth-sub { font-size:0.92rem; color:#90A4AE; font-weight:600; margin-bottom:28px; }
   .auth-tabs { display:flex; background:#F5F5F5; border-radius:14px; padding:4px; margin-bottom:24px; }
-  .auth-tab { flex:1; padding:10px; border:none; border-radius:10px; background:none; font-family:'Nunito',sans-serif; font-weight:800; font-size:1rem; cursor:pointer; color:#90A4AE; transition:all 0.2s; }
+  .auth-tab { flex:1; padding:10px; border:none; border-radius:10px; background:none; font-family:'Nunito',sans-serif; font-weight:800; font-size:1rem; cursor:pointer; color:#90A4AE; transition:all .2s; }
   .auth-tab.active { background:white; color:#1A237E; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
   .field { margin-bottom:14px; text-align:left; }
   .field label { display:block; font-weight:800; font-size:0.85rem; color:#546E7A; margin-bottom:6px; }
-  .field input { width:100%; padding:13px 16px; border-radius:14px; border:3px solid #E0E0E0; font-family:'Nunito',sans-serif; font-size:1rem; font-weight:700; color:#1A237E; outline:none; transition:border-color 0.2s; }
+  .field input { width:100%; padding:13px 16px; border-radius:14px; border:3px solid #E0E0E0; font-family:'Nunito',sans-serif; font-size:1rem; font-weight:700; color:#1A237E; outline:none; transition:border-color .2s; }
   .field input:focus { border-color:#3F51B5; }
-  .auth-btn { width:100%; padding:15px; border:none; border-radius:16px; background:linear-gradient(135deg,#1A237E,#3949AB); color:white; font-family:'Fredoka One',cursive; font-size:1.3rem; cursor:pointer; box-shadow:0 6px 20px rgba(26,35,126,0.4); transition:all 0.2s; margin-top:4px; }
+  .auth-btn { width:100%; padding:15px; border:none; border-radius:16px; background:linear-gradient(135deg,#1A237E,#3949AB); color:white; font-family:'Fredoka One',cursive; font-size:1.3rem; cursor:pointer; box-shadow:0 6px 20px rgba(26,35,126,0.4); transition:all .2s; margin-top:4px; }
   .auth-btn:hover { transform:translateY(-3px); box-shadow:0 10px 30px rgba(26,35,126,0.5); }
   .auth-err { font-weight:700; font-size:0.88rem; margin-top:10px; min-height:20px; }
 
-  /* DASHBOARD PAGE */
-  .dash-page { display:none; background:linear-gradient(180deg,#B3E5FC 0%,#E1F5FE 40%,#F1F8E9 100%); min-height:100vh; padding:0; }
-  .dash-header { background:linear-gradient(135deg,#1A237E,#3949AB); padding:18px 30px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 20px rgba(26,35,126,0.4); }
+  /* ── PAGES ── */
+  .page { display:none; min-height:100vh; }
+
+  /* ── SHARED HEADER ── */
+  .dash-header { background:linear-gradient(135deg,#1A237E,#3949AB); padding:18px 30px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 20px rgba(26,35,126,0.4); flex-wrap:wrap; gap:10px; }
   .dash-logo { font-family:'Fredoka One',cursive; font-size:1.6rem; color:white; }
   .dash-logo span { color:#FFD54F; }
-  .dash-user-info { display:flex; align-items:center; gap:12px; }
+  .header-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .dash-username { color:white; font-weight:800; font-size:0.95rem; }
-  .logout-btn { background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.35); border-radius:50px; padding:7px 16px; color:white; font-weight:800; font-size:0.85rem; cursor:pointer; font-family:'Nunito',sans-serif; transition:all 0.2s; }
-  .logout-btn:hover { background:rgba(255,255,255,0.35); }
-  .back-to-login { background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.3); border-radius:50px; padding:7px 16px; color:white; font-weight:800; font-size:0.85rem; cursor:pointer; font-family:'Nunito',sans-serif; }
-  .back-to-login:hover { background:rgba(255,255,255,0.25); }
+  .hbtn { background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.3); border-radius:50px; padding:7px 16px; color:white; font-weight:800; font-size:0.85rem; cursor:pointer; font-family:'Nunito',sans-serif; transition:all .2s; }
+  .hbtn:hover { background:rgba(255,255,255,0.32); }
+  .hbtn.back { background:rgba(255,165,0,0.22); border-color:rgba(255,200,0,0.4); }
 
-  .dash-container { max-width:900px; margin:0 auto; padding:28px 20px; }
-  .card { background:white; border-radius:24px; padding:28px; margin-bottom:20px; box-shadow:0 8px 30px rgba(0,0,0,0.1); border:2px solid #E8EAF6; }
+  /* ── CLASSES DASHBOARD ── */
+  #classes-page { background:linear-gradient(180deg,#B3E5FC 0%,#E1F5FE 40%,#F1F8E9 100%); }
+  .container { max-width:960px; margin:0 auto; padding:32px 20px; }
+  .page-headline { font-family:'Fredoka One',cursive; font-size:1.6rem; color:#1A237E; margin-bottom:6px; }
+  .page-sub { color:#78909C; font-weight:700; font-size:0.9rem; margin-bottom:28px; }
 
-  .section-title { font-family:'Fredoka One',cursive; font-size:1.2rem; color:#1A237E; margin-bottom:16px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-  .summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-bottom:4px; }
-  .stat-box { background:#F5F5F5; border-radius:16px; padding:16px; text-align:center; border:2px solid #E8EAF6; }
-  .stat-num { font-family:'Fredoka One',cursive; font-size:2rem; color:#3F51B5; }
-  .stat-label { font-size:0.8rem; color:#78909C; font-weight:700; margin-top:2px; }
+  .classes-toolbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+  .add-class-btn { background:linear-gradient(135deg,#FF7043,#FF5722); color:white; border:none; border-radius:14px; padding:12px 22px; font-family:'Fredoka One',cursive; font-size:1.05rem; cursor:pointer; box-shadow:0 4px 14px rgba(255,87,34,0.35); transition:all .2s; }
+  .add-class-btn:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(255,87,34,0.45); }
 
-  .table-wrap { overflow-x:auto; margin-bottom:8px; }
+  .classes-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; }
+  .class-card {
+    background:white; border-radius:22px; padding:24px; cursor:pointer;
+    border:3px solid #E8EAF6; box-shadow:0 6px 24px rgba(0,0,0,0.08);
+    transition:all .25s; position:relative; overflow:hidden;
+  }
+  .class-card::before { content:''; position:absolute; top:0; left:0; right:0; height:6px; border-radius:22px 22px 0 0; }
+  .class-card.color-0::before { background:linear-gradient(90deg,#3F51B5,#7986CB); }
+  .class-card.color-1::before { background:linear-gradient(90deg,#FF7043,#FFAB91); }
+  .class-card.color-2::before { background:linear-gradient(90deg,#43A047,#A5D6A7); }
+  .class-card.color-3::before { background:linear-gradient(90deg,#8E24AA,#CE93D8); }
+  .class-card.color-4::before { background:linear-gradient(90deg,#0288D1,#81D4FA); }
+  .class-card.color-5::before { background:linear-gradient(90deg,#E53935,#EF9A9A); }
+  .class-card:hover { transform:translateY(-4px); box-shadow:0 14px 40px rgba(0,0,0,0.14); border-color:#C5CAE9; }
+  .class-card-emoji { font-size:2.4rem; margin-bottom:12px; display:block; }
+  .class-card-name { font-family:'Fredoka One',cursive; font-size:1.25rem; color:#1A237E; margin-bottom:4px; }
+  .class-card-grade { font-size:0.82rem; font-weight:800; color:#90A4AE; margin-bottom:16px; }
+  .class-stats { display:flex; gap:14px; }
+  .cs { text-align:center; }
+  .cs-num { font-family:'Fredoka One',cursive; font-size:1.3rem; color:#3F51B5; }
+  .cs-lbl { font-size:0.72rem; font-weight:800; color:#B0BEC5; }
+  .class-del { position:absolute; top:14px; right:14px; background:#FFEBEE; border:2px solid #EF9A9A; border-radius:8px; padding:4px 9px; cursor:pointer; font-size:0.78rem; font-weight:800; color:#E53935; opacity:0; transition:opacity .2s; }
+  .class-card:hover .class-del { opacity:1; }
+
+  .empty-state { text-align:center; padding:60px 20px; color:#90A4AE; }
+  .empty-icon { font-size:4rem; margin-bottom:16px; }
+  .empty-title { font-family:'Fredoka One',cursive; font-size:1.4rem; color:#B0BEC5; margin-bottom:8px; }
+  .empty-desc { font-size:0.9rem; font-weight:700; }
+
+  /* ── CREATE CLASS MODAL ── */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(26,35,126,0.55); z-index:999; align-items:center; justify-content:center; padding:20px; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:white; border-radius:24px; padding:32px; width:100%; max-width:420px; box-shadow:0 20px 60px rgba(0,0,0,0.3); animation:popIn .25s ease; }
+  @keyframes popIn { from{transform:scale(0.92);opacity:0} to{transform:scale(1);opacity:1} }
+  .modal-title { font-family:'Fredoka One',cursive; font-size:1.35rem; color:#1A237E; margin-bottom:20px; }
+  .mfield { margin-bottom:14px; }
+  .mfield label { display:block; font-weight:800; font-size:0.83rem; color:#546E7A; margin-bottom:6px; }
+  .mfield input, .mfield select { width:100%; padding:12px 15px; border-radius:13px; border:3px solid #E0E0E0; font-family:'Nunito',sans-serif; font-size:0.97rem; font-weight:700; color:#1A237E; outline:none; transition:border-color .2s; }
+  .mfield input:focus, .mfield select:focus { border-color:#3F51B5; }
+  .emoji-picker { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+  .emoji-opt { font-size:1.6rem; cursor:pointer; padding:6px; border-radius:10px; border:3px solid transparent; transition:all .15s; }
+  .emoji-opt:hover, .emoji-opt.selected { border-color:#3F51B5; background:#E8EAF6; }
+  .modal-btns { display:flex; gap:10px; margin-top:20px; }
+  .mbtn-ok { flex:1; padding:13px; border:none; border-radius:14px; background:linear-gradient(135deg,#1A237E,#3949AB); color:white; font-family:'Fredoka One',cursive; font-size:1.05rem; cursor:pointer; }
+  .mbtn-cancel { padding:13px 20px; border:3px solid #E0E0E0; border-radius:14px; background:none; font-family:'Nunito',sans-serif; font-weight:800; font-size:0.95rem; cursor:pointer; color:#90A4AE; }
+  .modal-msg { font-size:0.85rem; font-weight:700; margin-top:10px; min-height:18px; }
+
+  /* ── CLASS DETAIL PAGE ── */
+  #class-page { background:linear-gradient(180deg,#B3E5FC 0%,#E1F5FE 40%,#F1F8E9 100%); }
+  .class-hero { background:white; border-bottom:3px solid #E8EAF6; padding:24px 30px; display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+  .class-hero-emoji { font-size:3rem; }
+  .class-hero-info { flex:1; }
+  .class-hero-name { font-family:'Fredoka One',cursive; font-size:1.7rem; color:#1A237E; }
+  .class-hero-grade { font-size:0.85rem; font-weight:800; color:#78909C; margin-top:2px; }
+  .class-hero-stats { display:flex; gap:20px; flex-wrap:wrap; margin-top:12px; }
+  .chs { background:#F5F7FF; border-radius:12px; padding:10px 16px; text-align:center; border:2px solid #E8EAF6; }
+  .chs-n { font-family:'Fredoka One',cursive; font-size:1.4rem; color:#3F51B5; }
+  .chs-l { font-size:0.75rem; font-weight:800; color:#90A4AE; }
+
+  .section-card { background:white; border-radius:22px; padding:26px; margin-bottom:20px; box-shadow:0 6px 24px rgba(0,0,0,0.08); border:2px solid #E8EAF6; }
+  .sc-title { font-family:'Fredoka One',cursive; font-size:1.15rem; color:#1A237E; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+  .add-stu-btn { background:linear-gradient(135deg,#FF7043,#FF5722); color:white; border:none; border-radius:12px; padding:9px 18px; font-family:'Fredoka One',cursive; font-size:0.95rem; cursor:pointer; }
+
+  /* ADD STUDENT FORM */
+  .add-stu-form { background:#F8F9FF; border-radius:16px; padding:20px; border:2px solid #E8EAF6; margin-bottom:20px; display:none; }
+  .af-title { font-family:'Fredoka One',cursive; font-size:1rem; color:#1A237E; margin-bottom:14px; }
+  .field-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+  .f { flex:1; min-width:120px; }
+  .f label { display:block; font-size:0.82rem; font-weight:800; color:#546E7A; margin-bottom:5px; }
+  .f input, .f select { width:100%; padding:10px 13px; border-radius:12px; border:2px solid #E0E0E0; font-family:'Nunito',sans-serif; font-weight:700; font-size:0.92rem; outline:none; }
+  .f input:focus, .f select:focus { border-color:#3F51B5; }
+  .form-btns { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .btn-green { background:linear-gradient(135deg,#43A047,#2E7D32); color:white; border:none; border-radius:12px; padding:11px 20px; font-family:'Fredoka One',cursive; font-size:0.95rem; cursor:pointer; }
+  .btn-cancel { background:none; border:2px solid #CFD8DC; border-radius:10px; padding:9px 16px; cursor:pointer; font-weight:700; color:#90A4AE; }
+  .form-msg { font-size:0.85rem; font-weight:700; }
+
+  /* STUDENTS TABLE */
+  .table-wrap { overflow-x:auto; }
   table { width:100%; border-collapse:collapse; font-size:0.9rem; }
   th { background:#E8EAF6; color:#3949AB; font-weight:800; padding:10px 14px; text-align:left; }
   th:first-child { border-radius:12px 0 0 12px; }
-  th:last-child  { border-radius:0 12px 12px 0; }
+  th:last-child { border-radius:0 12px 12px 0; }
   td { padding:11px 14px; border-bottom:2px solid #F5F5F5; font-weight:700; color:#37474F; }
   tr:last-child td { border-bottom:none; }
   tr:hover td { background:#FAFAFA; }
@@ -69,49 +149,35 @@
   .del-btn { background:#FFEBEE; border:2px solid #EF9A9A; border-radius:8px; padding:5px 10px; cursor:pointer; font-size:0.8rem; font-weight:800; color:#E53935; }
   .del-btn:hover { background:#E53935; color:white; }
 
-  .add-student-btn { background:linear-gradient(135deg,#FF7043,#FF5722); color:white; border:none; border-radius:12px; padding:8px 16px; font-family:'Fredoka One',cursive; font-size:0.95rem; cursor:pointer; margin-left:auto; }
-  .add-form { background:#F8F9FF; border-radius:16px; padding:20px; border:2px solid #E8EAF6; margin-bottom:20px; display:none; }
-  .add-form-title { font-family:'Fredoka One',cursive; font-size:1.05rem; color:#1A237E; margin-bottom:14px; }
-  .field-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
-  .f { flex:1; min-width:130px; }
-  .f label { display:block; font-size:0.82rem; font-weight:800; color:#546E7A; margin-bottom:5px; }
-  .f input, .f select { width:100%; padding:10px 14px; border-radius:12px; border:2px solid #E0E0E0; font-family:'Nunito',sans-serif; font-weight:700; font-size:0.95rem; outline:none; }
-  .f input:focus, .f select:focus { border-color:#3F51B5; }
-  .form-btns { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-  .btn-green { background:linear-gradient(135deg,#43A047,#2E7D32); color:white; border:none; border-radius:12px; padding:11px 20px; font-family:'Fredoka One',cursive; font-size:0.95rem; cursor:pointer; }
-  .btn-cancel { background:none; border:2px solid #CFD8DC; border-radius:10px; padding:9px 16px; cursor:pointer; font-weight:700; color:#90A4AE; }
-  .form-msg { font-size:0.85rem; font-weight:700; }
-
-  .pass-row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:8px; }
+  /* CHANGE PASS */
+  .pass-row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; }
   .pf { flex:1; min-width:140px; }
   .pf label { display:block; font-size:0.82rem; font-weight:800; color:#546E7A; margin-bottom:5px; }
   .pf input { width:100%; padding:10px 14px; border-radius:12px; border:2px solid #E0E0E0; font-family:'Nunito',sans-serif; font-weight:700; font-size:0.95rem; outline:none; }
   .pf input:focus { border-color:#3F51B5; }
   .btn-save { background:#43A047; color:white; border:none; border-radius:12px; padding:11px 18px; font-family:'Fredoka One',cursive; font-size:0.95rem; cursor:pointer; white-space:nowrap; }
   .msg { font-size:0.85rem; font-weight:700; min-height:20px; margin-top:8px; }
+
+  /* LOADING SPINNER */
+  .loader { text-align:center; padding:40px; color:#90A4AE; font-weight:700; font-size:1rem; }
 </style>
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
+<!-- ══ AUTH SCREEN ══ -->
 <div class="auth-card" id="auth-card">
   <div class="auth-logo">🎓 Educator<span>Hub</span></div>
-  <div class="auth-sub">Manage your class on MathQuest</div>
-
+  <div class="auth-sub">Manage your classes on MathQuest</div>
   <div class="auth-tabs">
     <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
     <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
   </div>
-
-  <!-- LOGIN FORM -->
   <div id="form-login">
     <div class="field"><label>Username</label><input type="text" id="login-user" placeholder="Your username" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="field"><label>Password</label><input type="password" id="login-pass" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <button class="auth-btn" onclick="doLogin()">🔓 Log In</button>
     <div class="auth-err" id="login-err"></div>
   </div>
-
-  <!-- SIGNUP FORM -->
   <div id="form-signup" style="display:none">
     <div class="field"><label>Full Name / School Name</label><input type="text" id="signup-name" placeholder="e.g. Ms. Johnson" autocomplete="off"></div>
     <div class="field"><label>Email</label><input type="email" id="signup-email" placeholder="your@email.com" autocomplete="off"></div>
@@ -120,69 +186,35 @@
     <button class="auth-btn" onclick="doSignup()">✨ Create Account</button>
     <div class="auth-err" id="signup-err"></div>
   </div>
-
   <div style="margin-top:16px;padding-top:14px;border-top:2px solid #F5F5F5">
     <button onclick="location.href='index.html'" style="background:none;border:none;color:#90A4AE;font-size:0.85rem;font-weight:700;cursor:pointer;">← Back to Student Login</button>
   </div>
 </div>
 
-<!-- DASHBOARD PAGE -->
-<div class="dash-page" id="dash-page">
+<!-- ══ CLASSES DASHBOARD ══ -->
+<div class="page" id="classes-page">
   <div class="dash-header">
     <div class="dash-logo">Math<span>Quest</span> 🎓</div>
-    <div class="dash-user-info">
+    <div class="header-right">
       <span class="dash-username" id="dash-username">Educator</span>
-      <button class="logout-btn" onclick="doLogout()">↩ Log Out</button>
+      <button class="hbtn" onclick="doLogout()">↩ Log Out</button>
     </div>
   </div>
-
-  <div class="dash-container">
-    <div class="card">
-      <div class="section-title">📊 Class Overview</div>
-      <div class="summary-grid" id="summary"></div>
+  <div class="container">
+    <div class="page-headline">My Classes</div>
+    <div class="page-sub">Click a class to manage students and view progress</div>
+    <div class="classes-toolbar">
+      <div></div>
+      <button class="add-class-btn" onclick="openCreateModal()">+ New Class</button>
     </div>
-
-    <div class="card">
-      <div class="section-title">
-        👩‍🎓 My Students
-        <button class="add-student-btn" onclick="toggleAddForm()">+ Add Student</button>
-      </div>
-
-      <div class="add-form" id="add-form">
-        <div class="add-form-title">➕ New Student Account</div>
-        <div class="field-row">
-          <div class="f"><label>Username</label><input type="text" id="new-name" placeholder="e.g. alex123" maxlength="16"></div>
-          <div class="f"><label>Password</label><input type="password" id="new-pass-s" placeholder="Min 4 chars"></div>
-          <div class="f"><label>Grade</label>
-            <select id="new-grade">
-              <option>1</option><option>2</option><option>3</option><option>4</option>
-              <option>5</option><option>6</option><option>7</option><option>8</option><option>9</option>
-            </select>
-          </div>
-          <div class="f"><label>Avatar</label>
-            <select id="new-avatar">
-              <option>🐣</option><option>🐱</option><option>🐶</option><option>🦄</option>
-              <option>🐸</option><option>🦊</option><option>🐼</option><option>🐙</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-btns">
-          <button class="btn-green" onclick="addStudent()">✅ Create Account</button>
-          <button class="btn-cancel" onclick="toggleAddForm()">Cancel</button>
-          <span class="form-msg" id="add-msg"></span>
-        </div>
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th></th><th>Name</th><th>Grade</th><th>Level</th><th>⭐ Stars</th><th>🎮 Games</th><th>🔥 Streak</th><th>Actions</th></tr></thead>
-          <tbody id="student-table"></tbody>
-        </table>
-      </div>
+    <div id="classes-grid" class="classes-grid">
+      <div class="loader">Loading classes... ⏳</div>
     </div>
-
-    <div class="card">
-      <div class="section-title">🔑 Change Password</div>
+  </div>
+  <!-- Settings card -->
+  <div class="container" style="padding-top:0">
+    <div class="section-card">
+      <div class="sc-title">🔑 Change Password</div>
       <div class="pass-row">
         <div class="pf"><label>New Password</label><input type="password" id="chg-pass" placeholder="New password"></div>
         <div class="pf"><label>Confirm</label><input type="password" id="chg-conf" placeholder="Repeat"></div>
@@ -193,111 +225,349 @@
   </div>
 </div>
 
+<!-- ══ CREATE CLASS MODAL ══ -->
+<div class="modal-overlay" id="create-modal">
+  <div class="modal">
+    <div class="modal-title">🏫 Create a New Class</div>
+    <div class="mfield">
+      <label>Class Name</label>
+      <div style="display:flex;gap:10px;align-items:center;position:relative;">
+        <button id="emoji-btn" onclick="toggleEmojiPopover(event)" style="font-size:1.7rem;background:#F5F7FF;border:3px solid #E0E0E0;border-radius:13px;padding:8px 12px;cursor:pointer;flex-shrink:0;line-height:1;transition:border-color .2s;" title="Pick an emoji">📚</button>
+        <input type="text" id="cls-name" placeholder="e.g. Rockets, Morning Group…" maxlength="32" style="flex:1;">
+        <div id="emoji-popover" style="display:none;position:absolute;top:calc(100% + 8px);left:0;background:white;border:3px solid #E8EAF6;border-radius:16px;padding:12px;box-shadow:0 8px 30px rgba(0,0,0,0.15);z-index:10;width:232px;">
+          <div style="display:flex;flex-wrap:wrap;gap:6px;" id="emoji-picker"></div>
+        </div>
+      </div>
+      <div style="font-size:0.78rem;color:#B0BEC5;font-weight:700;margin-top:6px;">Tap the emoji button to change the class icon</div>
+    </div>
+    <div class="modal-btns">
+      <button class="mbtn-cancel" onclick="closeCreateModal()">Cancel</button>
+      <button class="mbtn-ok" onclick="createClass()">✅ Create Class</button>
+    </div>
+    <div class="modal-msg" id="create-msg"></div>
+  </div>
+</div>
+
+<!-- ══ CLASS DETAIL PAGE ══ -->
+<div class="page" id="class-page">
+  <div class="dash-header">
+    <div class="dash-logo">Math<span>Quest</span> 🎓</div>
+    <div class="header-right">
+      <button class="hbtn back" onclick="goBackToClasses()">← My Classes</button>
+      <span class="dash-username" id="class-page-username">Educator</span>
+      <button class="hbtn" onclick="doLogout()">↩ Log Out</button>
+    </div>
+  </div>
+
+  <!-- Class hero strip -->
+  <div class="class-hero" id="class-hero">
+    <span class="class-hero-emoji" id="ch-emoji">📚</span>
+    <div class="class-hero-info">
+      <div class="class-hero-name" id="ch-name">Class Name</div>
+      <div class="class-hero-grade" id="ch-grade">Grade —</div>
+      <div class="class-hero-stats" id="ch-stats"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Add student form -->
+    <div class="add-stu-form" id="add-stu-form">
+      <div class="af-title">➕ Add New Student to This Class</div>
+      <div class="field-row">
+        <div class="f"><label>Username</label><input type="text" id="new-name" placeholder="e.g. alex123" maxlength="16"></div>
+        <div class="f"><label>Password</label><input type="password" id="new-pass-s" placeholder="Min 4 chars"></div>
+        <div class="f"><label>Grade</label>
+          <select id="new-grade">
+            <option>1</option><option>2</option><option>3</option><option>4</option>
+            <option>5</option><option>6</option><option>7</option><option>8</option><option>9</option>
+          </select>
+        </div>
+        <div class="f"><label>Avatar</label>
+          <select id="new-avatar">
+            <option>🐣</option><option>🐱</option><option>🐶</option><option>🦄</option>
+            <option>🐸</option><option>🦊</option><option>🐼</option><option>🐙</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-btns">
+        <button class="btn-green" onclick="addStudentToClass()">✅ Create & Add</button>
+        <button class="btn-cancel" onclick="toggleAddStuForm()">Cancel</button>
+        <span class="form-msg" id="add-stu-msg"></span>
+      </div>
+    </div>
+
+    <!-- Students card -->
+    <div class="section-card">
+      <div class="sc-title">
+        <span>👩‍🎓 Students</span>
+        <button class="add-stu-btn" onclick="toggleAddStuForm()">+ Add Student</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>Name</th><th>Grade</th><th>Level</th><th>⭐ Stars</th><th>🎮 Games</th><th>🔥 Streak</th><th>Remove</th></tr></thead>
+          <tbody id="class-student-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="api.js"></script>
 <script>
-let currentEdu = null; // { username, name, email }
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let currentEdu = null;
+let currentClass = null; // { id, name, grade, emoji }
 
-// ── TABS ──
+const CLASS_EMOJIS = ['📚','🚀','🌟','🎯','🦋','🌈','🔬','🎨','🏆','🌍','🧩','⚡'];
+
+// ══════════════════════════════════════════
+//  AUTH TABS
+// ══════════════════════════════════════════
 function switchTab(t){
   document.getElementById('tab-login').classList.toggle('active', t==='login');
   document.getElementById('tab-signup').classList.toggle('active', t==='signup');
   document.getElementById('form-login').style.display  = t==='login'  ? '' : 'none';
   document.getElementById('form-signup').style.display = t==='signup' ? '' : 'none';
-  document.getElementById('login-err').textContent='';
-  document.getElementById('signup-err').textContent='';
+  setErr('login-err',''); setErr('signup-err','');
+}
+function setErr(id,msg,ok=false){
+  const el=document.getElementById(id);
+  el.style.color=ok?'#43A047':'#E53935';
+  el.textContent=msg;
 }
 
-function setErr(id, msg, ok=false){
-  const el = document.getElementById(id);
-  el.style.color = ok ? '#43A047' : '#E53935';
-  el.textContent = msg;
-}
-
-// ── LOGIN ──
+// ══════════════════════════════════════════
+//  LOGIN / SIGNUP
+// ══════════════════════════════════════════
 async function doLogin(){
-  const u = document.getElementById('login-user').value.trim();
-  const p = document.getElementById('login-pass').value;
+  const u=document.getElementById('login-user').value.trim();
+  const p=document.getElementById('login-pass').value;
   if(!u||!p){ setErr('login-err','Please fill in both fields!'); return; }
-  setErr('login-err','Checking... ⏳', true);
-  const data = await apiGet('/educator/'+encodeURIComponent(u));
+  setErr('login-err','Checking... ⏳',true);
+  const data=await apiGet('/educator/'+encodeURIComponent(u));
   if(!data||data.error){ setErr('login-err','Username not found. Try signing up!'); return; }
-  if(data.password !== btoa(p)){ setErr('login-err','Wrong password. Try again!'); return; }
-  currentEdu = { username: u, name: data.name, email: data.email };
-  enterDashboard();
+  if(data.password!==btoa(p)){ setErr('login-err','Wrong password. Try again!'); return; }
+  currentEdu={username:u,name:data.name,email:data.email};
+  enterClassesDashboard();
 }
 
-// ── SIGNUP ──
 async function doSignup(){
-  const name  = document.getElementById('signup-name').value.trim();
-  const email = document.getElementById('signup-email').value.trim().toLowerCase();
-  const u     = document.getElementById('signup-user').value.trim();
-  const p     = document.getElementById('signup-pass').value;
+  const name=document.getElementById('signup-name').value.trim();
+  const email=document.getElementById('signup-email').value.trim().toLowerCase();
+  const u=document.getElementById('signup-user').value.trim();
+  const p=document.getElementById('signup-pass').value;
   if(!name||!email||!u||!p){ setErr('signup-err','Please fill in all fields!'); return; }
   if(!email.includes('@')){ setErr('signup-err','Enter a valid email address!'); return; }
   if(u.length<3){ setErr('signup-err','Username must be at least 3 characters!'); return; }
   if(!/^[a-zA-Z0-9_]+$/.test(u)){ setErr('signup-err','Username: only letters, numbers, _ allowed!'); return; }
   if(p.length<6){ setErr('signup-err','Password must be at least 6 characters!'); return; }
-  setErr('signup-err','Checking username... ⏳', true);
-  const existing = await apiGet('/educator/'+encodeURIComponent(u));
+  setErr('signup-err','Checking username... ⏳',true);
+  const existing=await apiGet('/educator/'+encodeURIComponent(u));
   if(existing&&!existing.error){ setErr('signup-err','That username is already taken!'); return; }
-  setErr('signup-err','Creating account... ⏳', true);
-  const res = await apiPost('/educator/'+encodeURIComponent(u), { name, email, password: btoa(p) });
+  setErr('signup-err','Creating account... ⏳',true);
+  const res=await apiPost('/educator/'+encodeURIComponent(u),{name,email,password:btoa(p)});
   if(!res||!res.ok){ setErr('signup-err','Failed to create account. Try again!'); return; }
-  currentEdu = { username: u, name, email };
-  enterDashboard();
+  currentEdu={username:u,name,email};
+  enterClassesDashboard();
 }
 
-// ── ENTER DASHBOARD ──
-function enterDashboard(){
-  document.getElementById('auth-card').style.display = 'none';
-  document.body.style.background = 'none';
-  document.body.style.alignItems = 'flex-start';
-  const dash = document.getElementById('dash-page');
-  dash.style.display = 'block';
-  document.getElementById('dash-username').textContent = `👋 ${currentEdu.name || currentEdu.username}`;
-  renderDashboard();
+// ══════════════════════════════════════════
+//  PAGE ROUTING
+// ══════════════════════════════════════════
+function showPage(id){
+  ['auth-card','classes-page','class-page'].forEach(p=>{
+    const el=document.getElementById(p);
+    if(p==='auth-card'){
+      el.style.display = id==='auth-card' ? '' : 'none';
+    } else {
+      el.style.display = p===id ? 'block' : 'none';
+    }
+  });
+  document.body.style.background = id==='auth-card'
+    ? 'linear-gradient(180deg,#1A237E 0%,#283593 50%,#1565C0 100%)'
+    : 'none';
+  document.body.style.alignItems = id==='auth-card' ? 'center' : 'flex-start';
+}
+
+function enterClassesDashboard(){
+  showPage('classes-page');
+  document.getElementById('dash-username').textContent = `👋 ${currentEdu.name||currentEdu.username}`;
+  renderClassesGrid();
+}
+
+function goBackToClasses(){
+  currentClass=null;
+  showPage('classes-page');
+  renderClassesGrid();
 }
 
 function doLogout(){
   if(!confirm('Log out of Educator Hub?')) return;
-  currentEdu = null;
-  document.getElementById('auth-card').style.display = '';
-  document.getElementById('dash-page').style.display = 'none';
-  document.body.style.background = 'linear-gradient(180deg,#1A237E 0%,#283593 50%,#1565C0 100%)';
-  document.body.style.alignItems = 'center';
+  currentEdu=null; currentClass=null;
+  showPage('auth-card');
   document.getElementById('login-user').value='';
   document.getElementById('login-pass').value='';
   setErr('login-err','');
 }
 
-// ── DASHBOARD ──
-async function renderDashboard(){
-  document.getElementById('student-table').innerHTML='<tr><td colspan="8" class="no-data">Loading... ⏳</td></tr>';
-  document.getElementById('summary').innerHTML='';
+// ══════════════════════════════════════════
+//  CLASSES GRID
+// ══════════════════════════════════════════
+async function renderClassesGrid(){
+  const grid=document.getElementById('classes-grid');
+  grid.innerHTML='<div class="loader">Loading classes... ⏳</div>';
 
-  const res = await apiGet('/edu-students/'+encodeURIComponent(currentEdu.username));
-  if(!res||!res.students){
-    document.getElementById('student-table').innerHTML='<tr><td colspan="8" class="no-data">Could not connect 😢</td></tr>';
+  const res=await apiGet('/edu-classes/'+encodeURIComponent(currentEdu.username));
+  const classes=(res&&res.classes)||[];
+
+  if(!classes.length){
+    grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1">
+      <div class="empty-icon">🏫</div>
+      <div class="empty-title">No classes yet!</div>
+      <div class="empty-desc">Click "New Class" to create your first class</div>
+    </div>`;
     return;
   }
 
-  const students = await Promise.all(res.students.map(async n=>{
+  // Load student counts for each class in parallel
+  const withCounts = await Promise.all(classes.map(async (cls,i) => {
+    const sr=await apiGet('/class-students/'+encodeURIComponent(currentEdu.username)+'/'+encodeURIComponent(cls.id));
+    const students=(sr&&sr.students)||[];
+    // Load progress for stars sum
+    const progList=await Promise.all(students.map(n=>apiGet('/progress/'+encodeURIComponent(n))));
+    const totalStars=progList.reduce((s,p)=>s+(p?.totalStars||0),0);
+    const avgLevel=students.length ? (progList.reduce((s,p)=>s+(p?.playerLevel||1),0)/students.length).toFixed(1) : 0;
+    // Derive grade range from students
+    const userList=await Promise.all(students.map(n=>apiGet('/user/'+encodeURIComponent(n))));
+    const grades=userList.map(u=>parseInt(u?.grade)).filter(g=>!isNaN(g)).sort((a,b)=>a-b);
+    const gradeRange=grades.length===0?'No students yet':grades.length===1?`Grade ${grades[0]}`:`Grades ${grades[0]}–${grades[grades.length-1]}`;
+    return{...cls, count:students.length, totalStars, avgLevel, colorIdx:i%6, gradeRange};
+  }));
+
+  grid.innerHTML=withCounts.map(cls=>`
+    <div class="class-card color-${cls.colorIdx}" onclick="openClass('${cls.id}')">
+      <button class="class-del" onclick="event.stopPropagation();deleteClass('${cls.id}','${cls.name}')">🗑 Delete</button>
+      <span class="class-card-emoji">${cls.emoji||'📚'}</span>
+      <div class="class-card-name">${cls.name}</div>
+      <div class="class-card-grade">${cls.gradeRange||'No students yet'}</div>
+      <div class="class-stats">
+        <div class="cs"><div class="cs-num">${cls.count}</div><div class="cs-lbl">Students</div></div>
+        <div class="cs"><div class="cs-num">${cls.avgLevel}</div><div class="cs-lbl">Avg Level</div></div>
+        <div class="cs"><div class="cs-num">${cls.totalStars}</div><div class="cs-lbl">Total Stars</div></div>
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════
+//  CREATE CLASS MODAL
+// ══════════════════════════════════════════
+let selectedEmoji='📚';
+function openCreateModal(){
+  selectedEmoji='📚';
+  document.getElementById('emoji-btn').textContent=selectedEmoji;
+  const picker=document.getElementById('emoji-picker');
+  picker.innerHTML=CLASS_EMOJIS.map(e=>`<span class="emoji-opt${e==='📚'?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
+  document.getElementById('cls-name').value='';
+  document.getElementById('create-msg').textContent='';
+  document.getElementById('emoji-popover').style.display='none';
+  document.getElementById('create-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('cls-name').focus(),100);
+}
+function closeCreateModal(){
+  document.getElementById('create-modal').classList.remove('open');
+  document.getElementById('emoji-popover').style.display='none';
+}
+function toggleEmojiPopover(e){
+  e.stopPropagation();
+  const pop=document.getElementById('emoji-popover');
+  const picker=document.getElementById('emoji-picker');
+  if(pop.style.display==='none'){
+    picker.innerHTML=CLASS_EMOJIS.map(em=>`<span class="emoji-opt${em===selectedEmoji?' selected':''}" onclick="selectEmoji('${em}')">${em}</span>`).join('');
+    pop.style.display='block';
+  } else {
+    pop.style.display='none';
+  }
+}
+function selectEmoji(e){
+  selectedEmoji=e;
+  document.getElementById('emoji-btn').textContent=e;
+  document.querySelectorAll('.emoji-opt').forEach(el=>el.classList.toggle('selected',el.textContent===e));
+  document.getElementById('emoji-popover').style.display='none';
+}
+// Close popover when clicking outside
+document.addEventListener('click',()=>{
+  const pop=document.getElementById('emoji-popover');
+  if(pop) pop.style.display='none';
+});
+
+async function createClass(){
+  const name=document.getElementById('cls-name').value.trim();
+  const msg=document.getElementById('create-msg');
+  if(!name){ msg.style.color='#E53935'; msg.textContent='Please enter a class name!'; return; }
+  msg.style.color='#90A4AE'; msg.textContent='Creating... ⏳';
+  const id='cls_'+Date.now();
+  const cls={id,name,emoji:selectedEmoji};
+  const res=await apiPost('/edu-classes/'+encodeURIComponent(currentEdu.username)+'/'+encodeURIComponent(id), cls);
+  if(!res||!res.ok){ msg.style.color='#E53935'; msg.textContent='❌ Failed to create class.'; return; }
+  msg.style.color='#43A047'; msg.textContent='✅ Class created!';
+  setTimeout(()=>{ closeCreateModal(); renderClassesGrid(); },900);
+}
+
+async function deleteClass(id,name){
+  if(!confirm(`Delete class "${name}"? This will NOT delete student accounts, but they will be removed from this class.`)) return;
+  await apiDelete('/edu-classes/'+encodeURIComponent(currentEdu.username)+'/'+encodeURIComponent(id));
+  renderClassesGrid();
+}
+
+// ══════════════════════════════════════════
+//  CLASS DETAIL
+// ══════════════════════════════════════════
+async function openClass(id){
+  // Fetch class metadata
+  const res=await apiGet('/edu-classes/'+encodeURIComponent(currentEdu.username));
+  const classes=(res&&res.classes)||[];
+  currentClass=classes.find(c=>c.id===id);
+  if(!currentClass){ alert('Class not found!'); return; }
+
+  showPage('class-page');
+  document.getElementById('class-page-username').textContent=`👋 ${currentEdu.name||currentEdu.username}`;
+  document.getElementById('ch-emoji').textContent=currentClass.emoji||'📚';
+  document.getElementById('ch-name').textContent=currentClass.name;
+  document.getElementById('ch-grade').textContent='';
+  document.getElementById('ch-stats').innerHTML='<div class="loader">Loading... ⏳</div>';
+  document.getElementById('class-student-table').innerHTML='<tr><td colspan="8" class="no-data">Loading... ⏳</td></tr>';
+
+  // Hide add form
+  document.getElementById('add-stu-form').style.display='none';
+  document.getElementById('add-stu-msg').textContent='';
+
+  renderClassStudents();
+}
+
+async function renderClassStudents(){
+  const sr=await apiGet('/class-students/'+encodeURIComponent(currentEdu.username)+'/'+encodeURIComponent(currentClass.id));
+  const names=(sr&&sr.students)||[];
+
+  const students=await Promise.all(names.map(async n=>{
     const u=await apiGet('/user/'+encodeURIComponent(n));
     const d=await apiGet('/progress/'+encodeURIComponent(n));
     return{name:n,avatar:u?.avatar||'🐣',grade:u?.grade||1,level:d?.playerLevel||1,stars:d?.totalStars||0,games:d?.gamesPlayed||0,streak:d?.streak||0};
   }));
   students.sort((a,b)=>b.stars-a.stars);
 
+  // Update hero stats
   const total=students.length;
   const avgLvl=total?(students.reduce((s,x)=>s+x.level,0)/total).toFixed(1):0;
-  document.getElementById('summary').innerHTML=`
-    <div class="stat-box"><div class="stat-num">${total}</div><div class="stat-label">Students</div></div>
-    <div class="stat-box"><div class="stat-num">${avgLvl}</div><div class="stat-label">Avg Level</div></div>
-    <div class="stat-box"><div class="stat-num">${students.reduce((s,x)=>s+x.games,0)}</div><div class="stat-label">Total Games</div></div>
-    <div class="stat-box"><div class="stat-num">${students.reduce((s,x)=>s+x.stars,0)}</div><div class="stat-label">Total Stars</div></div>
+  document.getElementById('ch-stats').innerHTML=`
+    <div class="chs"><div class="chs-n">${total}</div><div class="chs-l">Students</div></div>
+    <div class="chs"><div class="chs-n">${avgLvl}</div><div class="chs-l">Avg Level</div></div>
+    <div class="chs"><div class="chs-n">${students.reduce((s,x)=>s+x.games,0)}</div><div class="chs-l">Games Played</div></div>
+    <div class="chs"><div class="chs-n">${students.reduce((s,x)=>s+x.stars,0)}</div><div class="chs-l">Total Stars</div></div>
   `;
 
-  const tbody=document.getElementById('student-table');
+  const tbody=document.getElementById('class-student-table');
   if(!students.length){
     tbody.innerHTML='<tr><td colspan="8" class="no-data">No students yet! Click "+ Add Student" to get started 🎒</td></tr>';
     return;
@@ -305,57 +575,81 @@ async function renderDashboard(){
   tbody.innerHTML=students.map((s,i)=>`
     <tr>
       <td style="font-size:1.4rem">${s.avatar}</td>
-      <td><strong>${s.name}</strong>${i===0?' <span style="font-size:0.75rem;background:#FFD54F;color:#BF360C;border-radius:50px;padding:2px 8px;margin-left:6px">🏆 Top</span>':''}</td>
+      <td><strong>${s.name}</strong>${i===0?'<span style="font-size:0.75rem;background:#FFD54F;color:#BF360C;border-radius:50px;padding:2px 8px;margin-left:6px">🏆 Top</span>':''}</td>
       <td><span class="grade-pill">Grade ${s.grade}</span></td>
       <td>Lvl ${s.level}</td>
       <td>⭐ ${s.stars}</td>
       <td>${s.games}</td>
       <td>🔥 ${s.streak}</td>
-      <td><button class="del-btn" onclick="deleteStudent('${s.name}')">🗑 Remove</button></td>
+      <td><button class="del-btn" onclick="removeStudentFromClass('${s.name}')">🗑 Remove</button></td>
     </tr>`).join('');
 }
 
-// ── ADD STUDENT ──
-function toggleAddForm(){
-  const f=document.getElementById('add-form');
-  f.style.display = f.style.display==='block' ? 'none' : 'block';
-  document.getElementById('add-msg').textContent='';
+// ══════════════════════════════════════════
+//  ADD / REMOVE STUDENT (in class)
+// ══════════════════════════════════════════
+function toggleAddStuForm(){
+  const f=document.getElementById('add-stu-form');
+  f.style.display=f.style.display==='block'?'none':'block';
+  document.getElementById('add-stu-msg').textContent='';
   document.getElementById('new-name').value='';
   document.getElementById('new-pass-s').value='';
 }
 
-async function addStudent(){
-  const name  = document.getElementById('new-name').value.trim();
-  const pass  = document.getElementById('new-pass-s').value;
-  const grade = parseInt(document.getElementById('new-grade').value);
-  const avatar= document.getElementById('new-avatar').value;
-  const msg   = document.getElementById('add-msg');
+async function addStudentToClass(){
+  const name=document.getElementById('new-name').value.trim();
+  const pass=document.getElementById('new-pass-s').value;
+  const grade=parseInt(document.getElementById('new-grade').value);
+  const avatar=document.getElementById('new-avatar').value;
+  const msg=document.getElementById('add-stu-msg');
   if(!name||!pass){ msg.style.color='#E53935'; msg.textContent='Fill in name and password!'; return; }
   if(name.length<2){ msg.style.color='#E53935'; msg.textContent='Name too short!'; return; }
   if(pass.length<4){ msg.style.color='#E53935'; msg.textContent='Password needs 4+ characters!'; return; }
   if(!/^[a-zA-Z0-9_]+$/.test(name)){ msg.style.color='#E53935'; msg.textContent='Only letters, numbers, _ allowed!'; return; }
   msg.style.color='#90A4AE'; msg.textContent='Checking username... ⏳';
   const existing=await apiGet('/user/'+encodeURIComponent(name));
-  if(existing&&!existing.error){ msg.style.color='#E53935'; msg.textContent='Username already taken!'; return; }
-  msg.style.color='#90A4AE'; msg.textContent='Creating... ⏳';
+  if(existing&&!existing.error){
+    // Generate 5 variants with random suffixes, check all in parallel
+    const chars='abcdefghjkmnpqrstuvwxyz23456789';
+    const randChar=()=>chars[Math.floor(Math.random()*chars.length)];
+    const randSuffix=()=>Array.from({length:2},randChar).join('');
+    const candidates=[...new Set(Array.from({length:5},()=>name+randSuffix()))];
+    const checks=await Promise.all(candidates.map(c=>apiGet('/user/'+encodeURIComponent(c)).then(r=>({c,free:!r||!!r.error}))));
+    const free=checks.filter(x=>x.free).map(x=>x.c);
+    if(free.length){
+      const btns=free.map(u=>`<button onclick="document.getElementById('new-name').value='${u}';document.getElementById('add-stu-msg').innerHTML=''" style="background:#E8EAF6;border:2px solid #C5CAE9;border-radius:8px;padding:4px 10px;cursor:pointer;font-weight:800;font-size:0.82rem;color:#3949AB;font-family:'Nunito',sans-serif;">${u}</button>`).join(' ');
+      msg.style.color='#E53935';
+      msg.innerHTML=`<b>${name}</b> is taken. Try: ${btns}`;
+    } else {
+      msg.style.color='#E53935'; msg.textContent=`"${name}" is already taken — please choose a different username.`;
+    }
+    return;
+  }
+  msg.style.color='#90A4AE'; msg.textContent='Creating student... ⏳';
   const r1=await apiPost('/user/'+encodeURIComponent(name),{password:btoa(pass),avatar,grade,createdByEducator:true});
-  if(!r1||!r1.ok){ msg.style.color='#E53935'; msg.textContent='❌ Failed to create user. Is your Worker deployed?'; return; }
-  const r2=await apiPost('/edu-students/'+encodeURIComponent(currentEdu.username)+'/'+encodeURIComponent(name),{});
-  if(!r2||!r2.ok){ msg.style.color='#E53935'; msg.textContent='❌ Failed to add to class list.'; return; }
-  msg.style.color='#43A047'; msg.textContent=`✅ ${name} created!`;
+  if(!r1||!r1.ok){ msg.style.color='#E53935'; msg.textContent='❌ Failed to create user.'; return; }
+  // Add to class roster
+  const r2=await apiPost('/class-students/'+encodeURIComponent(currentEdu.username)+'/'+encodeURIComponent(currentClass.id)+'/'+encodeURIComponent(name),{});
+  if(!r2||!r2.ok){ msg.style.color='#E53935'; msg.textContent='❌ Failed to add to class.'; return; }
+  // Also add to legacy edu-students list (backwards compat)
+  await apiPost('/edu-students/'+encodeURIComponent(currentEdu.username)+'/'+encodeURIComponent(name),{});
+  msg.style.color='#43A047'; msg.textContent=`✅ ${name} added!`;
   document.getElementById('new-name').value='';
   document.getElementById('new-pass-s').value='';
-  setTimeout(()=>{ msg.textContent=''; toggleAddForm(); renderDashboard(); },1500);
+  document.getElementById('new-name').focus();
+  renderClassStudents();
+  setTimeout(()=>{ msg.textContent=''; },2000);
 }
 
-async function deleteStudent(name){
-  if(!confirm(`Remove ${name}? This deletes their account and all progress permanently!`)) return;
-  await apiDelete('/user/'+encodeURIComponent(name));
-  await apiDelete('/edu-students/'+encodeURIComponent(currentEdu.username)+'/'+encodeURIComponent(name));
-  renderDashboard();
+async function removeStudentFromClass(name){
+  if(!confirm(`Remove ${name} from this class? Their account will NOT be deleted.`)) return;
+  await apiDelete('/class-students/'+encodeURIComponent(currentEdu.username)+'/'+encodeURIComponent(currentClass.id)+'/'+encodeURIComponent(name));
+  renderClassStudents();
 }
 
-// ── CHANGE PASSWORD ──
+// ══════════════════════════════════════════
+//  CHANGE PASSWORD
+// ══════════════════════════════════════════
 async function changePassword(){
   const np=document.getElementById('chg-pass').value;
   const nc=document.getElementById('chg-conf').value;

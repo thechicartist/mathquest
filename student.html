@@ -361,7 +361,62 @@ function makeOpts(ans,spread=5,count=4){const opts=new Set([String(ans)]);let t=
 function genCounting(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const type=['next','missing','biggest'][rnd(0,diff==='easy'?1:2)];let text,ans,opts;if(type==='next'){const step=diff==='easy'?1:diff==='medium'?rnd(2,5):rnd(5,10);const start=rnd(1,diff==='easy'?15:50);const seq=[start,start+step,start+2*step,start+3*step];ans=start+4*step;text=`What comes next? ${seq.join(', ')}, ___`;opts=makeOpts(ans,step*2);}else if(type==='missing'){const step=diff==='easy'?1:rnd(2,5);const start=rnd(1,40);const pos=rnd(1,3);const seq=[start,start+step,start+2*step,start+3*step];ans=seq[pos];seq[pos]='___';text=`Fill the blank: ${seq.join(', ')}`;opts=makeOpts(ans,step*2);}else{const nums=shuffle([rnd(10,50),rnd(10,50),rnd(10,50),rnd(10,50)]);ans=Math.max(...nums);text='Which is the BIGGEST?';opts=nums.map(String);}qs.push({text,answer:String(ans),options:shuffle(opts),hint:'Count carefully!'});}return qs;}
 function genAddSubt(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const op=rnd(0,1)===0?'add':'sub';let a,b;if(diff==='easy'){a=rnd(1,10);b=rnd(1,10);}else if(diff==='medium'){a=rnd(10,50);b=rnd(5,30);}else{a=rnd(50,200);b=rnd(20,100);}if(op==='sub'&&b>a){let t=a;a=b;b=t;}const ans=op==='add'?a+b:a-b;qs.push({text:`${a} ${op==='add'?'+':'-'} ${b} = ?`,answer:String(ans),options:shuffle(makeOpts(ans,8)),hint:op==='add'?'Count on!':'Count backwards!'});}return qs;}
 function genMultiply(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){let a,b;if(diff==='easy'){a=rnd(2,10);b=rnd(2,10);}else if(diff==='medium'){a=rnd(7,20);b=rnd(7,15);}else{a=rnd(12,50);b=rnd(12,30);}const ans=a*b;qs.push({text:`${a} × ${b} = ?`,answer:String(ans),options:shuffle(makeOpts(ans,ans*0.2+5)),hint:'Use your times tables!'});}return qs;}
-function genFractions(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const type=['add','sub','compare','simplify'][rnd(0,3)];let text,displayHTML,ans,opts,hint;if(type==='add'||type==='sub'){let d1=rnd(2,diff==='easy'?6:12),d2=rnd(2,diff==='easy'?6:12);let n1=rnd(1,d1-1),n2=rnd(1,d2-1);const L=lcm(d1,d2);const resN=type==='add'?n1*(L/d1)+n2*(L/d2):n1*(L/d1)-n2*(L/d2);if(resN<=0){i--;continue;}const g=gcd(resN,L);ans=`${resN/g}/${L/g}`;text=type==='add'?'Add:':'Subtract:';displayHTML=`<div class="fraction-display"><span class="frac"><span class="frac-num">${n1}</span><span class="frac-den">${d1}</span></span>${type==='add'?'+':'-'}<span class="frac"><span class="frac-num">${n2}</span><span class="frac-den">${d2}</span></span></div>`;hint='Find a common denominator!';opts=[ans];while(opts.length<4){const wn=rnd(1,9),wd=rnd(2,12),w=`${wn}/${wd}`;if(!opts.includes(w))opts.push(w);};}else if(type==='compare'){const d=rnd(3,10),n1=rnd(1,d-1);let n2=rnd(1,d-1);while(n2===n1){n2=rnd(1,d-1);}ans=n1>n2?`${n1}/${d}`:`${n2}/${d}`;text='Which fraction is BIGGER?';displayHTML=null;hint='Same denominator? Compare tops!';opts=[`${n1}/${d}`,`${n2}/${d}`];while(opts.length<4){const wn=rnd(1,d-1),w=`${wn}/${d}`;if(!opts.includes(w))opts.push(w);};}else{let d=rnd(4,18),n=rnd(1,d-1);const g=gcd(n,d);if(g===1){i--;continue;}ans=`${n/g}/${d/g}`;text='Simplify:';displayHTML=`<div class="fraction-display"><span class="frac"><span class="frac-num">${n}</span><span class="frac-den">${d}</span></span></div>`;hint='Divide by GCD!';opts=[ans];while(opts.length<4){const wn=rnd(1,9),wd=rnd(2,12),w=`${wn}/${wd}`;if(!opts.includes(w)&&w!==ans)opts.push(w);};}opts=shuffle(opts).slice(0,4);if(!opts.includes(ans))opts[rnd(0,3)]=ans;qs.push({text,displayHTML,answer:ans,options:shuffle(opts),hint});}return qs;}
+function genFractions(diff){
+  const qs=[];
+  for(let i=0;i<TOTAL_QS;i++){
+    const type=['add','sub','compare','simplify'][rnd(0,3)];
+    let text,displayHTML=null,ans,opts,hint;
+ 
+    if(type==='add'||type==='sub'){
+      const maxD=diff==='easy'?6:12;
+      const d1=rnd(2,maxD),d2=rnd(2,maxD);
+      const n1=rnd(1,d1-1),n2=rnd(1,d2-1);
+      const L=lcm(d1,d2);
+      const resN=type==='add'?n1*(L/d1)+n2*(L/d2):n1*(L/d1)-n2*(L/d2);
+      if(resN<=0){i--;continue;}
+      const g=gcd(resN,L);
+      ans=`${resN/g}/${L/g}`;
+      text=type==='add'?'Add:':'Subtract:';
+      displayHTML=`<div class="fraction-display"><span class="frac"><span class="frac-num">${n1}</span><span class="frac-den">${d1}</span></span>${type==='add'?'+':'-'}<span class="frac"><span class="frac-num">${n2}</span><span class="frac-den">${d2}</span></span></div>`;
+      hint='Find a common denominator!';
+      opts=[ans];
+      let s1=0;
+      while(opts.length<4&&s1++<60){const wn=rnd(1,9),wd=rnd(2,12),w=`${wn}/${wd}`;if(!opts.includes(w))opts.push(w);}
+ 
+    }else if(type==='compare'){
+      const d=rnd(3,10),n1=rnd(1,d-1);
+      let n2=rnd(1,d-1),s2=0;
+      while(n2===n1&&s2++<20)n2=rnd(1,d-1);
+      if(n2===n1){i--;continue;}
+      ans=n1>n2?`${n1}/${d}`:`${n2}/${d}`;
+      text='Which fraction is BIGGER?';
+      hint='Same denominator? Compare the tops!';
+      opts=[`${n1}/${d}`,`${n2}/${d}`];
+      let s3=0;
+      while(opts.length<4&&s3++<40){const wn=rnd(1,d-1),w=`${wn}/${d}`;if(!opts.includes(w))opts.push(w);}
+ 
+    }else{
+      // Construct a reducible fraction: pick a reduced fraction n/d, multiply both by k>=2
+      // This GUARANTEES gcd(n*k, d*k) = k > 1, so the question is always valid
+      const simpleD=rnd(2,6),simpleN=rnd(1,simpleD-1);
+      if(gcd(simpleN,simpleD)!==1){i--;continue;}
+      const k=rnd(2,diff==='easy'?3:5);
+      const n=simpleN*k,d=simpleD*k;
+      ans=`${simpleN}/${simpleD}`;
+      text='Simplify:';
+      displayHTML=`<div class="fraction-display"><span class="frac"><span class="frac-num">${n}</span><span class="frac-den">${d}</span></span></div>`;
+      hint='Divide top and bottom by their GCD!';
+      opts=[ans];
+      let s4=0;
+      while(opts.length<4&&s4++<60){const wn=rnd(1,9),wd=rnd(2,12),w=`${wn}/${wd}`;if(!opts.includes(w)&&w!==ans)opts.push(w);}
+    }
+ 
+    opts=shuffle(opts).slice(0,4);
+    if(!opts.includes(ans))opts[rnd(0,3)]=ans;
+    qs.push({text,displayHTML,answer:ans,options:shuffle(opts),hint});
+  }
+  return qs;
+}
 function genDecimals(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const type=['add','sub'][rnd(0,1)];let a,b;if(diff==='easy'){a=+(rnd(10,99)/10).toFixed(1);b=+(rnd(10,99)/10).toFixed(1);}else{a=+(rnd(100,999)/100).toFixed(2);b=+(rnd(100,999)/100).toFixed(2);}if(type==='sub'&&b>a){let t=a;a=b;b=t;}const ans=+(type==='add'?a+b:a-b).toFixed(2);const opts=new Set([String(ans)]);while(opts.size<4){const w=+(ans+(rnd(-5,5)*0.1)).toFixed(2);if(w>0&&w!==ans)opts.add(String(w));}qs.push({text:`${a} ${type==='add'?'+':'-'} ${b} = ?`,answer:String(ans),options:shuffle([...opts]),hint:'Line up the decimal points!'});}return qs;}
 function genPercent(diff){const qs=[];const pcts=diff==='easy'?[10,20,25,50]:diff==='medium'?[15,30,40,75]:[12,17,33,66];for(let i=0;i<TOTAL_QS;i++){const p=pcts[rnd(0,pcts.length-1)];const n=Math.round(rnd(20,200)/5)*5;const ans=+(p/100*n).toFixed(1);const opts=new Set([String(ans)]);while(opts.size<4){const w=+(ans*(1+rnd(-3,3)*0.1)).toFixed(1);if(w>0&&w!==ans)opts.add(String(w));}qs.push({text:`What is ${p}% of ${n}?`,answer:String(ans),options:shuffle([...opts]),hint:`${p}% = ${p}/100`});}return qs;}
 function genAlgebra(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const x=rnd(diff==='easy'?1:2,diff==='easy'?10:30);const a=rnd(2,diff==='easy'?5:15);const b=rnd(0,diff==='easy'?10:20);const result=a*x+b;const text=rnd(0,1)===0?`${a}x + ${b} = ${result}, find x`:`${a}x = ${result-b}, find x`;qs.push({text,answer:String(x),options:shuffle(makeOpts(x,6)),hint:'Do the same to both sides!'});}return qs;}
