@@ -52,8 +52,19 @@
   .topic-card { background:white; border-radius:20px; padding:24px 16px; text-align:center; cursor:pointer; transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 6px 20px var(--shadow); border:3px solid transparent; position:relative; overflow:hidden; }
   .topic-card:hover:not(.locked) { transform:translateY(-6px) scale(1.02); }
   .topic-card.selected { transform:translateY(-8px) scale(1.04); }
-  .topic-card.locked { opacity:0.38; cursor:not-allowed; filter:grayscale(0.5); pointer-events:none; }
-  .topic-card.locked::after { content:'🔒'; position:absolute; top:8px; right:10px; font-size:1.1rem; }
+  .topic-card.locked { cursor:not-allowed; }
+  .topic-card.locked .topic-icon,
+  .topic-card.locked .topic-name,
+  .topic-card.locked .topic-desc { opacity:0.3; }
+
+  .lock-overlay { display:none; position:absolute; inset:0; background:rgba(255,255,255,0.88); backdrop-filter:blur(3px); border-radius:17px; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding:10px; }
+  .topic-card.locked .lock-overlay { display:flex; }
+  .lock-icon { font-size:1.5rem; }
+  .lock-games-text { font-family:'Nunito',sans-serif; font-weight:800; font-size:0.76rem; color:#3949AB; line-height:1.3; text-align:center; }
+  .lock-progress-wrap { width:80%; background:#E8EAF6; border-radius:50px; height:7px; overflow:hidden; margin-top:4px; }
+  .lock-progress-fill { height:100%; background:linear-gradient(90deg,#7C4DFF,#AB47BC); border-radius:50px; transition:width 0.5s ease; }
+  .lock-progress-label { font-size:0.7rem; font-weight:800; color:#90A4AE; margin-top:2px; }
+
   .topic-icon { font-size:2.8rem; margin-bottom:10px; display:block; }
   .topic-name { font-family:'Fredoka One',cursive; font-size:1.1rem; color:var(--navy); margin-bottom:4px; }
   .topic-desc { font-size:0.82rem; color:#78909C; font-weight:600; }
@@ -126,6 +137,9 @@
   .btn-primary { flex:1; padding:14px; background:linear-gradient(135deg,#FF7043,#FF5722); border:none; color:white; border-radius:16px; font-family:'Fredoka One',cursive; font-size:1.1rem; cursor:pointer; transition:all 0.2s; box-shadow:0 6px 20px rgba(255,87,34,0.4); }
   .btn-primary:hover { transform:translateY(-3px); }
 
+  .unlock-toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px); background:linear-gradient(135deg,#7C4DFF,#651FFF); color:white; border-radius:20px; padding:14px 24px; font-family:'Fredoka One',cursive; font-size:1.1rem; box-shadow:0 8px 30px rgba(124,77,255,0.5); z-index:9999; opacity:0; pointer-events:none; transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1); white-space:nowrap; }
+  .unlock-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
   .coin-burst { position:fixed; pointer-events:none; z-index:999; }
   .coin { position:absolute; font-size:1.5rem; animation:coinFly 1s ease forwards; }
   @keyframes coinFly { 0%{transform:translateY(0) scale(1);opacity:1} 100%{transform:translateY(-120px) scale(0.3);opacity:0} }
@@ -134,7 +148,6 @@
   @keyframes mascotBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
   .speech-bubble { position:fixed; bottom:90px; right:20px; background:white; border-radius:18px; padding:12px 16px; font-weight:700; font-size:0.9rem; color:var(--navy); box-shadow:0 4px 20px var(--shadow); border:3px solid #E8EAF6; max-width:200px; display:none; z-index:100; }
 
-  /* QUEST MODAL */
   .quest-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:5000; display:none; align-items:center; justify-content:center; padding:20px; }
   .quest-overlay.open { display:flex; animation:fadeIn 0.25s ease; }
   .quest-panel { background:white; border-radius:28px; width:100%; max-width:520px; max-height:85vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3); border:4px solid #E8EAF6; }
@@ -183,6 +196,7 @@
 <div class="clouds" id="clouds"></div>
 <div class="mascot" id="mascot" onclick="showTip()">🐣</div>
 <div class="speech-bubble" id="speech-bubble">Pick a topic and let's go! 🎯</div>
+<div class="unlock-toast" id="unlock-toast">🔓 Topic Unlocked!</div>
 
 <div class="container">
   <!-- HOME -->
@@ -203,14 +217,38 @@
     <div class="hero-sub">Choose a topic and start earning stars!</div>
     <div class="section-title" style="margin-bottom:14px;">🗺️ Choose Your Topic</div>
     <div class="topics-grid">
-      <div class="topic-card t-counting"  id="tc-counting"  onclick="selectTopic('counting')"><span class="topic-icon">🍎</span><div class="topic-name">Counting</div><div class="topic-desc">Numbers & sequences</div></div>
-      <div class="topic-card t-addsubt"   id="tc-addsubt"   onclick="selectTopic('addsubt')"><span class="topic-icon">➕</span><div class="topic-name">Add & Subtract</div><div class="topic-desc">Plus and minus</div></div>
-      <div class="topic-card t-multiply"  id="tc-multiply"  onclick="selectTopic('multiply')"><span class="topic-icon">✖️</span><div class="topic-name">Multiplication</div><div class="topic-desc">Times tables & more</div></div>
-      <div class="topic-card t-fractions" id="tc-fractions" onclick="selectTopic('fractions')"><span class="topic-icon">🍕</span><div class="topic-name">Fractions</div><div class="topic-desc">Add, subtract & compare</div></div>
-      <div class="topic-card t-decimals"  id="tc-decimals"  onclick="selectTopic('decimals')"><span class="topic-icon">🔢</span><div class="topic-name">Decimals</div><div class="topic-desc">Decimal operations</div></div>
-      <div class="topic-card t-percent"   id="tc-percent"   onclick="selectTopic('percent')"><span class="topic-icon">💯</span><div class="topic-name">Percentages</div><div class="topic-desc">% of numbers</div></div>
-      <div class="topic-card t-algebra"   id="tc-algebra"   onclick="selectTopic('algebra')"><span class="topic-icon">🔍</span><div class="topic-name">Algebra</div><div class="topic-desc">Find the unknown</div></div>
-      <div class="topic-card t-geometry"  id="tc-geometry"  onclick="selectTopic('geometry')"><span class="topic-icon">📐</span><div class="topic-name">Geometry</div><div class="topic-desc">Shapes & angles</div></div>
+      <div class="topic-card t-counting"  id="tc-counting"  onclick="handleTopicClick('counting')">
+        <span class="topic-icon">🍎</span><div class="topic-name">Counting</div><div class="topic-desc">Numbers &amp; sequences</div>
+        <div class="lock-overlay" id="lock-counting"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-counting"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-counting" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-counting"></div></div>
+      </div>
+      <div class="topic-card t-addsubt"   id="tc-addsubt"   onclick="handleTopicClick('addsubt')">
+        <span class="topic-icon">➕</span><div class="topic-name">Add &amp; Subtract</div><div class="topic-desc">Plus and minus</div>
+        <div class="lock-overlay" id="lock-addsubt"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-addsubt"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-addsubt" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-addsubt"></div></div>
+      </div>
+      <div class="topic-card t-multiply"  id="tc-multiply"  onclick="handleTopicClick('multiply')">
+        <span class="topic-icon">✖️</span><div class="topic-name">Multiplication</div><div class="topic-desc">Times tables &amp; more</div>
+        <div class="lock-overlay" id="lock-multiply"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-multiply"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-multiply" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-multiply"></div></div>
+      </div>
+      <div class="topic-card t-fractions" id="tc-fractions" onclick="handleTopicClick('fractions')">
+        <span class="topic-icon">🍕</span><div class="topic-name">Fractions</div><div class="topic-desc">Add, subtract &amp; compare</div>
+        <div class="lock-overlay" id="lock-fractions"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-fractions"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-fractions" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-fractions"></div></div>
+      </div>
+      <div class="topic-card t-decimals"  id="tc-decimals"  onclick="handleTopicClick('decimals')">
+        <span class="topic-icon">🔢</span><div class="topic-name">Decimals</div><div class="topic-desc">Decimal operations</div>
+        <div class="lock-overlay" id="lock-decimals"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-decimals"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-decimals" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-decimals"></div></div>
+      </div>
+      <div class="topic-card t-percent"   id="tc-percent"   onclick="handleTopicClick('percent')">
+        <span class="topic-icon">💯</span><div class="topic-name">Percentages</div><div class="topic-desc">% of numbers</div>
+        <div class="lock-overlay" id="lock-percent"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-percent"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-percent" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-percent"></div></div>
+      </div>
+      <div class="topic-card t-algebra"   id="tc-algebra"   onclick="handleTopicClick('algebra')">
+        <span class="topic-icon">🔍</span><div class="topic-name">Algebra</div><div class="topic-desc">Find the unknown</div>
+        <div class="lock-overlay" id="lock-algebra"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-algebra"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-algebra" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-algebra"></div></div>
+      </div>
+      <div class="topic-card t-geometry"  id="tc-geometry"  onclick="handleTopicClick('geometry')">
+        <span class="topic-icon">📐</span><div class="topic-name">Geometry</div><div class="topic-desc">Shapes &amp; angles</div>
+        <div class="lock-overlay" id="lock-geometry"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-geometry"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-geometry" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-geometry"></div></div>
+      </div>
     </div>
     <div class="grade-section">
       <div class="section-title">⚡ Difficulty</div>
@@ -278,12 +316,7 @@
 // ── SESSION ──
 const currentUser = JSON.parse(sessionStorage.getItem('mq_user'));
 if(!currentUser) location.href='index.html';
-
-function doLogout(){
-  if(!confirm('Switch user? Your progress is saved!')) return;
-  sessionStorage.removeItem('mq_user');
-  location.href='index.html';
-}
+function doLogout(){ if(!confirm('Switch user? Your progress is saved!')) return; sessionStorage.removeItem('mq_user'); location.href='index.html'; }
 
 // ── AVATARS ──
 const AVATARS=[{level:1,emoji:'🐣',title:'Hatchling'},{level:3,emoji:'🐥',title:'Chick'},{level:5,emoji:'🦊',title:'Fox Cub'},{level:8,emoji:'🦁',title:'Lion'},{level:12,emoji:'🧙',title:'Wizard'},{level:17,emoji:'🚀',title:'Rocket'},{level:23,emoji:'🌟',title:'Star'},{level:30,emoji:'🏆',title:'Champion'}];
@@ -292,18 +325,155 @@ function nextAvatar(lvl){ for(const av of AVATARS){if(av.level>lvl)return av;} r
 
 // ── STATE ──
 const TOTAL_QS=10;
-let grade=1,topic=null,difficulty='easy';
-let questions=[],currentQ=0,score=0;
-let timerInterval,timeLeft=15;
-let totalStars=0,streak=0,playerXP=0,playerLevel=1,gamesPlayed=0;
-let segStates=[],maxStreakThisGame=0;
+let grade=1, topic=null, difficulty='easy';
+let questions=[], currentQ=0, score=0;
+let timerInterval, timeLeft=15;
+let totalStars=0, streak=0, playerXP=0, playerLevel=1, gamesPlayed=0;
+let segStates=[], maxStreakThisGame=0;
+let topicGames={};
+
+// ── UNLOCK CHAIN ──
+// Each locked topic specifies exactly which topic you must play first, and how many games.
+// Topics with no entry in UNLOCK_CHAIN are always available (no prereq).
+// UNLOCK_CHAIN: each topic lists ALL possible prereqs — unlocked when ANY prereq has enough qualifying games.
+// This ensures every grade can reach every topic regardless of starting point.
+const UNLOCK_CHAIN = {
+  counting  : [{ prereq:'addsubt',   needed:4,  difficulty:'easy',   minScore:6  }],
+  addsubt   : [{ prereq:'counting',  needed:4,  difficulty:'easy',   minScore:6  },
+               { prereq:'multiply',  needed:4,  difficulty:'easy',   minScore:6  },
+               { prereq:'fractions', needed:4,  difficulty:'easy',   minScore:6  }],
+  multiply  : [{ prereq:'addsubt',   needed:5,  difficulty:'easy',   minScore:6  },
+               { prereq:'fractions', needed:5,  difficulty:'easy',   minScore:6  }],
+  geometry  : [{ prereq:'addsubt',   needed:6,  difficulty:'easy',   minScore:7  },
+               { prereq:'multiply',  needed:6,  difficulty:'easy',   minScore:7  },
+               { prereq:'fractions', needed:6,  difficulty:'easy',   minScore:7  }],
+  fractions : [{ prereq:'multiply',  needed:8,  difficulty:'medium', minScore:7  },
+               { prereq:'decimals',  needed:8,  difficulty:'medium', minScore:7  }],
+  decimals  : [{ prereq:'fractions', needed:8,  difficulty:'medium', minScore:7  },
+               { prereq:'percent',   needed:8,  difficulty:'medium', minScore:7  }],
+  percent   : [{ prereq:'decimals',  needed:10, difficulty:'medium', minScore:8  },
+               { prereq:'algebra',   needed:10, difficulty:'medium', minScore:8  }],
+  algebra   : [{ prereq:'percent',   needed:12, difficulty:'hard',   minScore:8  },
+               { prereq:'geometry',  needed:12, difficulty:'hard',   minScore:8  }],
+};
+
+const TOPIC_NAMES = {
+  counting:'Counting', addsubt:'Add & Subtract', multiply:'Multiplication',
+  fractions:'Fractions', decimals:'Decimals', percent:'Percentages',
+  algebra:'Algebra', geometry:'Geometry'
+};
+
+const ALL_TOPICS = ['counting','addsubt','multiply','fractions','decimals','percent','algebra','geometry'];
+
+// All topics a grade can ever access (determines which cards show at all — all 8 always show,
+// but grade-native ones start unlocked, others require the chain)
+const GRADE_NATIVE = {
+  1:['counting','addsubt'],
+  2:['counting','addsubt'],
+  3:['addsubt','multiply'],
+  4:['multiply','fractions'],
+  5:['fractions','decimals'],
+  6:['fractions','decimals'],
+  7:['decimals','percent'],
+  8:['decimals','percent'],
+  9:['algebra','geometry'],
+};
+
+function isGradeNative(t){ return (GRADE_NATIVE[grade]||[]).includes(t); }
+
+// topicGames shape: { addsubt: { easy: { q6: 3, q7: 1 }, medium: { q8: 2 } }, ... }
+function countQualifying(prereq, difficulty, minScore){
+  return (topicGames[prereq]?.[difficulty]?.[`q${minScore}`]) || 0;
+}
+
+function isTopicUnlocked(t){
+  if(isGradeNative(t)) return true;
+  const options = UNLOCK_CHAIN[t];
+  if(!options) return false;
+  // Unlocked if ANY prereq option is satisfied
+  return options.some(o => countQualifying(o.prereq, o.difficulty, o.minScore) >= o.needed);
+}
+
+// Returns the best lock info (most-progressed option), or null if unlocked
+function getLockInfo(t){
+  if(isTopicUnlocked(t)) return null;
+  const options = UNLOCK_CHAIN[t];
+  if(!options) return null;
+  // Pick the option with most progress so the overlay shows the most encouraging path
+  let best = null, bestPct = -1;
+  for(const o of options){
+    const played = countQualifying(o.prereq, o.difficulty, o.minScore);
+    const pct = played / o.needed;
+    if(pct > bestPct){ bestPct = pct; best = { ...o, played }; }
+  }
+  const remaining = best.needed - best.played;
+  const diffLabel = best.difficulty.charAt(0).toUpperCase()+best.difficulty.slice(1);
+  return {
+    prereqKey  : best.prereq,
+    prereqName : TOPIC_NAMES[best.prereq],
+    difficulty : best.difficulty,
+    diffLabel,
+    minScore   : best.minScore,
+    played     : best.played,
+    needed     : best.needed,
+    remaining,
+  };
+}
 
 // ── PERSISTENCE ──
-async function save(){ if(!currentUser)return; await apiPost('/progress/'+encodeURIComponent(currentUser.username),{totalStars,playerXP,playerLevel,streak,gamesPlayed}); }
+async function save(){
+  if(!currentUser)return;
+  await apiPost('/progress/'+encodeURIComponent(currentUser.username),{totalStars,playerXP,playerLevel,streak,gamesPlayed,topicGames});
+}
 async function load(){
   if(!currentUser)return;
   const d=await apiGet('/progress/'+encodeURIComponent(currentUser.username));
-  if(d){totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.gamesPlayed||0;}
+  if(d){ totalStars=d.totalStars||0; playerXP=d.playerXP||0; playerLevel=d.playerLevel||1; streak=d.streak||0; gamesPlayed=d.gamesPlayed||0; topicGames=d.topicGames||{}; }
+}
+
+// ── TOPIC CARD RENDERING ──
+function renderTopicCards(){
+  ALL_TOPICS.forEach(t=>{
+    const card      = document.getElementById('tc-'+t);
+    const overlay   = document.getElementById('lock-'+t);
+    const lockText  = document.getElementById('lock-text-'+t);
+    const lockProg  = document.getElementById('lock-prog-'+t);
+    const lockLabel = document.getElementById('lock-label-'+t);
+    if(!card) return;
+
+    card.classList.remove('locked','selected');
+    overlay.style.display = 'none';
+
+    const info = getLockInfo(t);
+    if(info){
+      card.classList.add('locked');
+      overlay.style.display = 'flex';
+      const pct = Math.round((info.played / info.needed) * 100);
+      lockText.textContent  = `Play ${info.remaining} more ${info.diffLabel} game${info.remaining!==1?'s':''} of ${info.prereqName} (${info.minScore}/10+) to unlock`;
+      lockProg.style.width  = pct+'%';
+      lockLabel.textContent = `${info.played} / ${info.needed} qualifying games`;
+    }
+  });
+}
+
+// ── TOPIC CLICK ──
+function handleTopicClick(t){
+  const info = getLockInfo(t);
+  if(info){
+    // Nudge this card
+    const card = document.getElementById('tc-'+t);
+    card.style.transform='scale(1.04)';
+    setTimeout(()=>card.style.transform='',300);
+    // Highlight the prereq card so student knows what to play
+    const prereqCard = document.getElementById('tc-'+info.prereqKey);
+    if(prereqCard){
+      prereqCard.style.outline='4px solid #7C4DFF';
+      prereqCard.style.transform='scale(1.05)';
+      setTimeout(()=>{ prereqCard.style.outline=''; prereqCard.style.transform=''; },1200);
+    }
+    return;
+  }
+  selectTopic(t);
 }
 
 // ── PLAYER UI ──
@@ -322,32 +492,25 @@ function updatePlayerUI(){
   document.getElementById('streak-count').textContent=streak;
   const next=nextAvatar(playerLevel);
   document.getElementById('avatar-tease').textContent=next?`Reach Level ${next.level} to unlock ${next.emoji} ${next.title}!`:'🏆 MAX RANK achieved!';
+  renderTopicCards();
 }
 
 function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
-// ── GRADE/TOPIC/DIFF ──
-const GRADE_TOPICS={1:['counting','addsubt'],2:['counting','addsubt','multiply'],3:['addsubt','multiply','fractions','geometry'],4:['multiply','fractions','decimals','geometry'],5:['fractions','decimals','percent','geometry','multiply'],6:['fractions','decimals','percent','geometry','algebra'],7:['fractions','decimals','percent','algebra','geometry'],8:['decimals','percent','algebra','geometry'],9:['algebra','geometry','percent','decimals']};
-
+// ── GRADE / TOPIC / DIFF ──
 function setGrade(g){
-  grade=g;topic=null;
-  const avail=GRADE_TOPICS[g]||[];
-  ['counting','addsubt','multiply','fractions','decimals','percent','algebra','geometry'].forEach(t=>{
-    const card=document.getElementById('tc-'+t);
-    if(!card)return;
-    avail.includes(t)?card.classList.remove('locked'):card.classList.add('locked');
-    card.classList.remove('selected');
-  });
+  grade=g; topic=null;
+  renderTopicCards();
   const btn=document.getElementById('play-btn');
-  btn.textContent='🚀 Pick a Topic First!';btn.disabled=true;
+  btn.textContent='🚀 Pick a Topic First!'; btn.disabled=true;
 }
 function selectTopic(t){
+  if(getLockInfo(t)) return;
   topic=t;
   document.querySelectorAll('.topic-card').forEach(c=>c.classList.remove('selected'));
   document.getElementById('tc-'+t).classList.add('selected');
-  const names={counting:'🍎 Counting',addsubt:'➕ Add & Subtract',multiply:'✖️ Multiplication',fractions:'🍕 Fractions',decimals:'🔢 Decimals',percent:'💯 Percentages',algebra:'🔍 Algebra',geometry:'📐 Geometry'};
   const btn=document.getElementById('play-btn');
-  btn.textContent=`🚀 Play ${names[t]}!`;btn.disabled=false;
+  btn.textContent=`🚀 Play ${TOPIC_NAMES[t]}!`; btn.disabled=false;
 }
 function setDiff(d,btn){ difficulty=d; document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
 
@@ -361,12 +524,12 @@ function makeOpts(ans,spread=5,count=4){const opts=new Set([String(ans)]);let t=
 function genCounting(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const type=['next','missing','biggest'][rnd(0,diff==='easy'?1:2)];let text,ans,opts;if(type==='next'){const step=diff==='easy'?1:diff==='medium'?rnd(2,5):rnd(5,10);const start=rnd(1,diff==='easy'?15:50);const seq=[start,start+step,start+2*step,start+3*step];ans=start+4*step;text=`What comes next? ${seq.join(', ')}, ___`;opts=makeOpts(ans,step*2);}else if(type==='missing'){const step=diff==='easy'?1:rnd(2,5);const start=rnd(1,40);const pos=rnd(1,3);const seq=[start,start+step,start+2*step,start+3*step];ans=seq[pos];seq[pos]='___';text=`Fill the blank: ${seq.join(', ')}`;opts=makeOpts(ans,step*2);}else{const nums=shuffle([rnd(10,50),rnd(10,50),rnd(10,50),rnd(10,50)]);ans=Math.max(...nums);text='Which is the BIGGEST?';opts=nums.map(String);}qs.push({text,answer:String(ans),options:shuffle(opts),hint:'Count carefully!'});}return qs;}
 function genAddSubt(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const op=rnd(0,1)===0?'add':'sub';let a,b;if(diff==='easy'){a=rnd(1,10);b=rnd(1,10);}else if(diff==='medium'){a=rnd(10,50);b=rnd(5,30);}else{a=rnd(50,200);b=rnd(20,100);}if(op==='sub'&&b>a){let t=a;a=b;b=t;}const ans=op==='add'?a+b:a-b;qs.push({text:`${a} ${op==='add'?'+':'-'} ${b} = ?`,answer:String(ans),options:shuffle(makeOpts(ans,8)),hint:op==='add'?'Count on!':'Count backwards!'});}return qs;}
 function genMultiply(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){let a,b;if(diff==='easy'){a=rnd(2,10);b=rnd(2,10);}else if(diff==='medium'){a=rnd(7,20);b=rnd(7,15);}else{a=rnd(12,50);b=rnd(12,30);}const ans=a*b;qs.push({text:`${a} × ${b} = ?`,answer:String(ans),options:shuffle(makeOpts(ans,ans*0.2+5)),hint:'Use your times tables!'});}return qs;}
+
 function genFractions(diff){
   const qs=[];
   for(let i=0;i<TOTAL_QS;i++){
     const type=['add','sub','compare','simplify'][rnd(0,3)];
     let text,displayHTML=null,ans,opts,hint;
- 
     if(type==='add'||type==='sub'){
       const maxD=diff==='easy'?6:12;
       const d1=rnd(2,maxD),d2=rnd(2,maxD);
@@ -379,25 +542,20 @@ function genFractions(diff){
       text=type==='add'?'Add:':'Subtract:';
       displayHTML=`<div class="fraction-display"><span class="frac"><span class="frac-num">${n1}</span><span class="frac-den">${d1}</span></span>${type==='add'?'+':'-'}<span class="frac"><span class="frac-num">${n2}</span><span class="frac-den">${d2}</span></span></div>`;
       hint='Find a common denominator!';
-      opts=[ans];
-      let s1=0;
+      opts=[ans]; let s1=0;
       while(opts.length<4&&s1++<60){const wn=rnd(1,9),wd=rnd(2,12),w=`${wn}/${wd}`;if(!opts.includes(w))opts.push(w);}
- 
-    }else if(type==='compare'){
+    } else if(type==='compare'){
       const d=rnd(3,10),n1=rnd(1,d-1);
       let n2=rnd(1,d-1),s2=0;
-      while(n2===n1&&s2++<20)n2=rnd(1,d-1);
+      while(n2===n1&&s2++<20) n2=rnd(1,d-1);
       if(n2===n1){i--;continue;}
       ans=n1>n2?`${n1}/${d}`:`${n2}/${d}`;
       text='Which fraction is BIGGER?';
       hint='Same denominator? Compare the tops!';
-      opts=[`${n1}/${d}`,`${n2}/${d}`];
-      let s3=0;
+      opts=[`${n1}/${d}`,`${n2}/${d}`]; let s3=0;
       while(opts.length<4&&s3++<40){const wn=rnd(1,d-1),w=`${wn}/${d}`;if(!opts.includes(w))opts.push(w);}
- 
-    }else{
-      // Construct a reducible fraction: pick a reduced fraction n/d, multiply both by k>=2
-      // This GUARANTEES gcd(n*k, d*k) = k > 1, so the question is always valid
+    } else {
+      // Construct reducible fraction: pick reduced n/d, multiply both by k — guarantees gcd>1
       const simpleD=rnd(2,6),simpleN=rnd(1,simpleD-1);
       if(gcd(simpleN,simpleD)!==1){i--;continue;}
       const k=rnd(2,diff==='easy'?3:5);
@@ -406,26 +564,25 @@ function genFractions(diff){
       text='Simplify:';
       displayHTML=`<div class="fraction-display"><span class="frac"><span class="frac-num">${n}</span><span class="frac-den">${d}</span></span></div>`;
       hint='Divide top and bottom by their GCD!';
-      opts=[ans];
-      let s4=0;
+      opts=[ans]; let s4=0;
       while(opts.length<4&&s4++<60){const wn=rnd(1,9),wd=rnd(2,12),w=`${wn}/${wd}`;if(!opts.includes(w)&&w!==ans)opts.push(w);}
     }
- 
     opts=shuffle(opts).slice(0,4);
     if(!opts.includes(ans))opts[rnd(0,3)]=ans;
     qs.push({text,displayHTML,answer:ans,options:shuffle(opts),hint});
   }
   return qs;
 }
-function genDecimals(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const type=['add','sub'][rnd(0,1)];let a,b;if(diff==='easy'){a=+(rnd(10,99)/10).toFixed(1);b=+(rnd(10,99)/10).toFixed(1);}else{a=+(rnd(100,999)/100).toFixed(2);b=+(rnd(100,999)/100).toFixed(2);}if(type==='sub'&&b>a){let t=a;a=b;b=t;}const ans=+(type==='add'?a+b:a-b).toFixed(2);const opts=new Set([String(ans)]);while(opts.size<4){const w=+(ans+(rnd(-5,5)*0.1)).toFixed(2);if(w>0&&w!==ans)opts.add(String(w));}qs.push({text:`${a} ${type==='add'?'+':'-'} ${b} = ?`,answer:String(ans),options:shuffle([...opts]),hint:'Line up the decimal points!'});}return qs;}
-function genPercent(diff){const qs=[];const pcts=diff==='easy'?[10,20,25,50]:diff==='medium'?[15,30,40,75]:[12,17,33,66];for(let i=0;i<TOTAL_QS;i++){const p=pcts[rnd(0,pcts.length-1)];const n=Math.round(rnd(20,200)/5)*5;const ans=+(p/100*n).toFixed(1);const opts=new Set([String(ans)]);while(opts.size<4){const w=+(ans*(1+rnd(-3,3)*0.1)).toFixed(1);if(w>0&&w!==ans)opts.add(String(w));}qs.push({text:`What is ${p}% of ${n}?`,answer:String(ans),options:shuffle([...opts]),hint:`${p}% = ${p}/100`});}return qs;}
+
+function genDecimals(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const type=['add','sub'][rnd(0,1)];let a,b;if(diff==='easy'){a=+(rnd(10,99)/10).toFixed(1);b=+(rnd(10,99)/10).toFixed(1);}else{a=+(rnd(100,999)/100).toFixed(2);b=+(rnd(100,999)/100).toFixed(2);}if(type==='sub'&&b>a){let t=a;a=b;b=t;}const ans=+(type==='add'?a+b:a-b).toFixed(2);const opts=new Set([String(ans)]);let safe=0;while(opts.size<4&&safe++<60){const w=+(ans+(rnd(-5,5)*0.1)).toFixed(2);if(w>0&&w!==ans)opts.add(String(w));}qs.push({text:`${a} ${type==='add'?'+':'-'} ${b} = ?`,answer:String(ans),options:shuffle([...opts]),hint:'Line up the decimal points!'});}return qs;}
+function genPercent(diff){const qs=[];const pcts=diff==='easy'?[10,20,25,50]:diff==='medium'?[15,30,40,75]:[12,17,33,66];for(let i=0;i<TOTAL_QS;i++){const p=pcts[rnd(0,pcts.length-1)];const n=Math.round(rnd(20,200)/5)*5;const ans=+(p/100*n).toFixed(1);const opts=new Set([String(ans)]);let safe=0;while(opts.size<4&&safe++<60){const w=+(ans*(1+rnd(-3,3)*0.1)).toFixed(1);if(w>0&&w!==ans)opts.add(String(w));}qs.push({text:`What is ${p}% of ${n}?`,answer:String(ans),options:shuffle([...opts]),hint:`${p}% = ${p}/100`});}return qs;}
 function genAlgebra(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const x=rnd(diff==='easy'?1:2,diff==='easy'?10:30);const a=rnd(2,diff==='easy'?5:15);const b=rnd(0,diff==='easy'?10:20);const result=a*x+b;const text=rnd(0,1)===0?`${a}x + ${b} = ${result}, find x`:`${a}x = ${result-b}, find x`;qs.push({text,answer:String(x),options:shuffle(makeOpts(x,6)),hint:'Do the same to both sides!'});}return qs;}
 function genGeometry(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const type=['area_rect','perimeter','angle'][rnd(0,2)];let text,ans;if(type==='area_rect'){const l=rnd(3,20),w=rnd(3,15);ans=l*w;text=`Area of rectangle: length=${l}, width=${w}`;}else if(type==='perimeter'){const l=rnd(4,20),w=rnd(4,15);ans=2*(l+w);text=`Perimeter of rectangle: length=${l}, width=${w}`;}else{const a=rnd(20,100),b=rnd(20,100);if(a+b>=180){i--;continue;}ans=180-a-b;text=`Triangle angles: ${a}° and ${b}°. Find the 3rd.`;}qs.push({text,answer:String(ans),options:shuffle(makeOpts(ans,ans*0.3+4)),hint:'Remember your formulas!'});}return qs;}
 function buildQuestions(){const gen={counting:genCounting,addsubt:genAddSubt,multiply:genMultiply,fractions:genFractions,decimals:genDecimals,percent:genPercent,algebra:genAlgebra,geometry:genGeometry};return gen[topic](difficulty);}
 
 // ── GAME FLOW ──
 function startGame(){
-  if(!topic)return;
+  if(!topic||getLockInfo(topic))return;
   questions=buildQuestions();currentQ=0;score=0;maxStreakThisGame=0;
   segStates=new Array(TOTAL_QS).fill('');
   const bar=document.getElementById('prog-bar-outer');bar.innerHTML='';
@@ -436,8 +593,7 @@ function paintSegs(){for(let i=0;i<TOTAL_QS;i++){const s=document.getElementById
 function loadQuestion(){
   const q=questions[currentQ];paintSegs();
   document.getElementById('q-counter').textContent=`${currentQ+1} / ${TOTAL_QS}`;
-  const names={counting:'🍎 Counting',addsubt:'➕ Add & Subtract',multiply:'✖️ Multiply',fractions:'🍕 Fractions',decimals:'🔢 Decimals',percent:'💯 Percent',algebra:'🔍 Algebra',geometry:'📐 Geometry'};
-  document.getElementById('q-topic-tag').textContent=names[topic];
+  document.getElementById('q-topic-tag').textContent=TOPIC_NAMES[topic]||topic;
   document.getElementById('question-text').innerHTML=q.text+(q.displayHTML?'<br>'+q.displayHTML:'');
   document.getElementById('feedback').style.display='none';
   document.getElementById('next-btn').style.display='none';
@@ -454,6 +610,7 @@ function checkAnswer(chosen,btn){
 }
 function timeUp(){clearInterval(timerInterval);document.querySelectorAll('.answer-btn').forEach(b=>b.disabled=true);const q=questions[currentQ];document.querySelectorAll('.answer-btn').forEach(b=>{if(b.textContent===String(q.answer))b.classList.add('ans-correct');});segStates[currentQ]='timeout';paintSegs();streak=0;document.getElementById('streak-count').textContent=streak;showFeedback(false,`⏰ Time's up! Answer: ${q.answer}`);save();document.getElementById('next-btn').style.display='block';}
 function nextQuestion(){currentQ++;if(currentQ>=TOTAL_QS)showResults();else loadQuestion();}
+
 function showResults(){
   const pct=score/TOTAL_QS;const xpEarned=score*10+(score===TOTAL_QS?50:0);const stars=pct>=0.9?3:pct>=0.7?2:pct>=0.5?1:0;
   const idx=Math.min(Math.floor(pct*4+0.1),4);
@@ -461,11 +618,45 @@ function showResults(){
   document.getElementById('results-title').textContent=["Don't Give Up!","Good Effort!","Well Done!","Excellent!","PERFECT! 🎉"][idx];
   document.getElementById('results-score').textContent=`${score}/${TOTAL_QS}`;
   document.getElementById('score-stars').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
-  document.getElementById('stat-correct').textContent=score;document.getElementById('stat-wrong').textContent=TOTAL_QS-score;
-  document.getElementById('stat-xp').textContent=`+${xpEarned}`;gamesPlayed++;document.getElementById('stat-games').textContent=gamesPlayed;
+  document.getElementById('stat-correct').textContent=score;
+  document.getElementById('stat-wrong').textContent=TOTAL_QS-score;
+  document.getElementById('stat-xp').textContent=`+${xpEarned}`;
+  gamesPlayed++;
+  document.getElementById('stat-games').textContent=gamesPlayed;
   document.getElementById('results-message').textContent=["Keep practicing!","Good try!","Nice work!","Great job!","PERFECT SCORE! 🎉"][idx];
-  totalStars+=stars;addXP(xpEarned);updateQuestTrackers(score,topic);save();showScreen('screen-results');if(score===TOTAL_QS)launchConfetti();
+  totalStars+=stars;
+  addXP(xpEarned);
+
+  // Track per-topic games & detect newly unlocked topics
+  const prevUnlocked=ALL_TOPICS.filter(t=>isTopicUnlocked(t));
+  // Record this game in nested structure: topicGames[topic][difficulty][qN]++
+  // for every minScore threshold this game's score meets
+  if(!topicGames[topic]) topicGames[topic]={};
+  if(!topicGames[topic][difficulty]) topicGames[topic][difficulty]={};
+  // A game with score S qualifies for all thresholds <= S
+  for(let thresh=1; thresh<=score; thresh++){
+    const key=`q${thresh}`;
+    topicGames[topic][difficulty][key]=(topicGames[topic][difficulty][key]||0)+1;
+  }
+  const nowUnlocked=ALL_TOPICS.filter(t=>isTopicUnlocked(t));
+  const newlyUnlocked=nowUnlocked.filter(t=>!prevUnlocked.includes(t));
+  if(newlyUnlocked.length>0) setTimeout(()=>showUnlockToast(newlyUnlocked),800);
+
+  updateQuestTrackers(score,topic);
+  save();
+  showScreen('screen-results');
+  if(score===TOTAL_QS)launchConfetti();
 }
+
+function showUnlockToast(topics){
+  const label=topics.length===1?TOPIC_NAMES[topics[0]]:topics.length+' topics';
+  const toast=document.getElementById('unlock-toast');
+  toast.textContent=`🔓 ${label} Unlocked!`;
+  toast.classList.add('show');
+  launchConfetti();
+  setTimeout(()=>toast.classList.remove('show'),3500);
+}
+
 function goHome(){clearInterval(timerInterval);showScreen('screen-home');updatePlayerUI();}
 function retryGame(){currentQ=0;score=0;startGame();}
 
@@ -519,7 +710,7 @@ function closeQuestsIfBg(e){if(e.target===document.getElementById('quest-overlay
 function updateQuestTrackers(gameScore,gameTopic){topicsPlayed.add(gameTopic);totalCorrect+=gameScore;if(gameScore===TOTAL_QS)perfectCount++;QUEST_DEFS.filter(d=>d.type==='streak').forEach(def=>{if(!questProgress[def.id])questProgress[def.id]={progress:0,claimed:false};if(maxStreakThisGame>=def.target)questProgress[def.id].progress=Math.max(questProgress[def.id].progress,maxStreakThisGame);});saveQuests();updateQuestNotif();}
 
 // ── RESET ──
-async function confirmReset(){if(!confirm(`Reset ALL progress for ${currentUser.username}?`))return;totalStars=0;playerXP=0;playerLevel=1;streak=0;gamesPlayed=0;questProgress={};perfectCount=0;totalCorrect=0;topicsPlayed=new Set();pickDailyQuests();await save();await saveQuests();updatePlayerUI();updateQuestNotif();}
+async function confirmReset(){if(!confirm(`Reset ALL progress for ${currentUser.username}?`))return;totalStars=0;playerXP=0;playerLevel=1;streak=0;gamesPlayed=0;topicGames={};questProgress={};perfectCount=0;totalCorrect=0;topicsPlayed=new Set();pickDailyQuests();await save();await saveQuests();updatePlayerUI();updateQuestNotif();}
 
 // ── INIT ──
 makeClouds();

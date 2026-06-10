@@ -10,7 +10,7 @@
 
   body {
     font-family:'Nunito',sans-serif;
-    background:linear-gradient(180deg,#1A237E 0%,#283593 50%,#1565C0 100%);
+    background:linear-gradient(180deg,#1E2A7A 0%,#1F6BB5 100%);
     min-height:100vh; display:flex; align-items:center; justify-content:center;
     padding:24px;
   }
@@ -50,10 +50,10 @@
   .hbtn.back { background:rgba(255,165,0,0.22); border-color:rgba(255,200,0,0.4); }
 
   /* ── CLASSES DASHBOARD ── */
-  #classes-page { background:linear-gradient(180deg,#B3E5FC 0%,#E1F5FE 40%,#F1F8E9 100%); }
+  #classes-page { background:linear-gradient(180deg,#1E2A7A 0%,#1F6BB5 100%); min-height:100vh; }
   .container { max-width:960px; margin:0 auto; padding:32px 20px; }
-  .page-headline { font-family:'Fredoka One',cursive; font-size:1.6rem; color:#1A237E; margin-bottom:6px; }
-  .page-sub { color:#78909C; font-weight:700; font-size:0.9rem; margin-bottom:28px; }
+  .page-headline { font-family:'Fredoka One',cursive; font-size:1.6rem; color:#ffffff; margin-bottom:6px; }
+  .page-sub { color:rgba(255,255,255,0.7); font-weight:700; font-size:0.9rem; margin-bottom:28px; }
 
   .classes-toolbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
   .add-class-btn { background:linear-gradient(135deg,#FF7043,#FF5722); color:white; border:none; border-radius:14px; padding:12px 22px; font-family:'Fredoka One',cursive; font-size:1.05rem; cursor:pointer; box-shadow:0 4px 14px rgba(255,87,34,0.35); transition:all .2s; }
@@ -85,8 +85,8 @@
 
   .empty-state { text-align:center; padding:60px 20px; color:#90A4AE; }
   .empty-icon { font-size:4rem; margin-bottom:16px; }
-  .empty-title { font-family:'Fredoka One',cursive; font-size:1.4rem; color:#B0BEC5; margin-bottom:8px; }
-  .empty-desc { font-size:0.9rem; font-weight:700; }
+  .empty-title { font-family:'Fredoka One',cursive; font-size:1.4rem; color:rgba(255,255,255,0.6); margin-bottom:8px; }
+  .empty-desc { font-size:0.9rem; font-weight:700; color:rgba(255,255,255,0.5); }
 
   /* ── CREATE CLASS MODAL ── */
   .modal-overlay { display:none; position:fixed; inset:0; background:rgba(26,35,126,0.55); z-index:999; align-items:center; justify-content:center; padding:20px; }
@@ -107,33 +107,33 @@
   .modal-msg { font-size:0.85rem; font-weight:700; margin-top:10px; min-height:18px; }
 
   /* ── CLASS DETAIL PAGE ── */
-  #class-page { background:linear-gradient(180deg,#B3E5FC 0%,#E1F5FE 40%,#F1F8E9 100%); }
-  .class-hero { background:white; border-bottom:3px solid #E8EAF6; padding:24px 30px; display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+  #class-page { background:linear-gradient(180deg,#1E2A7A 0%,#1F6BB5 100%); min-height:100vh; }
+  .class-hero { background:rgba(255,255,255,0.1); backdrop-filter:blur(10px); border-bottom:3px solid rgba(255,255,255,0.15); padding:24px 30px; display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
   .class-hero-emoji { font-size:3rem; }
   .class-hero-info { flex:1; }
-  .class-hero-name { font-family:'Fredoka One',cursive; font-size:1.7rem; color:#1A237E; }
-  .class-hero-grade { font-size:0.85rem; font-weight:800; color:#78909C; margin-top:2px; }
+  .class-hero-name { font-family:'Fredoka One',cursive; font-size:1.7rem; color:#ffffff; }
+  .class-hero-grade { font-size:0.85rem; font-weight:800; color:rgba(255,255,255,0.65); margin-top:2px; }
   .class-hero-stats { display:flex; gap:20px; flex-wrap:wrap; margin-top:12px; }
-  .chs { background:#F5F7FF; border-radius:12px; padding:10px 16px; text-align:center; border:2px solid #E8EAF6; }
-  .chs-n { font-family:'Fredoka One',cursive; font-size:1.4rem; color:#3F51B5; }
-  .chs-l { font-size:0.75rem; font-weight:800; color:#90A4AE; }
+  .chs { background:rgba(255,255,255,0.15); border-radius:12px; padding:10px 16px; text-align:center; border:2px solid rgba(255,255,255,0.2); }
+  .chs-n { font-family:'Fredoka One',cursive; font-size:1.4rem; color:#FFD54F; }
+  .chs-l { font-size:0.75rem; font-weight:800; color:rgba(255,255,255,0.7); }
 
-  .section-card { background:white; border-radius:22px; padding:26px; margin-bottom:20px; box-shadow:0 6px 24px rgba(0,0,0,0.08); border:2px solid #E8EAF6; }
+  .section-card { background:white; border-radius:22px; padding:26px; margin-bottom:20px; box-shadow:0 6px 24px rgba(0,0,0,0.15); border:2px solid rgba(255,255,255,0.3); }
   .sc-title { font-family:'Fredoka One',cursive; font-size:1.15rem; color:#1A237E; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
   .add-stu-btn { background:linear-gradient(135deg,#FF7043,#FF5722); color:white; border:none; border-radius:12px; padding:9px 18px; font-family:'Fredoka One',cursive; font-size:0.95rem; cursor:pointer; }
 
   /* ADD STUDENT FORM */
-  .add-stu-form { background:#F8F9FF; border-radius:16px; padding:20px; border:2px solid #E8EAF6; margin-bottom:20px; display:none; }
-  .af-title { font-family:'Fredoka One',cursive; font-size:1rem; color:#1A237E; margin-bottom:14px; }
+  .add-stu-form { background:rgba(255,255,255,0.12); backdrop-filter:blur(8px); border-radius:16px; padding:20px; border:2px solid rgba(255,255,255,0.2); margin-bottom:20px; display:none; }
+  .af-title { font-family:'Fredoka One',cursive; font-size:1rem; color:#ffffff; margin-bottom:14px; }
   .field-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
   .f { flex:1; min-width:120px; }
-  .f label { display:block; font-size:0.82rem; font-weight:800; color:#546E7A; margin-bottom:5px; }
-  .f input, .f select { width:100%; padding:10px 13px; border-radius:12px; border:2px solid #E0E0E0; font-family:'Nunito',sans-serif; font-weight:700; font-size:0.92rem; outline:none; }
-  .f input:focus, .f select:focus { border-color:#3F51B5; }
+  .f label { display:block; font-size:0.82rem; font-weight:800; color:rgba(255,255,255,0.8); margin-bottom:5px; }
+  .f input, .f select { width:100%; padding:10px 13px; border-radius:12px; border:2px solid rgba(255,255,255,0.3); background:rgba(255,255,255,0.9); font-family:'Nunito',sans-serif; font-weight:700; font-size:0.92rem; outline:none; }
+  .f input:focus, .f select:focus { border-color:#FFD54F; }
   .form-btns { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
   .btn-green { background:linear-gradient(135deg,#43A047,#2E7D32); color:white; border:none; border-radius:12px; padding:11px 20px; font-family:'Fredoka One',cursive; font-size:0.95rem; cursor:pointer; }
-  .btn-cancel { background:none; border:2px solid #CFD8DC; border-radius:10px; padding:9px 16px; cursor:pointer; font-weight:700; color:#90A4AE; }
-  .form-msg { font-size:0.85rem; font-weight:700; }
+  .btn-cancel { background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.3); border-radius:10px; padding:9px 16px; cursor:pointer; font-weight:700; color:white; }
+  .form-msg { font-size:0.85rem; font-weight:700; color:white; }
 
   /* STUDENTS TABLE */
   .table-wrap { overflow-x:auto; }
@@ -159,7 +159,7 @@
   .msg { font-size:0.85rem; font-weight:700; min-height:20px; margin-top:8px; }
 
   /* LOADING SPINNER */
-  .loader { text-align:center; padding:40px; color:#90A4AE; font-weight:700; font-size:1rem; }
+  .loader { text-align:center; padding:40px; color:rgba(255,255,255,0.7); font-weight:700; font-size:1rem; }
 </style>
 </head>
 <body>
@@ -385,9 +385,7 @@ function showPage(id){
       el.style.display = p===id ? 'block' : 'none';
     }
   });
-  document.body.style.background = id==='auth-card'
-    ? 'linear-gradient(180deg,#1A237E 0%,#283593 50%,#1565C0 100%)'
-    : 'none';
+  document.body.style.background = 'linear-gradient(180deg,#1E2A7A 0%,#1F6BB5 100%)';
   document.body.style.alignItems = id==='auth-card' ? 'center' : 'flex-start';
 }
 
@@ -667,4 +665,4 @@ async function changePassword(){
 }
 </script>
 </body>
-</html>
+</html> 
