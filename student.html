@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -11,8 +10,12 @@
   body { font-family:'Nunito',sans-serif; background:linear-gradient(180deg,#B3E5FC 0%,#E1F5FE 40%,#F1F8E9 100%); min-height:100vh; overflow-x:hidden; }
 
   header { background:linear-gradient(135deg,#FF7043,#FF8A65 50%,#FFB74D); padding:18px 30px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 20px rgba(255,112,67,0.4); }
+  .logo-group { display:flex; align-items:center; gap:14px; }
   .logo { font-family:'Fredoka One',cursive; font-size:2rem; color:white; text-shadow:3px 3px 0 rgba(0,0,0,0.15); }
   .logo span { color:#FFD54F; }
+  .eng-tab-btn { background:rgba(255,255,255,0.22); border:2px solid rgba(255,255,255,0.45); border-radius:50px; padding:8px 18px; color:white; font-weight:800; font-size:1rem; cursor:pointer; font-family:'Nunito',sans-serif; transition:all .2s; }
+  .eng-tab-btn:hover { background:rgba(255,255,255,0.35); transform:translateY(-2px); }
+  .eng-tab-btn.active { background:rgba(255,255,255,0.38); box-shadow:0 0 0 3px rgba(255,255,255,0.5); }
   .header-right { display:flex; align-items:center; gap:16px; }
   .star-counter { background:rgba(255,255,255,0.25); border-radius:50px; padding:8px 18px; display:flex; align-items:center; gap:8px; color:white; font-weight:800; font-size:1.1rem; border:2px solid rgba(255,255,255,0.4); }
   .streak-badge { background:#FFD54F; color:#BF360C; border-radius:50px; padding:8px 16px; font-weight:800; font-size:0.95rem; border:2px solid #FF8F00; }
@@ -172,16 +175,52 @@
   .quest-claim-btn:hover { transform:scale(1.05); }
   .quest-done-badge { flex-shrink:0; color:#AB47BC; font-size:1.5rem; }
 
+  /* ENGLISH */
+  .eng-header-active { background:linear-gradient(135deg,#6A1B9A,#AB47BC) !important; }
+  .eng-topics-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); gap:16px; margin-bottom:24px; }
+  .t-spelling    { border-color:#F48FB1; background:linear-gradient(135deg,#fff,#FCE4EC); }
+  .t-vocabulary  { border-color:#CE93D8; background:linear-gradient(135deg,#fff,#F3E5F5); }
+  .t-grammar     { border-color:#80CBC4; background:linear-gradient(135deg,#fff,#E0F2F1); }
+  .t-punctuation { border-color:#FFD54F; background:linear-gradient(135deg,#fff,#FFFDE7); }
+  .t-comprehension{ border-color:#90CAF9; background:linear-gradient(135deg,#fff,#E3F2FD); }
+  .t-creative    { border-color:#A5D6A7; background:linear-gradient(135deg,#fff,#E8F5E9); }
+
+  .type-answer-wrap { margin-bottom:16px; }
+  .type-answer-input { width:100%; padding:16px 20px; border-radius:18px; border:3px solid #CFD8DC; font-family:'Fredoka One',cursive; font-size:1.4rem; color:var(--navy); outline:none; text-align:center; transition:border-color .2s; box-shadow:0 4px 12px var(--shadow); }
+  .type-answer-input:focus { border-color:#7986CB; }
+  .type-answer-input.correct { border-color:#43A047 !important; background:#E8F5E9; color:#1B5E20; }
+  .type-answer-input.wrong   { border-color:#E53935 !important; background:#FFEBEE; color:#B71C1C; }
+  .submit-btn { width:100%; background:linear-gradient(135deg,#7C4DFF,#651FFF); color:white; border:none; border-radius:18px; padding:15px; font-family:'Fredoka One',cursive; font-size:1.2rem; cursor:pointer; box-shadow:0 6px 20px rgba(124,77,255,0.4); transition:all .2s; margin-bottom:16px; }
+  .submit-btn:hover:not(:disabled) { transform:translateY(-3px); }
+  .submit-btn:disabled { opacity:0.5; cursor:not-allowed; }
+  .passage-box { background:#F8F9FF; border:3px solid #E8EAF6; border-radius:18px; padding:18px 20px; margin-bottom:16px; font-size:1rem; font-weight:700; color:#37474F; line-height:1.7; text-align:left; }
+
+  /* AI LOADER */
+  .ai-loader-overlay { position:fixed; inset:0; background:rgba(255,255,255,0.94); z-index:8000; display:none; align-items:center; justify-content:center; flex-direction:column; gap:20px; }
+  .ai-loader-overlay.show { display:flex; animation:fadeIn 0.3s ease; }
+  .ai-spinner { width:64px; height:64px; border:6px solid #E8EAF6; border-top-color:#7C4DFF; border-radius:50%; animation:spin 0.9s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .ai-loader-text { font-family:'Fredoka One',cursive; font-size:1.5rem; color:#7C4DFF; text-align:center; }
+  .ai-loader-sub { font-size:0.9rem; color:#90A4AE; font-weight:700; text-align:center; max-width:260px; line-height:1.6; }
+  .ai-loader-dots span { animation:dotPulse 1.4s infinite; display:inline-block; }
+  .ai-loader-dots span:nth-child(2) { animation-delay:.2s; }
+  .ai-loader-dots span:nth-child(3) { animation-delay:.4s; }
+  @keyframes dotPulse { 0%,80%,100%{opacity:0.2;transform:scale(0.8)} 40%{opacity:1;transform:scale(1.2)} }
+
   @media(max-width:500px){
     .hero-title{font-size:2rem} .answers-grid{grid-template-columns:1fr}
     .question-text{font-size:1.5rem} .topics-grid{grid-template-columns:1fr 1fr}
+    .logo{font-size:1.4rem} .eng-tab-btn{font-size:0.82rem;padding:6px 12px}
   }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">Math<span>Quest</span> 🚀</div>
+  <div class="logo-group">
+    <div class="logo">Math<span>Quest</span> 🚀</div>
+    <button onclick="goEnglish()" id="eng-btn" class="eng-tab-btn">📖 English</button>
+  </div>
   <div class="header-right">
     <div class="quest-btn-wrap">
       <button class="quest-btn" onclick="openQuests()">📜 Quests</button>
@@ -197,6 +236,13 @@
 <div class="mascot" id="mascot" onclick="showTip()">🐣</div>
 <div class="speech-bubble" id="speech-bubble">Pick a topic and let's go! 🎯</div>
 <div class="unlock-toast" id="unlock-toast">🔓 Topic Unlocked!</div>
+
+<!-- AI Question Generation Loader -->
+<div class="ai-loader-overlay" id="ai-loader">
+  <div class="ai-spinner"></div>
+  <div class="ai-loader-text">🤖 Creating Questions<span class="ai-loader-dots"><span>.</span><span>.</span><span>.</span></span></div>
+  <div class="ai-loader-sub">Claude is writing brand-new questions just for you!</div>
+</div>
 
 <div class="container">
   <!-- HOME -->
@@ -261,7 +307,7 @@
     <button class="play-btn" id="play-btn" onclick="startGame()" disabled>🚀 Pick a Topic First!</button>
   </div>
 
-  <!-- GAME -->
+  <!-- MATH GAME -->
   <div class="screen" id="screen-game">
     <div class="game-header">
       <button class="back-btn" onclick="goHome()">← Back</button>
@@ -278,7 +324,7 @@
     <button class="next-btn" id="next-btn" onclick="nextQuestion()" style="display:none">Next Question →</button>
   </div>
 
-  <!-- RESULTS -->
+  <!-- MATH RESULTS -->
   <div class="screen" id="screen-results">
     <div class="results-card">
       <div class="trophy" id="results-trophy">🏆</div>
@@ -298,7 +344,104 @@
       </div>
     </div>
   </div>
-</div>
+
+  <!-- ENGLISH HOME -->
+  <div class="screen" id="screen-eng-home">
+    <div class="player-info">
+      <div class="avatar" id="eng-avatar-emoji">🐣</div>
+      <div class="player-meta">
+        <div class="player-name-row">
+          <div class="player-name" id="eng-player-name">Player</div>
+          <button class="reset-btn" onclick="goMath()">← Math</button>
+        </div>
+        <div class="player-level-text">Level <span id="eng-player-level">1</span> · <span id="eng-player-xp">0</span> / <span id="eng-xp-next">100</span> XP</div>
+        <div class="xp-bar-wrap"><div class="xp-bar" id="eng-xp-bar" style="width:0%;background:linear-gradient(90deg,#7C4DFF,#AB47BC)"></div></div>
+      </div>
+    </div>
+    <div class="hero-title">📖 English Quest!</div>
+    <div class="hero-sub">Spell, write and explore language!</div>
+    <div class="section-title" style="margin-bottom:14px;">📚 Choose Your Topic</div>
+    <div class="eng-topics-grid">
+      <div class="topic-card t-spelling"     id="tc-spelling"     onclick="handleEngTopicClick('spelling')">
+        <span class="topic-icon">✏️</span><div class="topic-name">Spelling</div><div class="topic-desc">Type the right word</div>
+        <div class="lock-overlay" id="lock-spelling"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-spelling"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-spelling" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-spelling"></div></div>
+      </div>
+      <div class="topic-card t-vocabulary"   id="tc-vocabulary"   onclick="handleEngTopicClick('vocabulary')">
+        <span class="topic-icon">📘</span><div class="topic-name">Vocabulary</div><div class="topic-desc">Words &amp; meanings</div>
+        <div class="lock-overlay" id="lock-vocabulary"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-vocabulary"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-vocabulary" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-vocabulary"></div></div>
+      </div>
+      <div class="topic-card t-grammar"      id="tc-grammar"      onclick="handleEngTopicClick('grammar')">
+        <span class="topic-icon">🔤</span><div class="topic-name">Grammar</div><div class="topic-desc">Fix the sentence</div>
+        <div class="lock-overlay" id="lock-grammar"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-grammar"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-grammar" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-grammar"></div></div>
+      </div>
+      <div class="topic-card t-punctuation"  id="tc-punctuation"  onclick="handleEngTopicClick('punctuation')">
+        <span class="topic-icon">❓</span><div class="topic-name">Punctuation</div><div class="topic-desc">Pick the correct sentence</div>
+        <div class="lock-overlay" id="lock-punctuation"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-punctuation"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-punctuation" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-punctuation"></div></div>
+      </div>
+      <div class="topic-card t-comprehension" id="tc-comprehension" onclick="handleEngTopicClick('comprehension')">
+        <span class="topic-icon">📰</span><div class="topic-name">Comprehension</div><div class="topic-desc">Read &amp; answer</div>
+        <div class="lock-overlay" id="lock-comprehension"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-comprehension"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-comprehension" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-comprehension"></div></div>
+      </div>
+      <div class="topic-card t-creative"     id="tc-creative"     onclick="handleEngTopicClick('creative')">
+        <span class="topic-icon">🖊️</span><div class="topic-name">Creative Writing</div><div class="topic-desc">Best opening sentence</div>
+        <div class="lock-overlay" id="lock-creative"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-creative"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-creative" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-creative"></div></div>
+      </div>
+    </div>
+    <div class="grade-section">
+      <div class="section-title">⚡ Difficulty</div>
+      <div class="difficulty-row" id="eng-diff-row">
+        <button class="diff-btn d-easy active" onclick="setEngDiff('easy',this)">😊 Easy</button>
+        <button class="diff-btn d-medium"      onclick="setEngDiff('medium',this)">😤 Medium</button>
+        <button class="diff-btn d-hard"        onclick="setEngDiff('hard',this)">🔥 Hard</button>
+      </div>
+    </div>
+    <button class="play-btn" id="eng-play-btn" onclick="startEngGame()" disabled style="background:linear-gradient(135deg,#7C4DFF,#651FFF);box-shadow:0 8px 25px rgba(124,77,255,0.45)">🚀 Pick a Topic First!</button>
+  </div>
+
+  <!-- ENGLISH GAME -->
+  <div class="screen" id="screen-eng-game">
+    <div class="game-header">
+      <button class="back-btn" onclick="goEnglish()">← Back</button>
+      <div class="prog-bar-outer" id="eng-prog-bar-outer"></div>
+      <div class="q-counter" id="eng-q-counter">1 / 10</div>
+      <div class="timer-ring" id="eng-timer-ring"><div class="timer-inner" id="eng-timer-text">20</div></div>
+    </div>
+    <div class="question-card">
+      <div class="topic-tag" id="eng-q-topic-tag" style="background:#F3E5F5;color:#7B1FA2;">Topic</div>
+      <div id="eng-passage-box" class="passage-box" style="display:none"></div>
+      <div class="question-text" id="eng-question-text">Loading...</div>
+    </div>
+    <div class="type-answer-wrap" id="eng-type-wrap" style="display:none">
+      <input type="text" class="type-answer-input" id="eng-type-input" placeholder="Type your answer..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')submitTyped()">
+      <button class="submit-btn" id="eng-submit-btn" onclick="submitTyped()">✅ Submit Answer</button>
+    </div>
+    <div class="answers-grid" id="eng-answers-grid"></div>
+    <div class="feedback" id="eng-feedback"></div>
+    <button class="next-btn" id="eng-next-btn" onclick="engNextQuestion()" style="display:none;background:linear-gradient(135deg,#7C4DFF,#651FFF)">Next Question →</button>
+  </div>
+
+  <!-- ENGLISH RESULTS -->
+  <div class="screen" id="screen-eng-results">
+    <div class="results-card">
+      <div class="trophy" id="eng-results-trophy">🏆</div>
+      <div class="results-title" id="eng-results-title">Amazing!</div>
+      <div class="results-score" id="eng-results-score">8/10</div>
+      <div class="score-stars" id="eng-score-stars">⭐⭐⭐</div>
+      <div class="results-stats">
+        <div class="stat-box"><div class="stat-num" id="eng-stat-correct" style="color:#43A047">0</div><div class="stat-label">Correct ✅</div></div>
+        <div class="stat-box"><div class="stat-num" id="eng-stat-wrong"   style="color:#E53935">0</div><div class="stat-label">Wrong ❌</div></div>
+        <div class="stat-box"><div class="stat-num" id="eng-stat-xp"      style="color:#7C4DFF">+0</div><div class="stat-label">XP ✨</div></div>
+        <div class="stat-box"><div class="stat-num" id="eng-stat-games"   style="color:#5C6BC0">0</div><div class="stat-label">Games 🎮</div></div>
+      </div>
+      <div id="eng-results-message" style="color:#546E7A;font-weight:700;font-size:1rem;margin-bottom:8px"></div>
+      <div class="results-btns">
+        <button class="btn-secondary" onclick="goEnglish()">🏠 Home</button>
+        <button class="btn-primary" onclick="retryEngGame()" style="background:linear-gradient(135deg,#7C4DFF,#651FFF)">🔄 Play Again</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .container -->
 
 <!-- QUEST MODAL -->
 <div class="quest-overlay" id="quest-overlay" onclick="closeQuestsIfBg(event)">
@@ -332,11 +475,6 @@ let totalStars=0, streak=0, playerXP=0, playerLevel=1, gamesPlayed=0;
 let segStates=[], maxStreakThisGame=0;
 let topicGames={};
 
-// ── UNLOCK CHAIN ──
-// Each locked topic specifies exactly which topic you must play first, and how many games.
-// Topics with no entry in UNLOCK_CHAIN are always available (no prereq).
-// UNLOCK_CHAIN: each topic lists ALL possible prereqs — unlocked when ANY prereq has enough qualifying games.
-// This ensures every grade can reach every topic regardless of starting point.
 const UNLOCK_CHAIN = {
   counting  : [{ prereq:'addsubt',   needed:4,  difficulty:'easy',   minScore:6  }],
   addsubt   : [{ prereq:'counting',  needed:4,  difficulty:'easy',   minScore:6  },
@@ -362,132 +500,70 @@ const TOPIC_NAMES = {
   fractions:'Fractions', decimals:'Decimals', percent:'Percentages',
   algebra:'Algebra', geometry:'Geometry'
 };
-
 const ALL_TOPICS = ['counting','addsubt','multiply','fractions','decimals','percent','algebra','geometry'];
-
-// All topics a grade can ever access (determines which cards show at all — all 8 always show,
-// but grade-native ones start unlocked, others require the chain)
 const GRADE_NATIVE = {
-  1:['counting','addsubt'],
-  2:['counting','addsubt'],
-  3:['addsubt','multiply'],
-  4:['multiply','fractions'],
-  5:['fractions','decimals'],
-  6:['fractions','decimals'],
-  7:['decimals','percent'],
-  8:['decimals','percent'],
-  9:['algebra','geometry'],
+  1:['counting','addsubt'],2:['counting','addsubt'],3:['addsubt','multiply'],
+  4:['multiply','fractions'],5:['fractions','decimals'],6:['fractions','decimals'],
+  7:['decimals','percent'],8:['decimals','percent'],9:['algebra','geometry'],
 };
 
 function isGradeNative(t){ return (GRADE_NATIVE[grade]||[]).includes(t); }
-
-// topicGames shape: { addsubt: { easy: { q6: 3, q7: 1 }, medium: { q8: 2 } }, ... }
-function countQualifying(prereq, difficulty, minScore){
-  return (topicGames[prereq]?.[difficulty]?.[`q${minScore}`]) || 0;
-}
-
-function isTopicUnlocked(t){
-  if(isGradeNative(t)) return true;
-  const options = UNLOCK_CHAIN[t];
-  if(!options) return false;
-  // Unlocked if ANY prereq option is satisfied
-  return options.some(o => countQualifying(o.prereq, o.difficulty, o.minScore) >= o.needed);
-}
-
-// Returns the best lock info (most-progressed option), or null if unlocked
+function countQualifying(prereq, difficulty, minScore){ return (topicGames[prereq]?.[difficulty]?.[`q${minScore}`]) || 0; }
+function isTopicUnlocked(t){ if(isGradeNative(t)) return true; const options=UNLOCK_CHAIN[t]; if(!options) return false; return options.some(o=>countQualifying(o.prereq,o.difficulty,o.minScore)>=o.needed); }
 function getLockInfo(t){
   if(isTopicUnlocked(t)) return null;
-  const options = UNLOCK_CHAIN[t];
-  if(!options) return null;
-  // Pick the option with most progress so the overlay shows the most encouraging path
-  let best = null, bestPct = -1;
-  for(const o of options){
-    const played = countQualifying(o.prereq, o.difficulty, o.minScore);
-    const pct = played / o.needed;
-    if(pct > bestPct){ bestPct = pct; best = { ...o, played }; }
-  }
-  const remaining = best.needed - best.played;
-  const diffLabel = best.difficulty.charAt(0).toUpperCase()+best.difficulty.slice(1);
-  return {
-    prereqKey  : best.prereq,
-    prereqName : TOPIC_NAMES[best.prereq],
-    difficulty : best.difficulty,
-    diffLabel,
-    minScore   : best.minScore,
-    played     : best.played,
-    needed     : best.needed,
-    remaining,
-  };
+  const options=UNLOCK_CHAIN[t]; if(!options) return null;
+  let best=null,bestPct=-1;
+  for(const o of options){ const played=countQualifying(o.prereq,o.difficulty,o.minScore); const pct=played/o.needed; if(pct>bestPct){bestPct=pct;best={...o,played};} }
+  const remaining=best.needed-best.played; const diffLabel=best.difficulty.charAt(0).toUpperCase()+best.difficulty.slice(1);
+  return {prereqKey:best.prereq,prereqName:TOPIC_NAMES[best.prereq],difficulty:best.difficulty,diffLabel,minScore:best.minScore,played:best.played,needed:best.needed,remaining};
 }
 
 // ── PERSISTENCE ──
 async function save(){
   if(!currentUser)return;
-  await apiPost('/progress/'+encodeURIComponent(currentUser.username),{totalStars,playerXP,playerLevel,streak,gamesPlayed,topicGames});
+  await apiPost('/progress/'+encodeURIComponent(currentUser.username),{totalStars,playerXP,playerLevel,streak,gamesPlayed,topicGames,engTopicGames,engGamesPlayed});
 }
 async function load(){
   if(!currentUser)return;
   const d=await apiGet('/progress/'+encodeURIComponent(currentUser.username));
-  if(d){ totalStars=d.totalStars||0; playerXP=d.playerXP||0; playerLevel=d.playerLevel||1; streak=d.streak||0; gamesPlayed=d.gamesPlayed||0; topicGames=d.topicGames||{}; }
+  if(d){ totalStars=d.totalStars||0; playerXP=d.playerXP||0; playerLevel=d.playerLevel||1; streak=d.streak||0; gamesPlayed=d.gamesPlayed||0; topicGames=d.topicGames||{}; loadEngFromData(d); }
 }
 
-// ── TOPIC CARD RENDERING ──
+// ── TOPIC CARDS ──
 function renderTopicCards(){
   ALL_TOPICS.forEach(t=>{
-    const card      = document.getElementById('tc-'+t);
-    const overlay   = document.getElementById('lock-'+t);
-    const lockText  = document.getElementById('lock-text-'+t);
-    const lockProg  = document.getElementById('lock-prog-'+t);
-    const lockLabel = document.getElementById('lock-label-'+t);
-    if(!card) return;
-
-    card.classList.remove('locked','selected');
-    overlay.style.display = 'none';
-
-    const info = getLockInfo(t);
-    if(info){
-      card.classList.add('locked');
-      overlay.style.display = 'flex';
-      const pct = Math.round((info.played / info.needed) * 100);
-      lockText.textContent  = `Play ${info.remaining} more ${info.diffLabel} game${info.remaining!==1?'s':''} of ${info.prereqName} (${info.minScore}/10+) to unlock`;
-      lockProg.style.width  = pct+'%';
-      lockLabel.textContent = `${info.played} / ${info.needed} qualifying games`;
-    }
+    const card=document.getElementById('tc-'+t); const overlay=document.getElementById('lock-'+t);
+    const lockText=document.getElementById('lock-text-'+t); const lockProg=document.getElementById('lock-prog-'+t); const lockLabel=document.getElementById('lock-label-'+t);
+    if(!card)return; card.classList.remove('locked','selected'); overlay.style.display='none';
+    const info=getLockInfo(t);
+    if(info){ card.classList.add('locked'); overlay.style.display='flex'; const pct=Math.round((info.played/info.needed)*100); lockText.textContent=`Play ${info.remaining} more ${info.diffLabel} game${info.remaining!==1?'s':''} of ${info.prereqName} (${info.minScore}/10+) to unlock`; lockProg.style.width=pct+'%'; lockLabel.textContent=`${info.played} / ${info.needed} qualifying games`; }
   });
 }
 
-// ── TOPIC CLICK ──
 function handleTopicClick(t){
-  const info = getLockInfo(t);
-  if(info){
-    // Nudge this card
-    const card = document.getElementById('tc-'+t);
-    card.style.transform='scale(1.04)';
-    setTimeout(()=>card.style.transform='',300);
-    // Highlight the prereq card so student knows what to play
-    const prereqCard = document.getElementById('tc-'+info.prereqKey);
-    if(prereqCard){
-      prereqCard.style.outline='4px solid #7C4DFF';
-      prereqCard.style.transform='scale(1.05)';
-      setTimeout(()=>{ prereqCard.style.outline=''; prereqCard.style.transform=''; },1200);
-    }
-    return;
-  }
+  const info=getLockInfo(t);
+  if(info){ const card=document.getElementById('tc-'+t); card.style.transform='scale(1.04)'; setTimeout(()=>card.style.transform='',300); const pc=document.getElementById('tc-'+info.prereqKey); if(pc){pc.style.outline='4px solid #7C4DFF';pc.style.transform='scale(1.05)';setTimeout(()=>{pc.style.outline='';pc.style.transform='';},1200);} return; }
   selectTopic(t);
 }
 
 // ── PLAYER UI ──
 function updatePlayerUI(){
-  const av=getAvatar(playerLevel);
-  const emoji=currentUser?.avatar||av.emoji;
+  const av=getAvatar(playerLevel); const emoji=currentUser?.avatar||av.emoji;
   document.getElementById('avatar-emoji').textContent=emoji;
+  document.getElementById('eng-avatar-emoji').textContent=emoji;
   document.getElementById('mascot').textContent=emoji;
   document.getElementById('player-name-display').textContent=currentUser?.username||av.title;
+  document.getElementById('eng-player-name').textContent=currentUser?.username||av.title;
   document.getElementById('player-level').textContent=playerLevel;
+  document.getElementById('eng-player-level').textContent=playerLevel;
   document.getElementById('player-xp').textContent=playerXP;
+  document.getElementById('eng-player-xp').textContent=playerXP;
   const needed=playerLevel*100;
   document.getElementById('xp-next').textContent=needed;
+  document.getElementById('eng-xp-next').textContent=needed;
   document.getElementById('xp-bar').style.width=Math.min(100,playerXP/needed*100)+'%';
+  document.getElementById('eng-xp-bar').style.width=Math.min(100,playerXP/needed*100)+'%';
   document.getElementById('total-stars').textContent=totalStars;
   document.getElementById('streak-count').textContent=streak;
   const next=nextAvatar(playerLevel);
@@ -497,22 +573,9 @@ function updatePlayerUI(){
 
 function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
-// ── GRADE / TOPIC / DIFF ──
-function setGrade(g){
-  grade=g; topic=null;
-  renderTopicCards();
-  const btn=document.getElementById('play-btn');
-  btn.textContent='🚀 Pick a Topic First!'; btn.disabled=true;
-}
-function selectTopic(t){
-  if(getLockInfo(t)) return;
-  topic=t;
-  document.querySelectorAll('.topic-card').forEach(c=>c.classList.remove('selected'));
-  document.getElementById('tc-'+t).classList.add('selected');
-  const btn=document.getElementById('play-btn');
-  btn.textContent=`🚀 Play ${TOPIC_NAMES[t]}!`; btn.disabled=false;
-}
-function setDiff(d,btn){ difficulty=d; document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+function setGrade(g){ grade=g; topic=null; renderTopicCards(); const btn=document.getElementById('play-btn'); btn.textContent='🚀 Pick a Topic First!'; btn.disabled=true; }
+function selectTopic(t){ if(getLockInfo(t))return; topic=t; document.querySelectorAll('.topic-card').forEach(c=>c.classList.remove('selected')); document.getElementById('tc-'+t).classList.add('selected'); const btn=document.getElementById('play-btn'); btn.textContent=`🚀 Play ${TOPIC_NAMES[t]}!`; btn.disabled=false; }
+function setDiff(d,btn){ difficulty=d; document.querySelectorAll('#screen-home .diff-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
 
 // ── QUESTION GENERATORS ──
 function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
@@ -524,56 +587,7 @@ function makeOpts(ans,spread=5,count=4){const opts=new Set([String(ans)]);let t=
 function genCounting(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const type=['next','missing','biggest'][rnd(0,diff==='easy'?1:2)];let text,ans,opts;if(type==='next'){const step=diff==='easy'?1:diff==='medium'?rnd(2,5):rnd(5,10);const start=rnd(1,diff==='easy'?15:50);const seq=[start,start+step,start+2*step,start+3*step];ans=start+4*step;text=`What comes next? ${seq.join(', ')}, ___`;opts=makeOpts(ans,step*2);}else if(type==='missing'){const step=diff==='easy'?1:rnd(2,5);const start=rnd(1,40);const pos=rnd(1,3);const seq=[start,start+step,start+2*step,start+3*step];ans=seq[pos];seq[pos]='___';text=`Fill the blank: ${seq.join(', ')}`;opts=makeOpts(ans,step*2);}else{const nums=shuffle([rnd(10,50),rnd(10,50),rnd(10,50),rnd(10,50)]);ans=Math.max(...nums);text='Which is the BIGGEST?';opts=nums.map(String);}qs.push({text,answer:String(ans),options:shuffle(opts),hint:'Count carefully!'});}return qs;}
 function genAddSubt(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const op=rnd(0,1)===0?'add':'sub';let a,b;if(diff==='easy'){a=rnd(1,10);b=rnd(1,10);}else if(diff==='medium'){a=rnd(10,50);b=rnd(5,30);}else{a=rnd(50,200);b=rnd(20,100);}if(op==='sub'&&b>a){let t=a;a=b;b=t;}const ans=op==='add'?a+b:a-b;qs.push({text:`${a} ${op==='add'?'+':'-'} ${b} = ?`,answer:String(ans),options:shuffle(makeOpts(ans,8)),hint:op==='add'?'Count on!':'Count backwards!'});}return qs;}
 function genMultiply(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){let a,b;if(diff==='easy'){a=rnd(2,10);b=rnd(2,10);}else if(diff==='medium'){a=rnd(7,20);b=rnd(7,15);}else{a=rnd(12,50);b=rnd(12,30);}const ans=a*b;qs.push({text:`${a} × ${b} = ?`,answer:String(ans),options:shuffle(makeOpts(ans,ans*0.2+5)),hint:'Use your times tables!'});}return qs;}
-
-function genFractions(diff){
-  const qs=[];
-  for(let i=0;i<TOTAL_QS;i++){
-    const type=['add','sub','compare','simplify'][rnd(0,3)];
-    let text,displayHTML=null,ans,opts,hint;
-    if(type==='add'||type==='sub'){
-      const maxD=diff==='easy'?6:12;
-      const d1=rnd(2,maxD),d2=rnd(2,maxD);
-      const n1=rnd(1,d1-1),n2=rnd(1,d2-1);
-      const L=lcm(d1,d2);
-      const resN=type==='add'?n1*(L/d1)+n2*(L/d2):n1*(L/d1)-n2*(L/d2);
-      if(resN<=0){i--;continue;}
-      const g=gcd(resN,L);
-      ans=`${resN/g}/${L/g}`;
-      text=type==='add'?'Add:':'Subtract:';
-      displayHTML=`<div class="fraction-display"><span class="frac"><span class="frac-num">${n1}</span><span class="frac-den">${d1}</span></span>${type==='add'?'+':'-'}<span class="frac"><span class="frac-num">${n2}</span><span class="frac-den">${d2}</span></span></div>`;
-      hint='Find a common denominator!';
-      opts=[ans]; let s1=0;
-      while(opts.length<4&&s1++<60){const wn=rnd(1,9),wd=rnd(2,12),w=`${wn}/${wd}`;if(!opts.includes(w))opts.push(w);}
-    } else if(type==='compare'){
-      const d=rnd(3,10),n1=rnd(1,d-1);
-      let n2=rnd(1,d-1),s2=0;
-      while(n2===n1&&s2++<20) n2=rnd(1,d-1);
-      if(n2===n1){i--;continue;}
-      ans=n1>n2?`${n1}/${d}`:`${n2}/${d}`;
-      text='Which fraction is BIGGER?';
-      hint='Same denominator? Compare the tops!';
-      opts=[`${n1}/${d}`,`${n2}/${d}`]; let s3=0;
-      while(opts.length<4&&s3++<40){const wn=rnd(1,d-1),w=`${wn}/${d}`;if(!opts.includes(w))opts.push(w);}
-    } else {
-      // Construct reducible fraction: pick reduced n/d, multiply both by k — guarantees gcd>1
-      const simpleD=rnd(2,6),simpleN=rnd(1,simpleD-1);
-      if(gcd(simpleN,simpleD)!==1){i--;continue;}
-      const k=rnd(2,diff==='easy'?3:5);
-      const n=simpleN*k,d=simpleD*k;
-      ans=`${simpleN}/${simpleD}`;
-      text='Simplify:';
-      displayHTML=`<div class="fraction-display"><span class="frac"><span class="frac-num">${n}</span><span class="frac-den">${d}</span></span></div>`;
-      hint='Divide top and bottom by their GCD!';
-      opts=[ans]; let s4=0;
-      while(opts.length<4&&s4++<60){const wn=rnd(1,9),wd=rnd(2,12),w=`${wn}/${wd}`;if(!opts.includes(w)&&w!==ans)opts.push(w);}
-    }
-    opts=shuffle(opts).slice(0,4);
-    if(!opts.includes(ans))opts[rnd(0,3)]=ans;
-    qs.push({text,displayHTML,answer:ans,options:shuffle(opts),hint});
-  }
-  return qs;
-}
-
+function genFractions(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const type=['add','sub','compare','simplify'][rnd(0,3)];let text,displayHTML=null,ans,opts,hint;if(type==='add'||type==='sub'){const maxD=diff==='easy'?6:12;const d1=rnd(2,maxD),d2=rnd(2,maxD);const n1=rnd(1,d1-1),n2=rnd(1,d2-1);const L=lcm(d1,d2);const resN=type==='add'?n1*(L/d1)+n2*(L/d2):n1*(L/d1)-n2*(L/d2);if(resN<=0){i--;continue;}const g=gcd(resN,L);ans=`${resN/g}/${L/g}`;text=type==='add'?'Add:':'Subtract:';displayHTML=`<div class="fraction-display"><span class="frac"><span class="frac-num">${n1}</span><span class="frac-den">${d1}</span></span>${type==='add'?'+':'-'}<span class="frac"><span class="frac-num">${n2}</span><span class="frac-den">${d2}</span></span></div>`;hint='Find a common denominator!';opts=[ans];let s1=0;while(opts.length<4&&s1++<60){const wn=rnd(1,9),wd=rnd(2,12),w=`${wn}/${wd}`;if(!opts.includes(w))opts.push(w);}}else if(type==='compare'){const d=rnd(3,10),n1=rnd(1,d-1);let n2=rnd(1,d-1),s2=0;while(n2===n1&&s2++<20)n2=rnd(1,d-1);if(n2===n1){i--;continue;}ans=n1>n2?`${n1}/${d}`:`${n2}/${d}`;text='Which fraction is BIGGER?';hint='Same denominator? Compare the tops!';opts=[`${n1}/${d}`,`${n2}/${d}`];let s3=0;while(opts.length<4&&s3++<40){const wn=rnd(1,d-1),w=`${wn}/${d}`;if(!opts.includes(w))opts.push(w);}}else{const simpleD=rnd(2,6),simpleN=rnd(1,simpleD-1);if(gcd(simpleN,simpleD)!==1){i--;continue;}const k=rnd(2,diff==='easy'?3:5);const n=simpleN*k,d=simpleD*k;ans=`${simpleN}/${simpleD}`;text='Simplify:';displayHTML=`<div class="fraction-display"><span class="frac"><span class="frac-num">${n}</span><span class="frac-den">${d}</span></span></div>`;hint='Divide top and bottom by their GCD!';opts=[ans];let s4=0;while(opts.length<4&&s4++<60){const wn=rnd(1,9),wd=rnd(2,12),w=`${wn}/${wd}`;if(!opts.includes(w)&&w!==ans)opts.push(w);}}opts=shuffle(opts).slice(0,4);if(!opts.includes(ans))opts[rnd(0,3)]=ans;qs.push({text,displayHTML,answer:ans,options:shuffle(opts),hint});}return qs;}
 function genDecimals(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const type=['add','sub'][rnd(0,1)];let a,b;if(diff==='easy'){a=+(rnd(10,99)/10).toFixed(1);b=+(rnd(10,99)/10).toFixed(1);}else{a=+(rnd(100,999)/100).toFixed(2);b=+(rnd(100,999)/100).toFixed(2);}if(type==='sub'&&b>a){let t=a;a=b;b=t;}const ans=+(type==='add'?a+b:a-b).toFixed(2);const opts=new Set([String(ans)]);let safe=0;while(opts.size<4&&safe++<60){const w=+(ans+(rnd(-5,5)*0.1)).toFixed(2);if(w>0&&w!==ans)opts.add(String(w));}qs.push({text:`${a} ${type==='add'?'+':'-'} ${b} = ?`,answer:String(ans),options:shuffle([...opts]),hint:'Line up the decimal points!'});}return qs;}
 function genPercent(diff){const qs=[];const pcts=diff==='easy'?[10,20,25,50]:diff==='medium'?[15,30,40,75]:[12,17,33,66];for(let i=0;i<TOTAL_QS;i++){const p=pcts[rnd(0,pcts.length-1)];const n=Math.round(rnd(20,200)/5)*5;const ans=+(p/100*n).toFixed(1);const opts=new Set([String(ans)]);let safe=0;while(opts.size<4&&safe++<60){const w=+(ans*(1+rnd(-3,3)*0.1)).toFixed(1);if(w>0&&w!==ans)opts.add(String(w));}qs.push({text:`What is ${p}% of ${n}?`,answer:String(ans),options:shuffle([...opts]),hint:`${p}% = ${p}/100`});}return qs;}
 function genAlgebra(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const x=rnd(diff==='easy'?1:2,diff==='easy'?10:30);const a=rnd(2,diff==='easy'?5:15);const b=rnd(0,diff==='easy'?10:20);const result=a*x+b;const text=rnd(0,1)===0?`${a}x + ${b} = ${result}, find x`:`${a}x = ${result-b}, find x`;qs.push({text,answer:String(x),options:shuffle(makeOpts(x,6)),hint:'Do the same to both sides!'});}return qs;}
@@ -624,40 +638,25 @@ function showResults(){
   gamesPlayed++;
   document.getElementById('stat-games').textContent=gamesPlayed;
   document.getElementById('results-message').textContent=["Keep practicing!","Good try!","Nice work!","Great job!","PERFECT SCORE! 🎉"][idx];
-  totalStars+=stars;
-  addXP(xpEarned);
-
-  // Track per-topic games & detect newly unlocked topics
+  totalStars+=stars; addXP(xpEarned);
   const prevUnlocked=ALL_TOPICS.filter(t=>isTopicUnlocked(t));
-  // Record this game in nested structure: topicGames[topic][difficulty][qN]++
-  // for every minScore threshold this game's score meets
-  if(!topicGames[topic]) topicGames[topic]={};
-  if(!topicGames[topic][difficulty]) topicGames[topic][difficulty]={};
-  // A game with score S qualifies for all thresholds <= S
-  for(let thresh=1; thresh<=score; thresh++){
-    const key=`q${thresh}`;
-    topicGames[topic][difficulty][key]=(topicGames[topic][difficulty][key]||0)+1;
-  }
+  if(!topicGames[topic])topicGames[topic]={};
+  if(!topicGames[topic][difficulty])topicGames[topic][difficulty]={};
+  for(let thresh=1;thresh<=score;thresh++){const key=`q${thresh}`;topicGames[topic][difficulty][key]=(topicGames[topic][difficulty][key]||0)+1;}
   const nowUnlocked=ALL_TOPICS.filter(t=>isTopicUnlocked(t));
   const newlyUnlocked=nowUnlocked.filter(t=>!prevUnlocked.includes(t));
-  if(newlyUnlocked.length>0) setTimeout(()=>showUnlockToast(newlyUnlocked),800);
-
-  updateQuestTrackers(score,topic);
-  save();
-  showScreen('screen-results');
+  if(newlyUnlocked.length>0)setTimeout(()=>showUnlockToast(newlyUnlocked),800);
+  updateQuestTrackers(score,topic); save(); showScreen('screen-results');
   if(score===TOTAL_QS)launchConfetti();
 }
 
 function showUnlockToast(topics){
-  const label=topics.length===1?TOPIC_NAMES[topics[0]]:topics.length+' topics';
-  const toast=document.getElementById('unlock-toast');
-  toast.textContent=`🔓 ${label} Unlocked!`;
-  toast.classList.add('show');
-  launchConfetti();
-  setTimeout(()=>toast.classList.remove('show'),3500);
+  const label=topics.length===1?TOPIC_NAMES[topics[0]]||topics[0]:topics.length+' topics';
+  const toast=document.getElementById('unlock-toast'); toast.textContent=`🔓 ${label} Unlocked!`;
+  toast.classList.add('show'); launchConfetti(); setTimeout(()=>toast.classList.remove('show'),3500);
 }
 
-function goHome(){clearInterval(timerInterval);showScreen('screen-home');updatePlayerUI();}
+function goHome(){clearInterval(timerInterval);document.querySelector('header').classList.remove('eng-header-active');document.getElementById('eng-btn').classList.remove('active');showScreen('screen-home');updatePlayerUI();}
 function retryGame(){currentQ=0;score=0;startGame();}
 
 // ── XP ──
@@ -709,8 +708,351 @@ function closeQuests(){document.getElementById('quest-overlay').classList.remove
 function closeQuestsIfBg(e){if(e.target===document.getElementById('quest-overlay'))closeQuests();}
 function updateQuestTrackers(gameScore,gameTopic){topicsPlayed.add(gameTopic);totalCorrect+=gameScore;if(gameScore===TOTAL_QS)perfectCount++;QUEST_DEFS.filter(d=>d.type==='streak').forEach(def=>{if(!questProgress[def.id])questProgress[def.id]={progress:0,claimed:false};if(maxStreakThisGame>=def.target)questProgress[def.id].progress=Math.max(questProgress[def.id].progress,maxStreakThisGame);});saveQuests();updateQuestNotif();}
 
+// ══════════════════════════════════════════
+//  ENGLISH SECTION
+// ══════════════════════════════════════════
+
+const ENG_TOPICS = ['spelling','vocabulary','grammar','punctuation','comprehension','creative'];
+const ENG_TOPIC_NAMES = {
+  spelling:'✏️ Spelling', vocabulary:'📘 Vocabulary', grammar:'🔤 Grammar',
+  punctuation:'❓ Punctuation', comprehension:'📰 Comprehension', creative:'🖊️ Creative Writing'
+};
+
+const ENG_UNLOCK_CHAIN = {
+  vocabulary   : [{ prereq:'spelling',     needed:5,  difficulty:'easy',   minScore:6 }],
+  grammar      : [{ prereq:'spelling',     needed:6,  difficulty:'easy',   minScore:7 }],
+  punctuation  : [{ prereq:'grammar',      needed:6,  difficulty:'easy',   minScore:7 }],
+  comprehension: [{ prereq:'vocabulary',   needed:8,  difficulty:'medium', minScore:7 }],
+  creative     : [{ prereq:'comprehension',needed:10, difficulty:'medium', minScore:8 },
+                  { prereq:'grammar',      needed:10, difficulty:'medium', minScore:8 }],
+};
+
+let engTopic=null, engDifficulty='easy';
+let engQuestions=[], engCurrentQ=0, engScore=0;
+let engTimerInterval, engTimeLeft=20;
+let engSegStates=[], engMaxStreakThisGame=0, engStreak=0;
+let engGamesPlayed=0;
+let engTopicGames={};
+
+async function saveEng(){
+  if(!currentUser)return;
+  await apiPost('/progress/'+encodeURIComponent(currentUser.username),
+    {totalStars,playerXP,playerLevel,streak,gamesPlayed,topicGames,engTopicGames,engGamesPlayed});
+}
+function loadEngFromData(d){ engTopicGames=d.engTopicGames||{}; engGamesPlayed=d.engGamesPlayed||0; }
+
+function isEngNative(t){ return t==='spelling'; }
+function countEngQualifying(prereq,difficulty,minScore){ return (engTopicGames[prereq]?.[difficulty]?.[`q${minScore}`])||0; }
+function isEngTopicUnlocked(t){ if(isEngNative(t))return true; const opts=ENG_UNLOCK_CHAIN[t]; if(!opts)return false; return opts.some(o=>countEngQualifying(o.prereq,o.difficulty,o.minScore)>=o.needed); }
+function getEngLockInfo(t){
+  if(isEngTopicUnlocked(t))return null;
+  const opts=ENG_UNLOCK_CHAIN[t]; if(!opts)return null;
+  let best=null,bestPct=-1;
+  for(const o of opts){const played=countEngQualifying(o.prereq,o.difficulty,o.minScore);const pct=played/o.needed;if(pct>bestPct){bestPct=pct;best={...o,played};}}
+  const remaining=best.needed-best.played; const diffLabel=best.difficulty.charAt(0).toUpperCase()+best.difficulty.slice(1);
+  return {prereqKey:best.prereq,prereqName:ENG_TOPIC_NAMES[best.prereq].replace(/^.+? /,''),difficulty:best.difficulty,diffLabel,minScore:best.minScore,played:best.played,needed:best.needed,remaining};
+}
+
+function renderEngTopicCards(){
+  ENG_TOPICS.forEach(t=>{
+    const card=document.getElementById('tc-'+t); const overlay=document.getElementById('lock-'+t);
+    const lockText=document.getElementById('lock-text-'+t); const lockProg=document.getElementById('lock-prog-'+t); const lockLabel=document.getElementById('lock-label-'+t);
+    if(!card)return; card.classList.remove('locked','selected'); overlay.style.display='none';
+    const info=getEngLockInfo(t);
+    if(info){ card.classList.add('locked'); overlay.style.display='flex'; const pct=Math.round((info.played/info.needed)*100); lockText.textContent=`Play ${info.remaining} more ${info.diffLabel} game${info.remaining!==1?'s':''} of ${info.prereqName} (${info.minScore}/10+) to unlock`; lockProg.style.width=pct+'%'; lockLabel.textContent=`${info.played} / ${info.needed} qualifying games`; }
+  });
+}
+
+function goEnglish(){
+  clearInterval(timerInterval); clearInterval(engTimerInterval);
+  document.querySelector('header').classList.add('eng-header-active');
+  document.getElementById('eng-btn').classList.add('active');
+  engTopic=null; engDifficulty='easy';
+  document.querySelectorAll('#eng-diff-row .diff-btn').forEach(b=>{ b.classList.remove('active'); if(b.textContent.includes('Easy'))b.classList.add('active'); });
+  const btn=document.getElementById('eng-play-btn'); btn.textContent='🚀 Pick a Topic First!'; btn.disabled=true;
+  renderEngTopicCards();
+  showScreen('screen-eng-home');
+}
+function goMath(){
+  clearInterval(engTimerInterval);
+  document.querySelector('header').classList.remove('eng-header-active');
+  document.getElementById('eng-btn').classList.remove('active');
+  showScreen('screen-home'); updatePlayerUI();
+}
+function handleEngTopicClick(t){
+  const info=getEngLockInfo(t);
+  if(info){ const card=document.getElementById('tc-'+t); card.style.transform='scale(1.04)'; setTimeout(()=>card.style.transform='',300); const pc=document.getElementById('tc-'+info.prereqKey); if(pc){pc.style.outline='4px solid #7C4DFF';pc.style.transform='scale(1.05)';setTimeout(()=>{pc.style.outline='';pc.style.transform='';},1200);} return; }
+  engTopic=t;
+  document.querySelectorAll('.topic-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('tc-'+t).classList.add('selected');
+  const btn=document.getElementById('eng-play-btn'); btn.textContent=`🚀 Play ${ENG_TOPIC_NAMES[t]}!`; btn.disabled=false;
+}
+function setEngDiff(d,btn){ engDifficulty=d; document.querySelectorAll('#eng-diff-row .diff-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+
+// ── STATIC FALLBACK QUESTION BANKS ──
+const SPELLING_BANK={easy:[{hint:'A furry pet that meows',word:'cat',wrong:['kat','cet','katt']},{hint:'Opposite of night',word:'day',wrong:['dey','dai','dae']},{hint:'You run with these',word:'feet',wrong:['feat','fete','feit']},{hint:'Colour of the sky',word:'blue',wrong:['blew','bloo','bleu']},{hint:'Baby dog',word:'puppy',wrong:['pupy','pupie','pupy']},{hint:'You read this',word:'book',wrong:['bok','boke','booc']},{hint:'Shines at night',word:'moon',wrong:['mune','moan','moun']},{hint:'Opposite of hot',word:'cold',wrong:['colt','kold','colde']},{hint:'You sit on this',word:'chair',wrong:['chare','chiar','chear']},{hint:'Moves through the air',word:'wind',wrong:['wend','wynd','winnd']},{hint:'A red fruit',word:'apple',wrong:['aple','appel','aplle']},{hint:'Opposite of up',word:'down',wrong:['doun','downe','dawn']}],medium:[{hint:'Very happy',word:'joyful',wrong:['joyfull','joiful','joyfel']},{hint:'Hard to believe',word:'amazing',wrong:['amasing','amazeing','amazng']},{hint:'To make bigger',word:'enlarge',wrong:['inlarge','enlargge','enlarje']},{hint:'Full of danger',word:'dangerous',wrong:['dangrous','dangerus','dangerouss']},{hint:'To move very fast',word:'sprint',wrong:['sprent','sprinte','sprnt']},{hint:'A place to learn',word:'library',wrong:['librairy','libary','librery']},{hint:'Very important',word:'essential',wrong:['esential','essensial','essencial']},{hint:'Feeling very tired',word:'exhausted',wrong:['exausted','exhasted','exhaustid']},{hint:'Cannot be seen',word:'invisible',wrong:['invisable','invissible','invisibel']},{hint:'To say sorry',word:'apologise',wrong:['apologize','apoligise','appologise']}],hard:[{hint:'Relating to the environment',word:'ecological',wrong:['ecologicall','ecoligical','ecologikal']},{hint:'Able to be believed',word:'credible',wrong:['credable','credibel','creddible']},{hint:'Very determined',word:'perseverance',wrong:['perserverance','perseverence','perseveranse']},{hint:'Not needed',word:'unnecessary',wrong:['unecessary','unnecesary','unnecessery']},{hint:'Science of living things',word:'biology',wrong:['biologie','byology','biologey']},{hint:'Happening at the same time',word:'simultaneous',wrong:['simultanious','simulteneous','simultaneus']},{hint:'Able to recover quickly',word:'resilient',wrong:['resiliant','resiilent','resillent']},{hint:'Government by the people',word:'democracy',wrong:['democrasy','demokraty','democracie']}]};
+const VOCAB_BANK={easy:[{sentence:'The dog was very ___.',answer:'happy',wrong:['table','running','blue'],hint:'Feeling good'},{sentence:'She ___ to school every day.',answer:'walks',wrong:['jumps','sleeps','eats'],hint:'Move on foot'},{sentence:'The sky is ___.',answer:'blue',wrong:['loud','soft','heavy'],hint:'A colour'},{sentence:'He felt ___ after winning.',answer:'proud',wrong:['wet','round','purple'],hint:'Pleased with yourself'},{sentence:'The cat ___ on the mat.',answer:'sat',wrong:['flew','swam','sang'],hint:'Past tense of sit'},{sentence:'She has a ___ smile.',answer:'bright',wrong:['dark','heavy','sour'],hint:'Full of light'},{sentence:'The baby ___ all night.',answer:'cried',wrong:['flew','built','drove'],hint:'Made tears'},{sentence:'It was a ___ day outside.',answer:'sunny',wrong:['purple','loud','sharp'],hint:'Full of sunshine'}],medium:[{sentence:'The scientist made a remarkable ___.',answer:'discovery',wrong:['argument','vehicle','melody'],hint:'Finding something new'},{sentence:'She spoke with great ___.',answer:'confidence',wrong:['furniture','distance','shadow'],hint:'Belief in yourself'},{sentence:'The news was completely ___.',answer:'unexpected',wrong:['circular','musical','ancient'],hint:'Not predicted'},{sentence:'He showed ___ by helping others.',answer:'generosity',wrong:['gravity','geography','symphony'],hint:'Being giving'},{sentence:'The ___ of the river was strong.',answer:'current',wrong:['flavour','carpet','budget'],hint:'Flow of water'},{sentence:'She read the book with great ___.',answer:'enthusiasm',wrong:['furniture','diameter','obstacle'],hint:'Excitement and energy'}],hard:[{sentence:'The law was deemed ___.',answer:'unconstitutional',wrong:['metaphorical','geographical','astronomical'],hint:'Against the constitution'},{sentence:'His speech was full of ___.',answer:'rhetoric',wrong:['geometry','taxonomy','velocity'],hint:'Persuasive language'},{sentence:"The treaty was signed after long ___.",answer:'negotiations',wrong:['illustrations','celebrations','constellations'],hint:'Formal discussions'},{sentence:'She showed ___ in her argument.',answer:'ambiguity',wrong:['prosperity','chronology','mythology'],hint:'Unclear meaning'},{sentence:'The painting showed great ___.',answer:'perspective',wrong:['arithmetic','legislation','amphibian'],hint:'Point of view in art'}]};
+const GRAMMAR_BANK={easy:[{sentence:'She ___ to the park yesterday.',answer:'went',wrong:['go','goes','gone'],hint:'Past tense of go'},{sentence:'They ___ eating lunch now.',answer:'are',wrong:['is','was','be'],hint:'Plural present tense of be'},{sentence:'He ___ a new bike last week.',answer:'got',wrong:['get','gets','getting'],hint:'Past tense of get'},{sentence:'The cat ___ on the sofa.',answer:'sits',wrong:['sit','sat','sitting'],hint:'Third person singular present'},{sentence:'I ___ never seen that film.',answer:'have',wrong:['has','had','having'],hint:'Present perfect with I'},{sentence:'We ___ going to the beach.',answer:'are',wrong:['is','was','am'],hint:'Plural subject'},{sentence:'She ___ her homework every day.',answer:'does',wrong:['do','did','done'],hint:'Third person singular'},{sentence:'The children ___ playing outside.',answer:'were',wrong:['was','is','are'],hint:'Past tense plural'}],medium:[{sentence:'Neither the cat nor the dogs ___ hungry.',answer:'were',wrong:['was','is','are'],hint:'Closer noun is plural'},{sentence:'Each of the students ___ a pencil.',answer:'has',wrong:['have','had','having'],hint:'Each = singular'},{sentence:'If I ___ you, I would apologise.',answer:'were',wrong:['was','am','be'],hint:'Subjunctive mood'},{sentence:'The team ___ won three matches.',answer:'has',wrong:['have','had','are'],hint:'Collective noun = singular'},{sentence:'She speaks French ___ than her brother.',answer:'better',wrong:['more better','gooder','best'],hint:'Comparative adverb'},{sentence:'He is one of those people who ___ always late.',answer:'are',wrong:['is','was','were'],hint:'Relative clause agrees with people'}],hard:[{sentence:'The data ___ been analysed.',answer:'has',wrong:['have','had','are'],hint:'Data as singular in formal English'},{sentence:'Whoever ___ first will get the prize.',answer:'arrives',wrong:['arrive','arrived','arriving'],hint:'Subjunctive clause subject'},{sentence:'He insisted that she ___ the report.',answer:'write',wrong:['writes','wrote','written'],hint:'Mandative subjunctive after insist'},{sentence:'The committee ___ divided on the issue.',answer:'was',wrong:['were','are','have'],hint:'Committee as single unit'},{sentence:'I wish I ___ taller.',answer:'were',wrong:['was','am','be'],hint:'Subjunctive expressing wish'}]};
+const PUNCT_BANK={easy:[{question:'Which sentence is correct?',options:['I like cats, dogs and birds.','I like cats dogs, and birds.','I like, cats dogs and birds.','I like cats dogs and, birds.'],answer:'I like cats, dogs and birds.'},{question:'Which sentence is correct?',options:["What's your name?",'Whats your name?',"Whats' your name?",'What`s your name?'],answer:"What's your name?"},{question:'Which sentence is correct?',options:['She said hello.','She said, hello.','She said hello!.','She said; hello.'],answer:'She said hello.'},{question:'Which is punctuated correctly?',options:["It's a sunny day.",'Its a sunny day.',"Its' a sunny day.",'It`s a sunny day.'],answer:"It's a sunny day."},{question:'Which sentence ends correctly?',options:['Where are you going.','Where are you going!','Where are you going?','Where are you going,'],answer:'Where are you going?'},{question:'Which uses a comma correctly?',options:['After dinner, we watched a film.','After dinner we, watched a film.','After, dinner we watched a film.','After dinner we watched, a film.'],answer:'After dinner, we watched a film.'},{question:'Which is correct?',options:["The boys' coats were wet.","The boys coats' were wet.","The boy's coats were wet.","The boys coat's were wet."],answer:"The boys' coats were wet."},{question:'Which sentence is correct?',options:['I have three pets: a cat, a dog, and a fish.','I have three pets: a cat a dog and a fish.','I have three pets, a cat, a dog, and a fish.','I have three pets a cat a dog and a fish.'],answer:'I have three pets: a cat, a dog, and a fish.'}],medium:[{question:'Which uses a semicolon correctly?',options:['I was tired; however, I kept going.','I was tired; However, I kept going.','I was tired, however; I kept going.','I was tired however; I kept going.'],answer:'I was tired; however, I kept going.'},{question:'Which is punctuated correctly?',options:['She asked, "Are you coming?"','She asked "Are you coming?"',"She asked, 'Are you coming?'",'She asked, Are you coming?'],answer:'She asked, "Are you coming?"'},{question:'Which sentence is correct?',options:['The results, which were surprising, pleased everyone.','The results which were surprising pleased everyone.','The results, which were surprising pleased everyone.','The results which, were surprising, pleased everyone.'],answer:'The results, which were surprising, pleased everyone.'},{question:'Which uses a dash correctly?',options:['She finally arrived — two hours late.','She finally arrived—, two hours late.','She finally arrived,— two hours late.','She finally —arrived two hours late.'],answer:'She finally arrived — two hours late.'},{question:'Which is correct?',options:["It's not its fault.",'Its not its fault.',"It's not it's fault.",'Its not its fault.'],answer:"It's not its fault."}],hard:[{question:'Which is correctly punctuated?',options:['The report — which took three months to complete — was rejected.','The report, which took three months to complete — was rejected.','The report — which took three months to complete, was rejected.','The report — which took three months, to complete — was rejected.'],answer:'The report — which took three months to complete — was rejected.'},{question:'Which uses a colon correctly?',options:['The answer is simple: practice every day.','The answer is: simple.','The answer: is simple.','The answer is simple practice: every day.'],answer:'The answer is simple: practice every day.'},{question:'Which is correct?',options:["The children's toys were everywhere.","The childrens' toys were everywhere.","The childrens toys were everywhere.","The children's toy's were everywhere."],answer:"The children's toys were everywhere."}]};
+const COMP_BANK={easy:[{passage:'Tom has a red bike. He rides it to school every morning. His favourite colour is red.',question:"What colour is Tom's bike?",answer:'Red',options:['Blue','Red','Green','Yellow']},{passage:'Sara loves animals. She has two cats and a dog. Every evening she feeds them.',question:'How many pets does Sara have?',answer:'Three',options:['Two','Three','Four','One']},{passage:'It was a cold winter morning. Jack put on his coat and scarf before going outside.',question:'What was the weather like?',answer:'Cold',options:['Hot','Rainy','Cold','Windy']},{passage:"The library opens at nine o'clock. It closes at six in the evening. It is closed on Sundays.",question:'When does the library close?',answer:'Six in the evening',options:["Nine o'clock",'Midday','Six in the evening','Eight o\'clock']},{passage:"Mia baked a chocolate cake for her mum's birthday. She used flour, eggs, butter and cocoa.",question:'Who was the cake for?',answer:"Mia's mum",options:['Mia','Her teacher',"Mia's mum",'Her friend']}],medium:[{passage:'Despite the heavy rain, the match continued. The players were exhausted but determined to finish. In the end, the home team scored in the final minute to win 2-1.',question:'What was the final score?',answer:'2-1',options:['1-0','2-0','2-1','1-1']},{passage:"The Amazon rainforest produces approximately 20% of the world's oxygen. It is home to millions of species of plants and animals, many of which have not yet been discovered.",question:"What percentage of the world's oxygen does the Amazon produce?",answer:'20%',options:['10%','20%','30%','50%']},{passage:'Marie Curie was the first woman to win a Nobel Prize. She won it twice — once for physics and once for chemistry. She was born in Poland in 1867.',question:'How many Nobel Prizes did Marie Curie win?',answer:'Two',options:['One','Two','Three','Four']},{passage:'The train was delayed by forty minutes due to signal failures. Passengers were advised to seek alternative routes or wait on the platform.',question:'Why was the train delayed?',answer:'Signal failures',options:['Bad weather','Engine problems','Signal failures','Track repairs']}],hard:[{passage:'The concept of cognitive dissonance, introduced by psychologist Leon Festinger in 1957, refers to the mental discomfort experienced when holding two conflicting beliefs simultaneously.',question:'Who introduced cognitive dissonance?',answer:'Leon Festinger',options:['Sigmund Freud','Leon Festinger','Carl Jung','B.F. Skinner']},{passage:'Photosynthesis is the process by which plants convert light energy, usually from the sun, into chemical energy stored as glucose. This process requires carbon dioxide and water, and releases oxygen as a byproduct.',question:'What do plants release during photosynthesis?',answer:'Oxygen',options:['Carbon dioxide','Glucose','Water','Oxygen']},{passage:'The Industrial Revolution, which began in Britain in the late 18th century, transformed manufacturing from hand production to machine-based processes.',question:'Where did the Industrial Revolution begin?',answer:'Britain',options:['France','America','Germany','Britain']}]};
+const CREATIVE_BANK={easy:[{prompt:'Write a story about a lost puppy.',answer:'The small brown puppy sat alone in the park, whimpering softly.',wrong:['The puppy was brown and small and it was lost somewhere.','Lost puppies are sad and they need to be found by someone.','Once there was a puppy story that I will now tell you about.']},{prompt:'Describe a perfect summer day.',answer:'Golden sunlight poured through the window as I stepped onto the warm, grassy lawn.',wrong:['It was summer and the weather was nice and sunny outside.','A perfect summer day has sun and warmth and you can play outside.','Summer is my favourite season because I like the sunshine very much.']},{prompt:'Write about your favourite place.',answer:'Tucked between two oak trees, my secret reading nook felt like the whole world had disappeared.',wrong:['My favourite place is somewhere I really like going to a lot.','I have a favourite place that I enjoy visiting whenever I can.','There is a place I like and it makes me feel happy when I go there.']}],medium:[{prompt:'Open a story set in a haunted house.',answer:'The floorboards groaned beneath my feet as I pushed open the heavy oak door, and the smell of dust and secrets rushed out to meet me.',wrong:['I went into the haunted house and it was very scary inside for me.','The haunted house was old and scary and I was frightened to go in it.','There was a haunted house that I decided to go and have a look at.']},{prompt:'Begin a story about an unexpected discovery.',answer:'It was only when she moved the bookcase that she noticed the door — small, wooden, and impossible.',wrong:['She found something unexpected and it turned out to be very surprising.','One day there was a discovery that nobody had expected to happen at all.','She discovered something that she had not expected to find when she looked.']},{prompt:'Open a mystery story.',answer:"The envelope had no stamp, no return address — just my name, written in a hand I didn't recognise.",wrong:['It was a mystery story that started with something mysterious happening.','There was a mystery and the main character had to try and solve it.','Something mysterious happened one day and nobody knew what it was about.']}],hard:[{prompt:'Open a dystopian story.',answer:'In the city of Verath, memory was not a right — it was a currency, and most people had already spent theirs.',wrong:['The dystopian world was a bad place where people did not have freedom.','It was a dystopia and everyone lived under the control of the government there.','In the future, things had gone very wrong and society was not good anymore.']},{prompt:'Begin a story exploring loneliness.',answer:"She had a hundred contacts in her phone and hadn't spoken to a single one in three weeks.",wrong:['The character felt lonely because they did not have many friends around them.','Loneliness is a feeling where you are alone and do not have people with you.','She was a lonely person who felt sad because she did not talk to others.']}]};
+
+function getEngBank(t,diff){const banks={spelling:SPELLING_BANK,vocabulary:VOCAB_BANK,grammar:GRAMMAR_BANK,punctuation:PUNCT_BANK,comprehension:COMP_BANK,creative:CREATIVE_BANK};const bank=banks[t];return bank[diff]||bank['easy'];}
+
+// ── AI QUESTION GENERATION ──
+const ENG_TOPIC_PROMPTS = {
+  spelling: (diff) => `Generate exactly 10 spelling quiz questions for ${diff} level school students (ages ${diff==='easy'?'6-9':diff==='medium'?'9-12':'12-16'}).
+Return ONLY a valid JSON array with no markdown, no backticks, no preamble. Each object must have exactly these keys:
+{"hint": "clue about what the word means (max 8 words)", "word": "correctspelling", "wrong": ["plausiblemisspelling1","plausiblemisspelling2","plausiblemisspelling3"]}
+Rules: wrong spellings must look like real student mistakes (swap letters, double letters, phonetic spellings). ${diff==='easy'?'Use 3-6 letter common words.':diff==='medium'?'Use 6-10 letter words with tricky patterns.':'Use 10+ letter words or words with silent letters/unusual patterns.'}
+Do not repeat any word. Return the JSON array only.`,
+
+  vocabulary: (diff) => `Generate exactly 10 vocabulary fill-in-the-blank questions for ${diff} level school students.
+Return ONLY a valid JSON array, no markdown. Each object:
+{"sentence": "A sentence with ___ where the vocabulary word goes.", "answer": "correct word", "wrong": ["plausible_wrong1","plausible_wrong2","plausible_wrong3"], "hint": "brief definition clue"}
+Rules: wrong options must be real words that are grammatically plausible but wrong in meaning. The answer must fit the blank perfectly. ${diff==='easy'?'Use everyday descriptive words.':diff==='medium'?'Use interesting vocabulary from various subjects.':'Use advanced academic or literary vocabulary.'}`,
+
+  grammar: (diff) => `Generate exactly 10 grammar fill-in-the-blank questions for ${diff} level school students.
+Return ONLY a valid JSON array, no markdown. Each object:
+{"sentence": "A sentence with ___ where the correct grammar word/phrase goes.", "answer": "correct answer", "wrong": ["wrong1","wrong2","wrong3"], "hint": "grammar rule explanation (max 6 words)"}
+Focus on: ${diff==='easy'?'simple verb tenses (past/present/future), was/were, has/have':'${diff==="medium"?"perfect tenses, modal verbs, comparative/superlative":"subjunctive mood, complex agreement, formal grammar"}'}
+Wrong options must be grammatically plausible mistakes. Return JSON only.`,
+
+  punctuation: (diff) => `Generate exactly 10 punctuation multiple-choice questions for ${diff} level school students.
+Return ONLY a valid JSON array, no markdown. Each object:
+{"question": "Which sentence is punctuated correctly? (or similar)", "options": ["option A","option B","option C","option D"], "answer": "the correct option — must match one of the options exactly, character for character"}
+CRITICAL: the "answer" value must be character-for-character identical to one entry in "options". Focus on: ${diff==='easy'?'apostrophes, commas, question marks, full stops, exclamation marks':diff==='medium'?'semicolons, colons, speech marks, complex apostrophes':'em dashes, complex comma rules, colons vs semicolons, nested punctuation'}`,
+
+  comprehension: (diff) => `Generate exactly 10 reading comprehension questions for ${diff} level school students.
+Return ONLY a valid JSON array, no markdown. Each object:
+{"passage": "A ${diff==='easy'?'2-3':'3-4'} sentence passage.", "question": "A question about the passage.", "answer": "The correct answer", "options": ["The correct answer","wrong option 1","wrong option 2","wrong option 3"]}
+CRITICAL: the "answer" must be character-for-character identical to the first element in "options". Use fresh, original passages on varied topics (science, history, sport, nature, culture). ${diff==='easy'?'Literal recall questions.':diff==='medium'?'Mix of recall and inference.':'Inference, vocabulary in context, and implied meaning.'}`,
+
+  creative: (diff) => `Generate exactly 10 creative writing "best opening sentence" questions for ${diff} level school students.
+Return ONLY a valid JSON array, no markdown. Each object:
+{"prompt": "A short story prompt (e.g. 'Write a story about...' or 'Open a tale set in...')", "answer": "A genuinely excellent, vivid, engaging opening sentence using strong vocabulary and imagery", "wrong": ["A bland, clichéd opening","A grammatically weak or vague opening","A repetitive or dull opening"]}
+The "answer" must be clearly and obviously superior to the wrong options. Wrong options should be the kind of openings a struggling student might write. ${diff==='easy'?'Simple, imaginative prompts.':diff==='medium'?'More dramatic or complex scenarios.':'Literary, ambitious scenarios requiring sophisticated writing.'}`
+};
+
+function showAILoader(show) {
+  const loader = document.getElementById('ai-loader');
+  if (show) loader.classList.add('show');
+  else loader.classList.remove('show');
+}
+
+async function buildEngQuestionsAI() {
+  const promptFn = ENG_TOPIC_PROMPTS[engTopic];
+  if (!promptFn) return buildEngQuestionsFallback();
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 4000,
+        system: "You are an expert educational content creator. Always return ONLY valid JSON arrays with absolutely no markdown formatting, no backticks, no explanation text before or after. Just the raw JSON array.",
+        messages: [{ role: "user", content: promptFn(engDifficulty) }]
+      })
+    });
+
+    if (!response.ok) throw new Error('API error: ' + response.status);
+
+    const data = await response.json();
+    const text = (data.content || []).map(i => i.text || '').join('');
+    // Strip any accidental markdown fences or leading/trailing whitespace
+    const clean = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    const bank = JSON.parse(clean);
+
+    if (!Array.isArray(bank) || bank.length < 5) throw new Error('Invalid bank');
+    return convertAIBank(bank);
+
+  } catch (err) {
+    console.warn('AI question generation failed, using static fallback:', err);
+    return buildEngQuestionsFallback();
+  }
+}
+
+function convertAIBank(bank) {
+  // Ensure we have exactly TOTAL_QS questions; pad with fallback if needed
+  let pool = shuffle([...bank]);
+  if (pool.length < TOTAL_QS) {
+    const fallback = buildEngQuestionsFallback();
+    pool = [...pool, ...fallback].slice(0, TOTAL_QS);
+  }
+  pool = pool.slice(0, TOTAL_QS);
+
+  return pool.map(q => {
+    if (engTopic === 'spelling') {
+      const word = (q.word || '').toLowerCase();
+      return {
+        type: 'type',
+        text: '💡 ' + (q.hint || 'Spell this word'),
+        answer: word,
+        hint: word ? `Starts with "${word[0].toUpperCase()}"` : 'Think carefully!'
+      };
+    }
+    if (engTopic === 'vocabulary' || engTopic === 'grammar') {
+      return {
+        type: 'type',
+        text: q.sentence || q.text || '',
+        answer: (q.answer || '').toLowerCase(),
+        hint: q.hint || 'Think carefully!'
+      };
+    }
+    if (engTopic === 'punctuation') {
+      const opts = Array.isArray(q.options) ? shuffle(q.options) : [];
+      // Safety: make sure answer is in opts
+      if (q.answer && !opts.includes(q.answer)) opts[0] = q.answer;
+      return {
+        type: 'choice',
+        text: q.question || 'Which is correct?',
+        answer: q.answer,
+        options: shuffle(opts)
+      };
+    }
+    if (engTopic === 'comprehension') {
+      const opts = Array.isArray(q.options) ? [...q.options] : [q.answer];
+      if (q.answer && !opts.includes(q.answer)) opts.unshift(q.answer);
+      return {
+        type: 'choice',
+        text: q.question || '',
+        answer: q.answer,
+        options: shuffle(opts.slice(0, 4)),
+        passage: q.passage || ''
+      };
+    }
+    // creative
+    const wrong = Array.isArray(q.wrong) ? q.wrong : [];
+    return {
+      type: 'choice',
+      text: '📝 Choose the best opening for:\n"' + (q.prompt || '') + '"',
+      answer: q.answer,
+      options: shuffle([q.answer, ...wrong].slice(0, 4))
+    };
+  });
+}
+
+function buildEngQuestionsFallback() {
+  const bank = getEngBank(engTopic, engDifficulty);
+  const pool = shuffle([...bank]).slice(0, Math.min(TOTAL_QS, bank.length));
+  if (pool.length < TOTAL_QS) {
+    const easy = getEngBank(engTopic, 'easy');
+    const extra = shuffle(easy).slice(0, TOTAL_QS - pool.length);
+    pool.push(...extra);
+  }
+  return pool.slice(0, TOTAL_QS).map(q => {
+    if (engTopic === 'spelling') return { type:'type', text:`💡 ${q.hint}`, answer:q.word.toLowerCase(), hint:`Starts with "${q.word[0].toUpperCase()}"` };
+    if (engTopic === 'vocabulary') return { type:'type', text:q.sentence, answer:q.answer.toLowerCase(), hint:q.hint };
+    if (engTopic === 'grammar') return { type:'type', text:q.sentence, answer:q.answer.toLowerCase(), hint:q.hint };
+    if (engTopic === 'punctuation') return { type:'choice', text:q.question, answer:q.answer, options:shuffle(q.options) };
+    if (engTopic === 'comprehension') return { type:'choice', text:q.question, answer:q.answer, options:shuffle(q.options), passage:q.passage };
+    return { type:'choice', text:`📝 Choose the best opening for:\n"${q.prompt}"`, answer:q.answer, options:shuffle([q.answer,...q.wrong]) };
+  });
+}
+
+// ── ENG GAME FLOW (async) ──
+async function startEngGame(){
+  if(!engTopic||getEngLockInfo(engTopic))return;
+  engCurrentQ=0;engScore=0;engMaxStreakThisGame=0;engStreak=0;
+  engSegStates=new Array(TOTAL_QS).fill('');
+
+  // Show loader while AI generates questions
+  showAILoader(true);
+  try {
+    engQuestions = await buildEngQuestionsAI();
+  } catch(e) {
+    engQuestions = buildEngQuestionsFallback();
+  }
+  showAILoader(false);
+
+  const bar=document.getElementById('eng-prog-bar-outer');bar.innerHTML='';
+  for(let i=0;i<TOTAL_QS;i++){const s=document.createElement('div');s.id='eng-seg-'+i;bar.appendChild(s);}
+  showScreen('screen-eng-game');loadEngQuestion();
+}
+
+function paintEngSegs(){for(let i=0;i<TOTAL_QS;i++){const s=document.getElementById('eng-seg-'+i);if(!s)continue;const base='flex:1;height:16px;border-radius:50px;transition:all 0.3s ease;';if(i===engCurrentQ)s.style.cssText=base+'background:#CE93D8;transform:scaleY(1.4);box-shadow:0 0 8px rgba(206,147,216,0.9);';else if(engSegStates[i]==='correct')s.style.cssText=base+'background:#43A047;';else if(engSegStates[i]==='wrong')s.style.cssText=base+'background:#E53935;';else if(engSegStates[i]==='timeout')s.style.cssText=base+'background:#FF8F00;';else s.style.cssText=base+'background:#E0E0E0;';}}
+
+function loadEngQuestion(){
+  const q=engQuestions[engCurrentQ];paintEngSegs();
+  document.getElementById('eng-q-counter').textContent=`${engCurrentQ+1} / ${TOTAL_QS}`;
+  document.getElementById('eng-q-topic-tag').textContent=ENG_TOPIC_NAMES[engTopic]||engTopic;
+  document.getElementById('eng-feedback').style.display='none';
+  document.getElementById('eng-next-btn').style.display='none';
+  const passageBox=document.getElementById('eng-passage-box');
+  if(q.passage){passageBox.textContent=q.passage;passageBox.style.display='block';}else passageBox.style.display='none';
+  document.getElementById('eng-question-text').innerHTML=q.text.replace(/\n/g,'<br>');
+  const typeWrap=document.getElementById('eng-type-wrap');
+  const answersGrid=document.getElementById('eng-answers-grid');
+  const input=document.getElementById('eng-type-input');
+  const submitBtn=document.getElementById('eng-submit-btn');
+  if(q.type==='type'){
+    typeWrap.style.display='block';answersGrid.innerHTML='';answersGrid.style.display='none';
+    input.value='';input.className='type-answer-input';input.disabled=false;
+    submitBtn.disabled=false;submitBtn.style.display='block';
+    setTimeout(()=>input.focus(),100);
+  } else {
+    typeWrap.style.display='none';answersGrid.style.display='grid';answersGrid.innerHTML='';
+    q.options.forEach(opt=>{const btn=document.createElement('button');btn.className='answer-btn';btn.style.fontSize='1rem';btn.textContent=opt;btn.addEventListener('click',()=>checkEngAnswer(opt,btn));answersGrid.appendChild(btn);});
+  }
+  startEngTimer();
+}
+
+function submitTyped(){
+  const input=document.getElementById('eng-type-input');const val=input.value.trim().toLowerCase();if(!val)return;
+  clearInterval(engTimerInterval);input.disabled=true;document.getElementById('eng-submit-btn').disabled=true;
+  const q=engQuestions[engCurrentQ];const correct=val===q.answer.toLowerCase();
+  input.classList.add(correct?'correct':'wrong');handleEngResult(correct,q,null);
+}
+function checkEngAnswer(chosen,btn){
+  clearInterval(engTimerInterval);document.querySelectorAll('#eng-answers-grid .answer-btn').forEach(b=>b.disabled=true);
+  const q=engQuestions[engCurrentQ];const correct=chosen===q.answer;
+  if(!correct)document.querySelectorAll('#eng-answers-grid .answer-btn').forEach(b=>{if(b.textContent===q.answer)b.classList.add('ans-correct');});
+  btn.classList.add(correct?'ans-correct':'ans-wrong');handleEngResult(correct,q,btn);
+}
+function handleEngResult(correct,q,btn){
+  if(correct){engScore++;engStreak++;if(engStreak>engMaxStreakThisGame)engMaxStreakThisGame=engStreak;engSegStates[engCurrentQ]='correct';paintEngSegs();const bonus=engStreak>=3?30:10;showEngFeedback(true,engStreak>=3?`🔥 ${engStreak} in a row! +${bonus} XP!`:getCorrectMsg());addXP(bonus);if(btn)spawnCoins(btn);}
+  else{engStreak=0;engSegStates[engCurrentQ]='wrong';paintEngSegs();showEngFeedback(false,`❌ ${q.hint||('Answer: '+q.answer)}`);}
+  document.getElementById('streak-count').textContent=streak;saveEng();document.getElementById('eng-next-btn').style.display='block';
+}
+function engTimeUp(){
+  clearInterval(engTimerInterval);const q=engQuestions[engCurrentQ];
+  const input=document.getElementById('eng-type-input');
+  if(q.type==='type'){input.disabled=true;document.getElementById('eng-submit-btn').disabled=true;}
+  else document.querySelectorAll('#eng-answers-grid .answer-btn').forEach(b=>{b.disabled=true;if(b.textContent===q.answer)b.classList.add('ans-correct');});
+  engSegStates[engCurrentQ]='timeout';paintEngSegs();engStreak=0;
+  showEngFeedback(false,`⏰ Time's up! Answer: ${q.answer}`);saveEng();document.getElementById('eng-next-btn').style.display='block';
+}
+function engNextQuestion(){engCurrentQ++;if(engCurrentQ>=TOTAL_QS)showEngResults();else loadEngQuestion();}
+
+function showEngResults(){
+  const pct=engScore/TOTAL_QS;const xpEarned=engScore*10+(engScore===TOTAL_QS?50:0);const stars=pct>=0.9?3:pct>=0.7?2:pct>=0.5?1:0;const idx=Math.min(Math.floor(pct*4+0.1),4);
+  ['😢','😅','😊','🌟','🏆'].forEach((t,i)=>{if(i===idx)document.getElementById('eng-results-trophy').textContent=t;});
+  document.getElementById('eng-results-title').textContent=["Keep Trying!","Good Effort!","Well Done!","Excellent!","PERFECT! 🎉"][idx];
+  document.getElementById('eng-results-score').textContent=`${engScore}/${TOTAL_QS}`;
+  document.getElementById('eng-score-stars').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
+  document.getElementById('eng-stat-correct').textContent=engScore;
+  document.getElementById('eng-stat-wrong').textContent=TOTAL_QS-engScore;
+  document.getElementById('eng-stat-xp').textContent=`+${xpEarned}`;
+  engGamesPlayed++;document.getElementById('eng-stat-games').textContent=engGamesPlayed;
+  document.getElementById('eng-results-message').textContent=["Keep practicing!","Good try!","Nice work!","Great job!","PERFECT SCORE! 🎉"][idx];
+  totalStars+=stars;addXP(xpEarned);
+  const prevUnlocked=ENG_TOPICS.filter(t=>isEngTopicUnlocked(t));
+  if(!engTopicGames[engTopic])engTopicGames[engTopic]={};if(!engTopicGames[engTopic][engDifficulty])engTopicGames[engTopic][engDifficulty]={};
+  for(let thresh=1;thresh<=engScore;thresh++){const key=`q${thresh}`;engTopicGames[engTopic][engDifficulty][key]=(engTopicGames[engTopic][engDifficulty][key]||0)+1;}
+  const nowUnlocked=ENG_TOPICS.filter(t=>isEngTopicUnlocked(t));
+  const newlyUnlocked=nowUnlocked.filter(t=>!prevUnlocked.includes(t));
+  if(newlyUnlocked.length>0)setTimeout(()=>showUnlockToast(newlyUnlocked.map(t=>ENG_TOPIC_NAMES[t].replace(/^.+? /,''))),800);
+  saveEng();showScreen('screen-eng-results');if(engScore===TOTAL_QS)launchConfetti();
+}
+function retryEngGame(){startEngGame();}  // async, regenerates fresh questions each time
+
+function startEngTimer(){clearInterval(engTimerInterval);const secs=engDifficulty==='easy'?25:engDifficulty==='medium'?20:15;engTimeLeft=secs;updateEngTimerUI(secs,secs);engTimerInterval=setInterval(()=>{engTimeLeft--;updateEngTimerUI(engTimeLeft,secs);if(engTimeLeft<=0){clearInterval(engTimerInterval);engTimeUp();}},1000);}
+function updateEngTimerUI(t,max){const deg=360*(1-t/max);document.getElementById('eng-timer-ring').style.background=`conic-gradient(#7C4DFF ${deg}deg, #E0E0E0 ${deg}deg)`;const inner=document.getElementById('eng-timer-text');inner.textContent=t;inner.style.color=t<=5?'#E53935':t<=10?'#FF8F00':'#1A237E';}
+function showEngFeedback(correct,msg){const fb=document.getElementById('eng-feedback');fb.textContent=msg;fb.className='feedback '+(correct?'fb-correct':'fb-wrong');fb.style.display='block';}
+
 // ── RESET ──
-async function confirmReset(){if(!confirm(`Reset ALL progress for ${currentUser.username}?`))return;totalStars=0;playerXP=0;playerLevel=1;streak=0;gamesPlayed=0;topicGames={};questProgress={};perfectCount=0;totalCorrect=0;topicsPlayed=new Set();pickDailyQuests();await save();await saveQuests();updatePlayerUI();updateQuestNotif();}
+async function confirmReset(){if(!confirm(`Reset ALL progress for ${currentUser.username}?`))return;totalStars=0;playerXP=0;playerLevel=1;streak=0;gamesPlayed=0;topicGames={};engTopicGames={};engGamesPlayed=0;questProgress={};perfectCount=0;totalCorrect=0;topicsPlayed=new Set();pickDailyQuests();await save();await saveQuests();updatePlayerUI();updateQuestNotif();}
 
 // ── INIT ──
 makeClouds();
