@@ -218,8 +218,14 @@
 
 <header>
   <div class="logo-group">
-    <div class="logo">Math<span>Quest</span> 🚀</div>
+      
+  <div class="logo">Math<span>Quest</span> 🚀</div>
+    
+  <div class="logo-group">
+    
+    <button onclick="goMath()" id="math-btn" class="eng-tab-btn">📖 Math</button>
     <button onclick="goEnglish()" id="eng-btn" class="eng-tab-btn">📖 English</button>
+  </div>
   </div>
   <div class="header-right">
     <div class="quest-btn-wrap">
@@ -351,11 +357,12 @@
       <div class="avatar" id="eng-avatar-emoji">🐣</div>
       <div class="player-meta">
         <div class="player-name-row">
-          <div class="player-name" id="eng-player-name">Player</div>
-          <button class="reset-btn" onclick="goMath()">← Math</button>
+          <div class="player-name" id="player-name-display">Player</div>
+          <button class="reset-btn" onclick="confirmReset()">↺ Reset</button>
         </div>
-        <div class="player-level-text">Level <span id="eng-player-level">1</span> · <span id="eng-player-xp">0</span> / <span id="eng-xp-next">100</span> XP</div>
-        <div class="xp-bar-wrap"><div class="xp-bar" id="eng-xp-bar" style="width:0%;background:linear-gradient(90deg,#7C4DFF,#AB47BC)"></div></div>
+        <div class="player-level-text">Level <span id="player-level">1</span> · <span id="player-xp">0</span> / <span id="xp-next">100</span> XP</div>
+        <div class="xp-bar-wrap"><div class="xp-bar" id="xp-bar" style="width:0%"></div></div>
+        <div class="avatar-tease" id="avatar-tease"></div>
       </div>
     </div>
     <div class="hero-title">📖 English Quest!</div>
@@ -506,6 +513,10 @@ const GRADE_NATIVE = {
   4:['multiply','fractions'],5:['fractions','decimals'],6:['fractions','decimals'],
   7:['decimals','percent'],8:['decimals','percent'],9:['algebra','geometry'],
 };
+const GRADE_HIDDEN = {
+  4:['counting','addsubt'],5:['counting','addsubt'],6:['counting','addsubt'],
+  7:['counting','addsubt'],8:['counting','addsubt'],9:['counting','addsubt'],
+};  
 
 function isGradeNative(t){ return (GRADE_NATIVE[grade]||[]).includes(t); }
 function countQualifying(prereq, difficulty, minScore){ return (topicGames[prereq]?.[difficulty]?.[`q${minScore}`]) || 0; }
@@ -531,11 +542,16 @@ async function load(){
 }
 
 // ── TOPIC CARDS ──
+console.log('grade:', grade, typeof grade);
 function renderTopicCards(){
+  const GRADE_HIDDEN_MAP={4:['counting','addsubt'],5:['counting','addsubt'],6:['counting','addsubt'],7:['counting','addsubt'],8:['counting','addsubt'],9:['counting','addsubt']};
+    const hidden=(GRADE_HIDDEN_MAP[+grade]||[]);
   ALL_TOPICS.forEach(t=>{
     const card=document.getElementById('tc-'+t); const overlay=document.getElementById('lock-'+t);
     const lockText=document.getElementById('lock-text-'+t); const lockProg=document.getElementById('lock-prog-'+t); const lockLabel=document.getElementById('lock-label-'+t);
-    if(!card)return; card.classList.remove('locked','selected'); overlay.style.display='none';
+    if(!card)return;
+    if(hidden.includes(t)){ card.style.display='none'; return; }
+    card.style.display=''; card.classList.remove('locked','selected'); overlay.style.display='none';
     const info=getLockInfo(t);
     if(info){ card.classList.add('locked'); overlay.style.display='flex'; const pct=Math.round((info.played/info.needed)*100); lockText.textContent=`Play ${info.remaining} more ${info.diffLabel} game${info.remaining!==1?'s':''} of ${info.prereqName} (${info.minScore}/10+) to unlock`; lockProg.style.width=pct+'%'; lockLabel.textContent=`${info.played} / ${info.needed} qualifying games`; }
   });
@@ -550,24 +566,25 @@ function handleTopicClick(t){
 // ── PLAYER UI ──
 function updatePlayerUI(){
   const av=getAvatar(playerLevel); const emoji=currentUser?.avatar||av.emoji;
-  document.getElementById('avatar-emoji').textContent=emoji;
-  document.getElementById('eng-avatar-emoji').textContent=emoji;
-  document.getElementById('mascot').textContent=emoji;
-  document.getElementById('player-name-display').textContent=currentUser?.username||av.title;
-  document.getElementById('eng-player-name').textContent=currentUser?.username||av.title;
-  document.getElementById('player-level').textContent=playerLevel;
-  document.getElementById('eng-player-level').textContent=playerLevel;
-  document.getElementById('player-xp').textContent=playerXP;
-  document.getElementById('eng-player-xp').textContent=playerXP;
+  const safe=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+  const safeStyle=(id,prop,val)=>{const el=document.getElementById(id);if(el)el.style[prop]=val;};
+  safe('avatar-emoji',emoji);
+  safe('eng-avatar-emoji',emoji);
+  safe('mascot',emoji);
+  safe('player-name-display',currentUser?.username||av.title);
+  safe('player-level',playerLevel);
+  safe('eng-player-level',playerLevel);
+  safe('player-xp',playerXP);
+  safe('eng-player-xp',playerXP);
   const needed=playerLevel*100;
-  document.getElementById('xp-next').textContent=needed;
-  document.getElementById('eng-xp-next').textContent=needed;
-  document.getElementById('xp-bar').style.width=Math.min(100,playerXP/needed*100)+'%';
-  document.getElementById('eng-xp-bar').style.width=Math.min(100,playerXP/needed*100)+'%';
-  document.getElementById('total-stars').textContent=totalStars;
-  document.getElementById('streak-count').textContent=streak;
+  safe('xp-next',needed);
+  safe('eng-xp-next',needed);
+  safeStyle('xp-bar','width',Math.min(100,playerXP/needed*100)+'%');
+  safeStyle('eng-xp-bar','width',Math.min(100,playerXP/needed*100)+'%');
+  safe('total-stars',totalStars);
+  safe('streak-count',streak);
   const next=nextAvatar(playerLevel);
-  document.getElementById('avatar-tease').textContent=next?`Reach Level ${next.level} to unlock ${next.emoji} ${next.title}!`:'🏆 MAX RANK achieved!';
+  safe('avatar-tease',next?`Reach Level ${next.level} to unlock ${next.emoji} ${next.title}!`:'🏆 MAX RANK achieved!');
   renderTopicCards();
 }
 
@@ -1061,7 +1078,8 @@ makeClouds();
   await loadQuests();
   updatePlayerUI();
   updateQuestNotif();
-  setGrade(currentUser.grade||1);
+console.log('calling setGrade with', currentUser.grade);
+setGrade(currentUser.grade||1);
   setTimeout(()=>showTip(),1500);
 })();
 </script>
