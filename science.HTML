@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Science Quest 🔬</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#1A237E; --shadow:rgba(0,0,0,0.12); }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Nunito',sans-serif; background:linear-gradient(180deg,#B2DFDB 0%,#E0F2F1 40%,#F1F8E9 100%); min-height:100vh; overflow-x:hidden; }
+
+  header { background:linear-gradient(135deg,#00695C,#26A69A 50%,#80CBC4); padding:18px 30px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 20px rgba(0,105,92,0.4); }
+  .logo-group { display:flex; align-items:center; gap:14px; }
+  .logo { font-family:'Fredoka One',cursive; font-size:2rem; color:white; text-shadow:3px 3px 0 rgba(0,0,0,0.15); }
+  .logo span { color:#A5D6A7; }
+  .switch-btn { background:rgba(255,255,255,0.22); border:2px solid rgba(255,255,255,0.45); border-radius:50px; padding:8px 18px; color:white; font-weight:800; font-size:1rem; cursor:pointer; font-family:'Nunito',sans-serif; transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+  .switch-btn:hover { background:rgba(255,255,255,0.35); transform:translateY(-2px); }
+  .header-right { display:flex; align-items:center; gap:16px; }
+  .star-counter { background:rgba(255,255,255,0.25); border-radius:50px; padding:8px 18px; display:flex; align-items:center; gap:8px; color:white; font-weight:800; font-size:1.1rem; border:2px solid rgba(255,255,255,0.4); }
+  .streak-badge { background:#A5D6A7; color:#1B5E20; border-radius:50px; padding:8px 16px; font-weight:800; font-size:0.95rem; border:2px solid #4CAF50; }
+  .quest-btn-wrap { position:relative; }
+  .quest-btn { background:rgba(255,255,255,0.25); border:2px solid rgba(255,255,255,0.4); border-radius:50px; padding:8px 18px; color:white; font-weight:800; font-size:1.05rem; cursor:pointer; font-family:'Nunito',sans-serif; transition:all 0.2s; }
+  .quest-btn:hover { background:rgba(255,255,255,0.4); transform:translateY(-2px); }
+  .quest-notif { position:absolute; top:-6px; right:-6px; background:#E53935; color:white; border-radius:50%; width:20px; height:20px; font-size:0.7rem; font-weight:800; display:none; align-items:center; justify-content:center; border:2px solid white; pointer-events:none; animation:notifPop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  .quest-notif.show { display:flex; }
+  @keyframes notifPop { from{transform:scale(0)} to{transform:scale(1)} }
+
+  .clouds { position:fixed; top:70px; width:100%; pointer-events:none; z-index:0; }
+  .cloud { position:absolute; background:white; border-radius:50px; opacity:0.6; animation:floatCloud linear infinite; }
+  @keyframes floatCloud { from{transform:translateX(-200px)} to{transform:translateX(110vw)} }
+
+  .container { max-width:900px; margin:0 auto; padding:24px 20px; position:relative; z-index:1; }
+  .screen { display:none; }
+  .screen.active { display:block; animation:fadeIn 0.4s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+  .player-info { display:flex; align-items:center; gap:12px; background:white; border-radius:16px; padding:12px 20px; box-shadow:0 4px 16px var(--shadow); margin-bottom:20px; border:2px solid #E0F2F1; }
+  .avatar { width:48px; height:48px; border-radius:50%; font-size:1.6rem; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#80CBC4,#00695C); }
+  .player-meta { flex:1; }
+  .player-name-row { display:flex; align-items:center; justify-content:space-between; }
+  .player-name { font-weight:800; color:var(--navy); font-size:1rem; }
+  .reset-btn { background:none; border:none; font-size:0.75rem; color:#B0BEC5; cursor:pointer; font-weight:700; padding:2px 6px; }
+  .player-level-text { font-size:0.82rem; color:#78909C; font-weight:600; }
+  .xp-bar-wrap { background:#E0F2F1; border-radius:50px; height:10px; margin-top:6px; overflow:hidden; }
+  .xp-bar { height:100%; background:linear-gradient(90deg,#00695C,#80CBC4); border-radius:50px; transition:width 1s ease; }
+  .avatar-tease { font-size:0.75rem; color:#90A4AE; font-weight:600; margin-top:4px; }
+
+  .hero-title { font-family:'Fredoka One',cursive; font-size:2.8rem; color:var(--navy); text-align:center; margin-bottom:8px; }
+  .hero-sub { text-align:center; font-size:1.15rem; color:#00695C; font-weight:600; margin-bottom:32px; }
+  .grade-section { background:white; border-radius:24px; padding:24px; margin-bottom:24px; box-shadow:0 8px 30px var(--shadow); border:3px solid #E0F2F1; }
+  .section-title { font-family:'Fredoka One',cursive; font-size:1.3rem; color:var(--navy); margin-bottom:16px; display:flex; align-items:center; gap:10px; }
+
+  .topics-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); gap:16px; margin-bottom:24px; }
+  .topic-card { background:white; border-radius:20px; padding:24px 16px; text-align:center; cursor:pointer; transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 6px 20px var(--shadow); border:3px solid transparent; position:relative; overflow:hidden; }
+  .topic-card:hover:not(.locked) { transform:translateY(-6px) scale(1.02); }
+  .topic-card.selected { transform:translateY(-8px) scale(1.04); }
+  .topic-card.locked { cursor:not-allowed; }
+  .topic-card.locked .topic-icon,.topic-card.locked .topic-name,.topic-card.locked .topic-desc { opacity:0.3; }
+  .lock-overlay { display:none; position:absolute; inset:0; background:rgba(255,255,255,0.92); backdrop-filter:blur(3px); border-radius:17px; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding:10px; }
+  .topic-card.locked .lock-overlay { display:flex; }
+  .lock-icon { font-size:1.5rem; }
+  .lock-games-text { font-family:'Nunito',sans-serif; font-weight:800; font-size:0.76rem; color:#00695C; line-height:1.3; text-align:center; }
+  .lock-progress-wrap { width:80%; background:#E0F2F1; border-radius:50px; height:7px; overflow:hidden; margin-top:4px; }
+  .lock-progress-fill { height:100%; background:linear-gradient(90deg,#00695C,#80CBC4); border-radius:50px; transition:width 0.5s ease; }
+  .lock-progress-label { font-size:0.7rem; font-weight:800; color:#90A4AE; margin-top:2px; }
+  .topic-icon { font-size:2.8rem; margin-bottom:10px; display:block; }
+  .topic-name { font-family:'Fredoka One',cursive; font-size:1.1rem; color:var(--navy); margin-bottom:4px; }
+  .topic-desc { font-size:0.82rem; color:#78909C; font-weight:600; }
+
+  .t-biology    { border-color:#66BB6A; background:linear-gradient(135deg,#fff,#E8F5E9); }
+  .t-chemistry  { border-color:#26C6DA; background:linear-gradient(135deg,#fff,#E0F7FA); }
+  .t-physics    { border-color:#7E57C2; background:linear-gradient(135deg,#fff,#EDE7F6); }
+  .t-earth      { border-color:#8D6E63; background:linear-gradient(135deg,#fff,#EFEBE9); }
+  .t-space      { border-color:#5C6BC0; background:linear-gradient(135deg,#fff,#E8EAF6); }
+  .t-humanbody  { border-color:#EF5350; background:linear-gradient(135deg,#fff,#FFEBEE); }
+
+  .difficulty-row { display:flex; gap:10px; margin-bottom:24px; }
+  .diff-btn { flex:1; padding:12px; border-radius:16px; border:3px solid; font-family:'Nunito',sans-serif; font-weight:800; font-size:0.95rem; cursor:pointer; transition:all 0.2s; }
+  .diff-btn:hover { transform:translateY(-3px); }
+  .diff-btn.d-easy{border-color:#66BB6A;background:#E8F5E9;color:#2E7D32;}
+  .diff-btn.d-medium{border-color:#FF8F00;background:#FFF8E1;color:#E65100;}
+  .diff-btn.d-hard{border-color:#E53935;background:#FFEBEE;color:#B71C1C;}
+  .diff-btn.active.d-easy{background:#66BB6A;color:white;transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,0.2);}
+  .diff-btn.active.d-medium{background:#FF8F00;color:white;transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,0.2);}
+  .diff-btn.active.d-hard{background:#E53935;color:white;transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,0.2);}
+
+  .play-btn { display:block; width:100%; background:linear-gradient(135deg,#00695C,#00897B); color:white; border:none; border-radius:20px; padding:18px; font-family:'Fredoka One',cursive; font-size:1.5rem; cursor:pointer; box-shadow:0 8px 25px rgba(0,105,92,0.45); transition:all 0.2s; letter-spacing:1px; }
+  .play-btn:hover:not(:disabled) { transform:translateY(-4px); }
+  .play-btn:disabled { opacity:0.5; cursor:not-allowed; }
+
+  .game-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; gap:10px; }
+  .back-btn { background:white; border:3px solid #CFD8DC; border-radius:12px; padding:8px 16px; cursor:pointer; font-weight:800; font-family:'Nunito',sans-serif; color:#546E7A; transition:all 0.2s; white-space:nowrap; }
+  .back-btn:hover { background:#F5F5F5; transform:translateX(-3px); }
+  .prog-bar-outer { flex:1; display:flex; gap:4px; align-items:center; }
+  .q-counter { font-weight:800; color:#546E7A; font-size:0.9rem; white-space:nowrap; }
+  .timer-ring { width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .timer-inner { width:44px; height:44px; border-radius:50%; background:white; display:flex; align-items:center; justify-content:center; font-family:'Fredoka One',cursive; font-size:1.1rem; }
+
+  .question-card { background:white; border-radius:28px; padding:36px 32px; text-align:center; box-shadow:0 10px 40px var(--shadow); margin-bottom:20px; border:4px solid #E0F2F1; }
+  .topic-tag { display:inline-block; padding:4px 14px; border-radius:50px; font-size:0.8rem; font-weight:800; background:#E0F2F1; color:#00695C; margin-bottom:16px; }
+  .question-text { font-family:'Fredoka One',cursive; font-size:1.9rem; color:var(--navy); line-height:1.3; margin-bottom:8px; }
+
+  .answers-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+  .answer-btn { background:white; border:3px solid #CFD8DC; border-radius:18px; padding:18px 12px; font-family:'Fredoka One',cursive; font-size:1rem; color:var(--navy); cursor:pointer; transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 4px 12px var(--shadow); }
+  .answer-btn:hover:not(:disabled) { transform:translateY(-4px) scale(1.03); border-color:#26A69A; }
+  .answer-btn.ans-correct { background:#E8F5E9!important; border-color:#43A047!important; color:#1B5E20!important; animation:bounceCorrect 0.5s ease; }
+  .answer-btn.ans-wrong { background:#FFEBEE!important; border-color:#E53935!important; color:#B71C1C!important; animation:shakeWrong 0.4s ease; }
+  @keyframes bounceCorrect { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+  @keyframes shakeWrong { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+
+  .feedback { border-radius:18px; padding:16px 24px; text-align:center; font-weight:800; font-size:1.1rem; margin-bottom:16px; display:none; animation:fadeIn 0.3s ease; }
+  .feedback.fb-correct { background:#E8F5E9; color:#2E7D32; border:3px solid #A5D6A7; }
+  .feedback.fb-wrong { background:#FFEBEE; color:#C62828; border:3px solid #EF9A9A; }
+  .next-btn { width:100%; background:linear-gradient(135deg,#00695C,#00897B); color:white; border:none; border-radius:18px; padding:16px; font-family:'Fredoka One',cursive; font-size:1.3rem; cursor:pointer; box-shadow:0 6px 20px rgba(0,105,92,0.4); transition:all 0.2s; }
+  .next-btn:hover { transform:translateY(-3px); }
+
+  .results-card { background:white; border-radius:28px; padding:40px 32px; text-align:center; box-shadow:0 10px 40px var(--shadow); border:4px solid #E0F2F1; }
+  .trophy { font-size:5rem; margin-bottom:16px; animation:trophy-bounce 1s ease infinite alternate; }
+  @keyframes trophy-bounce { from{transform:translateY(0) rotate(-5deg)} to{transform:translateY(-12px) rotate(5deg)} }
+  .results-title { font-family:'Fredoka One',cursive; font-size:2.4rem; color:var(--navy); margin-bottom:8px; }
+  .results-score { font-size:4rem; font-family:'Fredoka One',cursive; margin:20px 0; }
+  .score-stars { font-size:2.5rem; margin-bottom:20px; letter-spacing:6px; }
+  .results-stats { display:flex; gap:12px; margin:24px 0; flex-wrap:wrap; }
+  .stat-box { flex:1; min-width:70px; background:#F5F5F5; border-radius:16px; padding:16px; text-align:center; }
+  .stat-num { font-family:'Fredoka One',cursive; font-size:2rem; }
+  .stat-label { font-size:0.82rem; color:#78909C; font-weight:600; }
+  .results-btns { display:flex; gap:12px; margin-top:24px; }
+  .btn-secondary { flex:1; padding:14px; background:#E0F2F1; border:3px solid #80CBC4; color:#00695C; border-radius:16px; font-family:'Fredoka One',cursive; font-size:1.1rem; cursor:pointer; transition:all 0.2s; }
+  .btn-secondary:hover { background:#00695C; color:white; transform:translateY(-3px); }
+  .btn-primary { flex:1; padding:14px; background:linear-gradient(135deg,#00695C,#00897B); border:none; color:white; border-radius:16px; font-family:'Fredoka One',cursive; font-size:1.1rem; cursor:pointer; transition:all 0.2s; box-shadow:0 6px 20px rgba(0,105,92,0.4); }
+  .btn-primary:hover { transform:translateY(-3px); }
+
+  .unlock-toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px); background:linear-gradient(135deg,#00695C,#00897B); color:white; border-radius:20px; padding:14px 24px; font-family:'Fredoka One',cursive; font-size:1.1rem; box-shadow:0 8px 30px rgba(0,105,92,0.5); z-index:9999; opacity:0; pointer-events:none; transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1); white-space:nowrap; }
+  .unlock-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .coin-burst { position:fixed; pointer-events:none; z-index:999; }
+  .coin { position:absolute; font-size:1.5rem; animation:coinFly 1s ease forwards; }
+  @keyframes coinFly { 0%{transform:translateY(0) scale(1);opacity:1} 100%{transform:translateY(-120px) scale(0.3);opacity:0} }
+  .mascot { position:fixed; bottom:20px; right:20px; font-size:3.5rem; cursor:pointer; animation:mascotBob 2s ease infinite; filter:drop-shadow(2px 4px 8px rgba(0,0,0,0.2)); z-index:100; }
+  .mascot:hover { transform:scale(1.2) rotate(10deg)!important; }
+  @keyframes mascotBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  .speech-bubble { position:fixed; bottom:90px; right:20px; background:white; border-radius:18px; padding:12px 16px; font-weight:700; font-size:0.9rem; color:var(--navy); box-shadow:0 4px 20px var(--shadow); border:3px solid #E0F2F1; max-width:200px; display:none; z-index:100; }
+
+  .ai-loader-overlay { position:fixed; inset:0; background:rgba(255,255,255,0.94); z-index:8000; display:none; align-items:center; justify-content:center; flex-direction:column; gap:20px; }
+  .ai-loader-overlay.show { display:flex; animation:fadeIn 0.3s ease; }
+  .ai-spinner { width:64px; height:64px; border:6px solid #E0F2F1; border-top-color:#00695C; border-radius:50%; animation:spin 0.9s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .ai-loader-text { font-family:'Fredoka One',cursive; font-size:1.5rem; color:#00695C; text-align:center; }
+  .ai-loader-sub { font-size:0.9rem; color:#90A4AE; font-weight:700; text-align:center; max-width:260px; line-height:1.6; }
+  .ai-loader-dots span { animation:dotPulse 1.4s infinite; display:inline-block; }
+  .ai-loader-dots span:nth-child(2){animation-delay:.2s;} .ai-loader-dots span:nth-child(3){animation-delay:.4s;}
+  @keyframes dotPulse{0%,80%,100%{opacity:0.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1.2)}}
+
+  .quest-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:5000; display:none; align-items:center; justify-content:center; padding:20px; }
+  .quest-overlay.open { display:flex; animation:fadeIn 0.25s ease; }
+  .quest-panel { background:white; border-radius:28px; width:100%; max-width:520px; max-height:85vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3); border:4px solid #E0F2F1; }
+  .quest-header { background:linear-gradient(135deg,#00695C,#00897B); border-radius:24px 24px 0 0; padding:20px 24px; display:flex; align-items:center; justify-content:space-between; }
+  .quest-header-title { font-family:'Fredoka One',cursive; font-size:1.6rem; color:white; }
+  .quest-close { background:rgba(255,255,255,0.2); border:none; color:white; border-radius:50%; width:36px; height:36px; font-size:1.2rem; cursor:pointer; font-weight:800; transition:all 0.2s; }
+  .quest-close:hover { background:rgba(255,255,255,0.35); transform:rotate(90deg); }
+  .quest-list { padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .quest-card { border-radius:18px; padding:16px 18px; border:3px solid #E0F2F1; background:#FAFAFA; display:flex; align-items:center; gap:14px; transition:all 0.2s; }
+  .quest-card.q-done { background:#E0F2F1; border-color:#80CBC4; }
+  .quest-card.q-claimable { background:#E8F5E9; border-color:#81C784; cursor:pointer; }
+  .quest-card.q-claimable:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(67,160,71,0.3); }
+  .quest-icon { font-size:2rem; flex-shrink:0; }
+  .quest-info { flex:1; }
+  .quest-name { font-family:'Fredoka One',cursive; font-size:1.05rem; color:#1A237E; margin-bottom:2px; }
+  .quest-desc { font-size:0.82rem; color:#78909C; font-weight:600; margin-bottom:6px; }
+  .quest-prog-wrap { background:#E0E0E0; border-radius:50px; height:8px; overflow:hidden; }
+  .quest-prog-fill { height:100%; border-radius:50px; background:linear-gradient(90deg,#00695C,#80CBC4); transition:width 0.6s ease; }
+  .quest-prog-text { font-size:0.78rem; color:#90A4AE; font-weight:700; margin-top:3px; }
+  .quest-reward { flex-shrink:0; background:#E0F7FA; border:2px solid #26C6DA; border-radius:12px; padding:6px 10px; text-align:center; font-family:'Fredoka One',cursive; font-size:0.95rem; color:#006064; white-space:nowrap; }
+  .quest-claim-btn { flex-shrink:0; background:linear-gradient(135deg,#43A047,#2E7D32); color:white; border:none; border-radius:12px; padding:10px 14px; font-family:'Fredoka One',cursive; font-size:0.95rem; cursor:pointer; box-shadow:0 4px 12px rgba(67,160,71,0.4); transition:all 0.2s; white-space:nowrap; }
+  .quest-claim-btn:hover { transform:scale(1.05); }
+  .quest-done-badge { flex-shrink:0; color:#00897B; font-size:1.5rem; }
+
+  @media(max-width:500px){
+    .hero-title{font-size:2rem} .answers-grid{grid-template-columns:1fr}
+    .question-text{font-size:1.5rem} .topics-grid{grid-template-columns:1fr 1fr}
+    .logo{font-size:1.4rem}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-group">
+    <div class="logo">Science<span>Quest</span> 🔬</div>
+    <a href="math.html" class="switch-btn">🚀 Math</a>
+    <a href="english.html" class="switch-btn">📖 English</a>
+  </div>
+  <div class="header-right">
+    <div class="quest-btn-wrap">
+      <button class="quest-btn" onclick="openQuests()">📜 Quests</button>
+      <div class="quest-notif" id="quest-notif">!</div>
+    </div>
+    <div class="star-counter">⭐ <span id="total-stars">0</span></div>
+    <div class="streak-badge">🔥 <span id="streak-count">0</span></div>
+    <button onclick="doLogout()" style="background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.35);border-radius:50px;padding:7px 14px;color:white;font-weight:800;font-size:0.85rem;cursor:pointer;font-family:'Nunito',sans-serif;">👤 Switch</button>
+  </div>
+</header>
+
+<div class="clouds" id="clouds"></div>
+<div class="mascot" id="mascot" onclick="showTip()">🔬</div>
+<div class="speech-bubble" id="speech-bubble">Pick a topic and start experimenting! 🧪</div>
+<div class="unlock-toast" id="unlock-toast">🔓 Topic Unlocked!</div>
+
+<div class="ai-loader-overlay" id="ai-loader">
+  <div class="ai-spinner"></div>
+  <div class="ai-loader-text">🧪 Creating Questions<span class="ai-loader-dots"><span>.</span><span>.</span><span>.</span></span></div>
+  <div class="ai-loader-sub">Claude is writing brand-new science questions just for you!</div>
+</div>
+
+<div class="container">
+  <!-- HOME -->
+  <div class="screen active" id="screen-home">
+    <div class="player-info">
+      <div class="avatar" id="avatar-emoji">🔬</div>
+      <div class="player-meta">
+        <div class="player-name-row">
+          <div class="player-name" id="player-name-display">Scientist</div>
+          <button class="reset-btn" onclick="confirmReset()">↺ Reset</button>
+        </div>
+        <div class="player-level-text">Level <span id="player-level">1</span> · <span id="player-xp">0</span> / <span id="xp-next">100</span> XP</div>
+        <div class="xp-bar-wrap"><div class="xp-bar" id="xp-bar" style="width:0%"></div></div>
+        <div class="avatar-tease" id="avatar-tease"></div>
+      </div>
+    </div>
+    <div class="hero-title">🔬 Science Quest!</div>
+    <div class="hero-sub">Explore biology, chemistry, physics & more!</div>
+    <div class="section-title" style="margin-bottom:14px;">🧫 Choose Your Topic</div>
+    <div class="topics-grid">
+      <div class="topic-card t-biology" id="tc-biology" onclick="handleTopicClick('biology')">
+        <span class="topic-icon">🌿</span><div class="topic-name">Biology</div><div class="topic-desc">Life & living things</div>
+        <div class="lock-overlay" id="lock-biology"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-biology"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-biology" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-biology"></div></div>
+      </div>
+      <div class="topic-card t-chemistry" id="tc-chemistry" onclick="handleTopicClick('chemistry')">
+        <span class="topic-icon">⚗️</span><div class="topic-name">Chemistry</div><div class="topic-desc">Elements & reactions</div>
+        <div class="lock-overlay" id="lock-chemistry"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-chemistry"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-chemistry" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-chemistry"></div></div>
+      </div>
+      <div class="topic-card t-physics" id="tc-physics" onclick="handleTopicClick('physics')">
+        <span class="topic-icon">⚡</span><div class="topic-name">Physics</div><div class="topic-desc">Forces & energy</div>
+        <div class="lock-overlay" id="lock-physics"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-physics"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-physics" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-physics"></div></div>
+      </div>
+      <div class="topic-card t-earth" id="tc-earth" onclick="handleTopicClick('earth')">
+        <span class="topic-icon">🌍</span><div class="topic-name">Earth Science</div><div class="topic-desc">Rocks, weather & more</div>
+        <div class="lock-overlay" id="lock-earth"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-earth"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-earth" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-earth"></div></div>
+      </div>
+      <div class="topic-card t-space" id="tc-space" onclick="handleTopicClick('space')">
+        <span class="topic-icon">🚀</span><div class="topic-name">Space</div><div class="topic-desc">Planets & the universe</div>
+        <div class="lock-overlay" id="lock-space"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-space"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-space" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-space"></div></div>
+      </div>
+      <div class="topic-card t-humanbody" id="tc-humanbody" onclick="handleTopicClick('humanbody')">
+        <span class="topic-icon">🫀</span><div class="topic-name">Human Body</div><div class="topic-desc">Organs & systems</div>
+        <div class="lock-overlay" id="lock-humanbody"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-humanbody"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-humanbody" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-humanbody"></div></div>
+      </div>
+    </div>
+    <div class="grade-section">
+      <div class="section-title">⚡ Difficulty</div>
+      <div class="difficulty-row" id="diff-row">
+        <button class="diff-btn d-easy active" onclick="setDiff('easy',this)">😊 Easy</button>
+        <button class="diff-btn d-medium"      onclick="setDiff('medium',this)">😤 Medium</button>
+        <button class="diff-btn d-hard"        onclick="setDiff('hard',this)">🔥 Hard</button>
+      </div>
+    </div>
+    <button class="play-btn" id="play-btn" onclick="startGame()" disabled>🚀 Pick a Topic First!</button>
+  </div>
+
+  <!-- GAME -->
+  <div class="screen" id="screen-game">
+    <div class="game-header">
+      <button class="back-btn" onclick="goHome()">← Back</button>
+      <div class="prog-bar-outer" id="prog-bar-outer"></div>
+      <div class="q-counter" id="q-counter">1 / 10</div>
+      <div class="timer-ring" id="timer-ring"><div class="timer-inner" id="timer-text">20</div></div>
+    </div>
+    <div class="question-card">
+      <div class="topic-tag" id="q-topic-tag">Topic</div>
+      <div class="question-text" id="question-text">Loading...</div>
+    </div>
+    <div class="answers-grid" id="answers-grid"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()" style="display:none">Next Question →</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="screen" id="screen-results">
+    <div class="results-card">
+      <div class="trophy" id="results-trophy">🏆</div>
+      <div class="results-title" id="results-title">Amazing!</div>
+      <div class="results-score" id="results-score">8/10</div>
+      <div class="score-stars" id="score-stars">⭐⭐⭐</div>
+      <div class="results-stats">
+        <div class="stat-box"><div class="stat-num" id="stat-correct" style="color:#43A047">0</div><div class="stat-label">Correct ✅</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-wrong"   style="color:#E53935">0</div><div class="stat-label">Wrong ❌</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-xp"      style="color:#00695C">+0</div><div class="stat-label">XP ✨</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-games"   style="color:#5C6BC0">0</div><div class="stat-label">Games 🎮</div></div>
+      </div>
+      <div id="results-message" style="color:#546E7A;font-weight:700;font-size:1rem;margin-bottom:8px"></div>
+      <div class="results-btns">
+        <button class="btn-secondary" onclick="goHome()">🏠 Home</button>
+        <button class="btn-primary" onclick="retryGame()">🔄 Play Again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUEST MODAL -->
+<div class="quest-overlay" id="quest-overlay" onclick="closeQuestsIfBg(event)">
+  <div class="quest-panel">
+    <div class="quest-header">
+      <div class="quest-header-title">📜 Daily Quests</div>
+      <button class="quest-close" onclick="closeQuests()">✕</button>
+    </div>
+    <div class="quest-list" id="quest-list"></div>
+  </div>
+</div>
+
+<script>
+// ── SESSION ──
+const currentUser = JSON.parse(sessionStorage.getItem('mq_user'));
+if(!currentUser) location.href='index.html';
+function doLogout(){ if(!confirm('Switch user? Your progress is saved!')) return; sessionStorage.removeItem('mq_user'); location.href='index.html'; }
+
+// ── AVATARS ──
+const AVATARS=[{level:1,emoji:'🔬',title:'Lab Trainee'},{level:3,emoji:'🧪',title:'Junior Chemist'},{level:5,emoji:'🦠',title:'Microbiologist'},{level:8,emoji:'🧬',title:'Geneticist'},{level:12,emoji:'⚛️',title:'Physicist'},{level:17,emoji:'🌌',title:'Astronomer'},{level:23,emoji:'🏅',title:'Professor'},{level:30,emoji:'🏆',title:'Nobel Laureate'}];
+function getAvatar(lvl){ let a=AVATARS[0]; for(const av of AVATARS){if(lvl>=av.level)a=av;} return a; }
+function nextAvatar(lvl){ for(const av of AVATARS){if(av.level>lvl)return av;} return null; }
+
+// ── STATE ──
+const TOTAL_QS=10;
+let sciTopic=null, difficulty='easy';
+let questions=[], currentQ=0, score=0;
+let timerInterval, timeLeft=20;
+let totalStars=0, streak=0, playerXP=0, playerLevel=1, gamesPlayed=0;
+let segStates=[], maxStreakThisGame=0;
+let topicGames={};
+
+const SCI_TOPICS = ['biology','chemistry','physics','earth','space','humanbody'];
+const SCI_TOPIC_NAMES = {biology:'🌿 Biology',chemistry:'⚗️ Chemistry',physics:'⚡ Physics',earth:'🌍 Earth Science',space:'🚀 Space',humanbody:'🫀 Human Body'};
+const SCI_UNLOCK_CHAIN = {
+  chemistry  : [{ prereq:'biology',   needed:5, difficulty:'easy',   minScore:6 }],
+  physics    : [{ prereq:'biology',   needed:5, difficulty:'easy',   minScore:6 }],
+  earth      : [{ prereq:'chemistry', needed:6, difficulty:'easy',   minScore:7 }],
+  space      : [{ prereq:'physics',   needed:6, difficulty:'medium', minScore:7 }],
+  humanbody  : [{ prereq:'biology',   needed:8, difficulty:'medium', minScore:7 },
+                { prereq:'chemistry', needed:8, difficulty:'medium', minScore:7 }],
+};
+
+// ── PERSISTENCE ──
+function save(){
+  const raw=localStorage.getItem('mq_progress_'+currentUser.username);
+  const existing=raw?JSON.parse(raw):{};
+  const data={...existing,totalStars,playerXP,playerLevel,streak,sciGamesPlayed:gamesPlayed,sciTopicGames:topicGames};
+  localStorage.setItem('mq_progress_'+currentUser.username,JSON.stringify(data));
+}
+function load(){
+  const raw=localStorage.getItem('mq_progress_'+currentUser.username);
+  if(raw){const d=JSON.parse(raw);totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.sciGamesPlayed||0;topicGames=d.sciTopicGames||{};}
+}
+
+function isNative(t){ return t==='biology'; }
+function countQualifying(prereq,diff,minScore){ return (topicGames[prereq]?.[diff]?.[`q${minScore}`])||0; }
+function isUnlocked(t){ if(isNative(t))return true; const opts=SCI_UNLOCK_CHAIN[t]; if(!opts)return false; return opts.some(o=>countQualifying(o.prereq,o.difficulty,o.minScore)>=o.needed); }
+function getLockInfo(t){
+  if(isUnlocked(t))return null;
+  const opts=SCI_UNLOCK_CHAIN[t]; if(!opts)return null;
+  let best=null,bestPct=-1;
+  for(const o of opts){const played=countQualifying(o.prereq,o.difficulty,o.minScore);const pct=played/o.needed;if(pct>bestPct){bestPct=pct;best={...o,played};}}
+  const remaining=best.needed-best.played;const diffLabel=best.difficulty.charAt(0).toUpperCase()+best.difficulty.slice(1);
+  const prereqName=SCI_TOPIC_NAMES[best.prereq].replace(/^.+? /,'');
+  return {prereqKey:best.prereq,prereqName,difficulty:best.difficulty,diffLabel,minScore:best.minScore,played:best.played,needed:best.needed,remaining};
+}
+
+function renderTopicCards(){
+  SCI_TOPICS.forEach(t=>{
+    const card=document.getElementById('tc-'+t); const overlay=document.getElementById('lock-'+t);
+    const lockText=document.getElementById('lock-text-'+t); const lockProg=document.getElementById('lock-prog-'+t); const lockLabel=document.getElementById('lock-label-'+t);
+    if(!card)return; card.classList.remove('locked','selected'); overlay.style.display='none';
+    const info=getLockInfo(t);
+    if(info){ card.classList.add('locked'); overlay.style.display='flex'; const pct=Math.round((info.played/info.needed)*100); lockText.textContent=`Play ${info.remaining} more ${info.diffLabel} game${info.remaining!==1?'s':''} of ${info.prereqName} (${info.minScore}/10+) to unlock`; lockProg.style.width=pct+'%'; lockLabel.textContent=`${info.played} / ${info.needed} qualifying games`; }
+  });
+}
+function handleTopicClick(t){
+  const info=getLockInfo(t);
+  if(info){ const card=document.getElementById('tc-'+t); card.style.transform='scale(1.04)'; setTimeout(()=>card.style.transform='',300); const pc=document.getElementById('tc-'+info.prereqKey); if(pc){pc.style.outline='4px solid #00695C';pc.style.transform='scale(1.05)';setTimeout(()=>{pc.style.outline='';pc.style.transform='';},1200);} return; }
+  sciTopic=t;
+  document.querySelectorAll('.topic-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('tc-'+t).classList.add('selected');
+  const btn=document.getElementById('play-btn'); btn.textContent=`🚀 Play ${SCI_TOPIC_NAMES[t]}!`; btn.disabled=false;
+}
+function setDiff(d,btn){ difficulty=d; document.querySelectorAll('#diff-row .diff-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+function goHome(){ clearInterval(timerInterval); showScreen('screen-home'); updatePlayerUI(); }
+
+// ── PLAYER UI ──
+function updatePlayerUI(){
+  const av=getAvatar(playerLevel); const emoji=currentUser?.avatar||av.emoji;
+  const safe=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+  const safeStyle=(id,prop,val)=>{const el=document.getElementById(id);if(el)el.style[prop]=val;};
+  safe('avatar-emoji',emoji); safe('mascot',emoji);
+  safe('player-name-display',currentUser?.username||av.title);
+  safe('player-level',playerLevel); safe('player-xp',playerXP);
+  const needed=playerLevel*100; safe('xp-next',needed);
+  safeStyle('xp-bar','width',Math.min(100,playerXP/needed*100)+'%');
+  safe('total-stars',totalStars); safe('streak-count',streak);
+  const next=nextAvatar(playerLevel);
+  safe('avatar-tease',next?`Reach Level ${next.level} to unlock ${next.emoji} ${next.title}!`:'🏆 MAX RANK achieved!');
+  renderTopicCards();
+}
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+
+// ── FALLBACK QUESTION BANKS ──
+const BANKS = {
+biology:{
+  easy:[
+    {q:'What do plants use to make food using sunlight?',a:'Photosynthesis',w:['Respiration','Digestion','Germination']},
+    {q:'What part of a plant absorbs water from the soil?',a:'Roots',w:['Leaves','Stem','Flower']},
+    {q:'What gas do plants produce during photosynthesis?',a:'Oxygen',w:['Carbon dioxide','Nitrogen','Hydrogen']},
+    {q:'Which of these is a mammal?',a:'Dolphin',w:['Crocodile','Eagle','Salmon']},
+    {q:'What do caterpillars turn into?',a:'Butterflies',w:['Moths only','Beetles','Dragonflies']},
+    {q:'How many legs does an insect have?',a:'Six',w:['Four','Eight','Ten']},
+    {q:'What is the process by which plants lose water through their leaves?',a:'Transpiration',w:['Photosynthesis','Germination','Respiration']},
+    {q:'Which part of a flower produces pollen?',a:'Stamen',w:['Petal','Pistil','Sepal']},
+    {q:'What type of animal is a frog?',a:'Amphibian',w:['Reptile','Mammal','Fish']},
+    {q:'What do herbivores eat?',a:'Plants',w:['Meat','Both plants and meat','Fungi']},
+    {q:'Which kingdom do mushrooms belong to?',a:'Fungi',w:['Plants','Animals','Bacteria']},
+    {q:'What is the green pigment in plants called?',a:'Chlorophyll',w:['Melanin','Keratin','Carotene']},
+    {q:'How do fish breathe underwater?',a:'Through gills',w:['Through skin','Through lungs','Through fins']},
+    {q:'What is the function of the roots of a plant?',a:'Absorb water and anchor the plant',w:['Make food','Carry water only','Attract insects']},
+    {q:'Which of these animals is cold-blooded?',a:'Snake',w:['Dog','Bird','Whale']},
+  ],
+  medium:[
+    {q:'What is the powerhouse of the cell?',a:'Mitochondria',w:['Nucleus','Ribosome','Vacuole']},
+    {q:'What type of cell division produces gametes?',a:'Meiosis',w:['Mitosis','Binary fission','Budding']},
+    {q:'What is the role of the nucleus in a cell?',a:'Controls cell activities and contains DNA',w:['Produces energy','Makes proteins','Stores water']},
+    {q:'Which blood cells fight infection?',a:'White blood cells',w:['Red blood cells','Platelets','Plasma cells']},
+    {q:'What is osmosis?',a:'Movement of water through a semi-permeable membrane',w:['Movement of glucose into cells','Breaking down food','Converting sunlight to energy']},
+    {q:'What is the name for animals that eat both plants and animals?',a:'Omnivores',w:['Carnivores','Herbivores','Decomposers']},
+    {q:'What structure controls what enters and exits a cell?',a:'Cell membrane',w:['Cell wall','Nucleus','Cytoplasm']},
+    {q:'Which part of a leaf contains the most chloroplasts?',a:'Palisade mesophyll layer',w:['Epidermis','Spongy layer','Vein']},
+    {q:'What is the function of ribosomes?',a:'Synthesise proteins',w:['Store genetic material','Produce energy','Digest waste']},
+    {q:'What is the term for organisms that break down dead matter?',a:'Decomposers',w:['Producers','Consumers','Parasites']},
+  ],
+  hard:[
+    {q:'Which enzyme breaks down starch in the mouth?',a:'Amylase',w:['Lipase','Protease','Pepsin']},
+    {q:'What is the role of ATP in cells?',a:'Energy carrier / currency of the cell',w:['Genetic storage','Protein synthesis','Cell division']},
+    {q:'What is the difference between aerobic and anaerobic respiration?',a:'Aerobic uses oxygen; anaerobic does not',w:['Anaerobic uses oxygen; aerobic does not','Both use oxygen','Neither uses oxygen']},
+    {q:'What does DNA stand for?',a:'Deoxyribonucleic acid',w:['Dioxynucleic acid','Deoxyribose amino acid','Dinitrogen nucleic acid']},
+    {q:'Which process is responsible for the formation of fossils?',a:'Mineralisation of organic material',w:['Photosynthesis','Fermentation','Decomposition by bacteria']},
+    {q:'What is the Hardy-Weinberg principle used for?',a:'Predicting allele frequencies in a stable population',w:['Measuring mutation rate','Calculating energy in food chains','Modelling cell division']},
+  ]
+},
+chemistry:{
+  easy:[
+    {q:'What is the chemical symbol for water?',a:'H₂O',w:['CO₂','O₂','H₂']},
+    {q:'How many elements are in a water molecule?',a:'Two (hydrogen and oxygen)',w:['One','Three','Four']},
+    {q:'What state of matter has a fixed shape and volume?',a:'Solid',w:['Liquid','Gas','Plasma']},
+    {q:'What happens when water boils?',a:'It changes from liquid to gas',w:['It changes from gas to liquid','It changes from solid to liquid','It changes from liquid to solid']},
+    {q:'What is the chemical symbol for gold?',a:'Au',w:['Go','Gd','Ag']},
+    {q:'What is the most abundant gas in Earth\'s atmosphere?',a:'Nitrogen',w:['Oxygen','Carbon dioxide','Argon']},
+    {q:'What do you call a substance that speeds up a chemical reaction without being used up?',a:'Catalyst',w:['Reactant','Product','Solvent']},
+    {q:'What is the pH of pure water?',a:'7',w:['1','14','0']},
+    {q:'What type of substance has a pH below 7?',a:'Acid',w:['Base','Neutral','Salt']},
+    {q:'What is the chemical symbol for oxygen?',a:'O',w:['Ox','O₂ (as element)','Om']},
+    {q:'What do we call the smallest unit of an element?',a:'Atom',w:['Molecule','Compound','Ion']},
+    {q:'What is formed when an acid and a base react?',a:'Salt and water',w:['Gas and acid','Two new acids','Only water']},
+    {q:'What state of matter takes the shape of its container but has a fixed volume?',a:'Liquid',w:['Solid','Gas','Plasma']},
+    {q:'Which of these is a pure element?',a:'Iron',w:['Salt','Water','Air']},
+    {q:'What colour does litmus paper turn in an acid?',a:'Red',w:['Blue','Green','Yellow']},
+  ],
+  medium:[
+    {q:'What is the atomic number of carbon?',a:'6',w:['12','8','4']},
+    {q:'Which subatomic particle has a negative charge?',a:'Electron',w:['Proton','Neutron','Nucleus']},
+    {q:'What is an isotope?',a:'Atoms of the same element with different numbers of neutrons',w:['Atoms with different proton numbers','Molecules with the same mass','Compounds with the same formula']},
+    {q:'What type of bond involves sharing electrons?',a:'Covalent bond',w:['Ionic bond','Metallic bond','Hydrogen bond']},
+    {q:'What is the formula for sulfuric acid?',a:'H₂SO₄',w:['HSO₄','H₂S','HNO₃']},
+    {q:'What is Avogadro\'s number approximately equal to?',a:'6.02 × 10²³',w:['3.14 × 10⁸','9.8 × 10¹²','1.6 × 10⁻¹⁹']},
+    {q:'What happens to atoms during a chemical reaction?',a:'Bonds are broken and new bonds are formed',w:['Atoms are created and destroyed','Protons are exchanged','Electrons are destroyed']},
+    {q:'What is the difference between an element and a compound?',a:'Elements have one type of atom; compounds have two or more types bonded together',w:['Compounds have one type of atom; elements have more','Elements are liquids; compounds are solids','No difference']},
+    {q:'What is oxidation in terms of electrons?',a:'Loss of electrons',w:['Gain of electrons','Gain of protons','Loss of neutrons']},
+    {q:'What is the name of the process that separates mixtures by boiling point?',a:'Distillation',w:['Filtration','Crystallisation','Chromatography']},
+  ],
+  hard:[
+    {q:'What is Le Chatelier\'s principle?',a:'A system at equilibrium will shift to oppose any applied change',w:['Reactions always proceed to completion','Catalysts change equilibrium position','Rate always increases with temperature']},
+    {q:'What is the enthalpy change of an exothermic reaction?',a:'Negative (energy released)',w:['Positive (energy absorbed)','Zero','Undefined']},
+    {q:'What does the Aufbau principle describe?',a:'How electrons fill orbitals from lowest to highest energy',w:['How protons are arranged in the nucleus','How molecules bond together','The rate of radioactive decay']},
+    {q:'What is a buffer solution?',a:'A solution that resists changes in pH when small amounts of acid or base are added',w:['A solution with pH of exactly 7','A solution that speeds up reactions','A saturated salt solution']},
+    {q:'What is Hess\'s law?',a:'The total enthalpy change is independent of the route taken',w:['Entropy always increases','Equilibrium favours products at high temperature','Concentration and rate are always proportional']},
+  ]
+},
+physics:{
+  easy:[
+    {q:'What is the unit of force?',a:'Newton',w:['Joule','Watt','Pascal']},
+    {q:'What type of energy does a moving object have?',a:'Kinetic energy',w:['Potential energy','Chemical energy','Nuclear energy']},
+    {q:'What is the speed of light approximately?',a:'300,000 km/s',w:['3,000 km/s','30,000 km/s','3,000,000 km/s']},
+    {q:'What force pulls objects towards the Earth?',a:'Gravity',w:['Magnetism','Friction','Tension']},
+    {q:'What unit is used to measure electrical power?',a:'Watt',w:['Volt','Ampere','Ohm']},
+    {q:'What is the unit of electrical current?',a:'Ampere',w:['Volt','Watt','Ohm']},
+    {q:'What type of wave is sound?',a:'Longitudinal wave',w:['Transverse wave','Electromagnetic wave','Tidal wave']},
+    {q:'What happens to the pitch of a sound when frequency increases?',a:'Pitch gets higher',w:['Pitch gets lower','Pitch stays the same','Volume increases']},
+    {q:'What is the formula for speed?',a:'Speed = Distance ÷ Time',w:['Speed = Distance × Time','Speed = Force ÷ Mass','Speed = Mass × Acceleration']},
+    {q:'What type of energy is stored in a stretched spring?',a:'Elastic potential energy',w:['Kinetic energy','Chemical energy','Nuclear energy']},
+    {q:'What is the unit of energy?',a:'Joule',w:['Newton','Watt','Pascal']},
+    {q:'What do we call the bending of light as it passes from one medium to another?',a:'Refraction',w:['Reflection','Diffraction','Absorption']},
+    {q:'Which colour of light has the longest wavelength?',a:'Red',w:['Violet','Green','Blue']},
+    {q:'What is the unit of resistance?',a:'Ohm',w:['Volt','Ampere','Watt']},
+    {q:'What does a voltmeter measure?',a:'Voltage (potential difference)',w:['Current','Resistance','Power']},
+  ],
+  medium:[
+    {q:'State Newton\'s Second Law of Motion.',a:'Force = mass × acceleration',w:['Force = mass + velocity','Force = mass ÷ acceleration','Force = mass × velocity']},
+    {q:'What is the principle of conservation of energy?',a:'Energy cannot be created or destroyed, only transferred or transformed',w:['Energy always increases over time','Energy is always lost as heat','Energy can be created but not destroyed']},
+    {q:'What is the difference between speed and velocity?',a:'Velocity includes direction; speed does not',w:['Speed includes direction; velocity does not','They are the same thing','Velocity is always greater than speed']},
+    {q:'What is Ohm\'s Law?',a:'Voltage = Current × Resistance (V = IR)',w:['Voltage = Current + Resistance','Current = Voltage × Resistance','Resistance = Voltage × Current']},
+    {q:'What is meant by terminal velocity?',a:'The constant speed reached when air resistance equals the driving force',w:['The maximum possible speed of any object','The speed at which an object leaves the ground','The speed at which friction becomes zero']},
+    {q:'What type of electromagnetic radiation has the shortest wavelength?',a:'Gamma rays',w:['Radio waves','Visible light','Infrared']},
+    {q:'What is the relationship between frequency and wavelength?',a:'They are inversely proportional (f = v/λ)',w:['They are directly proportional','They are unrelated','Frequency equals wavelength']},
+    {q:'What is work done defined as?',a:'Force multiplied by distance in the direction of the force',w:['Force divided by distance','Mass multiplied by acceleration','Energy divided by time']},
+    {q:'What is power defined as?',a:'The rate of doing work (Energy ÷ Time)',w:['Force × velocity only','Mass × acceleration','Energy × time']},
+    {q:'What is the difference between series and parallel circuits?',a:'In series, current is the same throughout; in parallel, voltage is the same across each branch',w:['In parallel, current is the same throughout','They are identical','Series has more voltage']},
+  ],
+  hard:[
+    {q:'What does Einstein\'s famous equation E = mc² mean?',a:'Energy equals mass times the speed of light squared',w:['Entropy equals mass times charge squared','Energy equals mass times coulombs squared','Electricity equals mass times current squared']},
+    {q:'What is the Doppler effect?',a:'The change in observed frequency/pitch due to relative motion between source and observer',w:['The bending of light around massive objects','The loss of energy as heat in a system','The increase in wavelength with distance']},
+    {q:'What is meant by a photon?',a:'A discrete quantum (particle) of electromagnetic energy',w:['A subatomic particle with mass','A unit of nuclear energy','A charged particle in plasma']},
+    {q:'What is Snell\'s Law used for?',a:'Calculating the angle of refraction when light passes between media',w:['Calculating the force of gravity','Finding the frequency of a wave','Determining electrical resistance']},
+    {q:'What is the First Law of Thermodynamics?',a:'The total energy of an isolated system is conserved',w:['Entropy of a system always increases','Heat flows from hot to cold spontaneously','Work is always greater than heat']},
+  ]
+},
+earth:{
+  easy:[
+    {q:'What are the three types of rock?',a:'Igneous, sedimentary and metamorphic',w:['Granite, limestone and marble','Hard, soft and medium','Volcanic, oceanic and continental']},
+    {q:'What causes earthquakes?',a:'Movement of tectonic plates',w:['Heavy rainfall','Changes in temperature','Volcanic ash falls']},
+    {q:'What layer of the Earth do we live on?',a:'The crust',w:['The mantle','The outer core','The inner core']},
+    {q:'What type of rock is formed from cooled magma?',a:'Igneous',w:['Sedimentary','Metamorphic','Limestone']},
+    {q:'What is the water cycle?',a:'The continuous movement of water through evaporation, condensation and precipitation',w:['The movement of water in rivers only','The process of water being created from rocks','The flow of water underground']},
+    {q:'What instrument measures the strength of earthquakes?',a:'Seismograph',w:['Barometer','Thermometer','Anemometer']},
+    {q:'What causes the seasons on Earth?',a:'The tilt of Earth\'s axis as it orbits the Sun',w:['Earth\'s changing distance from the Sun','The Moon\'s gravitational pull','Changes in solar flare activity']},
+    {q:'What is a fossil?',a:'Preserved remains or traces of ancient organisms',w:['A type of rock formed by cooling lava','A mineral deposit in caves','A form of crystal']},
+    {q:'What is the name of the supercontinent that existed 300 million years ago?',a:'Pangaea',w:['Gondwana only','Laurasia','Atlantis']},
+    {q:'What type of cloud is associated with thunderstorms?',a:'Cumulonimbus',w:['Stratus','Cirrus','Cumulus']},
+    {q:'What causes wind?',a:'Differences in air pressure',w:['Earth\'s rotation alone','The Moon\'s gravity','Ocean currents only']},
+    {q:'What is the term for water that falls from clouds?',a:'Precipitation',w:['Evaporation','Condensation','Transpiration']},
+  ],
+  medium:[
+    {q:'What is the theory of plate tectonics?',a:'The Earth\'s lithosphere is divided into moving plates',w:['The Earth\'s core spins independently','Mountains form only from volcanic activity','The oceans move in fixed patterns']},
+    {q:'How are sedimentary rocks formed?',a:'From layers of sediment compacted and cemented over time',w:['From cooled magma','From existing rocks changed by heat and pressure','From dissolved minerals in caves only']},
+    {q:'What is the Richter Scale used to measure?',a:'The magnitude (energy) of earthquakes',w:['Wind speed','Ocean depth','Atmospheric pressure']},
+    {q:'What is the difference between weather and climate?',a:'Weather is short-term atmospheric conditions; climate is long-term patterns',w:['They are the same thing','Climate is daily; weather is yearly','Weather is long-term; climate is daily']},
+    {q:'What causes ocean tides?',a:'Gravitational pull of the Moon (and Sun)',w:['Wind patterns','Earth\'s rotation only','Underwater earthquakes always']},
+    {q:'What is the difference between a mineral and a rock?',a:'Minerals are pure naturally occurring inorganic substances; rocks are mixtures of minerals',w:['Rocks are pure; minerals are mixtures','Minerals are always soft; rocks are hard','No difference']},
+    {q:'What is the greenhouse effect?',a:'Trapping of heat in the atmosphere by gases like CO₂ and methane',w:['The cooling effect of ozone','The reflection of sunlight by ice caps','Heating of ocean floors by volcanoes']},
+    {q:'What is an epicentre?',a:'The point on the Earth\'s surface directly above an earthquake\'s focus',w:['The centre of the Earth','The point of maximum volcanic activity','The boundary between tectonic plates']},
+  ],
+  hard:[
+    {q:'What is radioactive decay used for in determining the age of rocks?',a:'Radiometric (radioisotope) dating',w:['Stratigraphic indexing','Carbon dating only (for all rocks)','Seismic profiling']},
+    {q:'What is convection in the Earth\'s mantle responsible for?',a:'Driving the movement of tectonic plates',w:['Generating Earth\'s magnetic field alone','Causing ocean currents only','Creating the ozone layer']},
+    {q:'What is the Coriolis effect?',a:'The deflection of moving objects caused by Earth\'s rotation',w:['The increase in temperature near the equator','The pull of the Moon on Earth\'s oceans','The bending of light near the horizon']},
+    {q:'What is the difference between a constructive and destructive plate boundary?',a:'Constructive: plates move apart, new crust forms. Destructive: plates collide, crust is subducted.',w:['Constructive causes earthquakes only; destructive makes volcanoes only','They are the same type of boundary','Constructive causes subduction; destructive forms new crust']},
+  ]
+},
+space:{
+  easy:[
+    {q:'What is the closest star to Earth?',a:'The Sun',w:['Proxima Centauri','Sirius','Alpha Centauri A']},
+    {q:'How many planets are in our solar system?',a:'8',w:['9','7','10']},
+    {q:'What is the largest planet in our solar system?',a:'Jupiter',w:['Saturn','Uranus','Neptune']},
+    {q:'What is the name of Earth\'s natural satellite?',a:'The Moon',w:['Titan','Phobos','Ganymede']},
+    {q:'What is a light year?',a:'The distance light travels in one year',w:['The time it takes light to reach Earth','A measure of brightness','The age of a star in years']},
+    {q:'What is the Milky Way?',a:'The galaxy that contains our solar system',w:['A type of star','The nearest galaxy to ours','A group of planets']},
+    {q:'What is a constellation?',a:'A pattern of stars as seen from Earth',w:['A type of galaxy','A group of planets','A cluster of black holes']},
+    {q:'What causes day and night?',a:'Earth\'s rotation on its own axis',w:['Earth\'s orbit around the Sun','The Moon blocking the Sun','Changes in cloud cover']},
+    {q:'What planet is known as the Red Planet?',a:'Mars',w:['Jupiter','Venus','Saturn']},
+    {q:'What is an asteroid?',a:'A rocky body orbiting the Sun, smaller than a planet',w:['A type of star','A moon of Jupiter','A fragment of a comet']},
+    {q:'What is a solar eclipse?',a:'When the Moon blocks the Sun from Earth\'s view',w:['When Earth passes between the Sun and Moon','When the Moon goes dark','When a comet passes the Sun']},
+    {q:'Which planet has the most visible rings?',a:'Saturn',w:['Uranus','Jupiter','Neptune']},
+  ],
+  medium:[
+    {q:'What is a black hole?',a:'A region of spacetime with gravity so strong that nothing, not even light, can escape',w:['A dead star that has cooled completely','A type of dark nebula','A gap between galaxies']},
+    {q:'What is the difference between a meteor and a meteorite?',a:'A meteor burns up in the atmosphere; a meteorite reaches Earth\'s surface',w:['A meteorite burns up; a meteor reaches the ground','They are the same thing','A meteor is larger than a meteorite']},
+    {q:'What causes the phases of the Moon?',a:'The changing angle between the Moon, Earth and Sun as the Moon orbits Earth',w:['Earth\'s shadow falling on the Moon','The Moon\'s rotation speed','Changes in sunlight intensity']},
+    {q:'What is the Big Bang theory?',a:'The universe began from an extremely hot, dense point about 13.8 billion years ago',w:['The universe has always existed','Stars explode to create new galaxies','The solar system was created by a massive explosion']},
+    {q:'What is a nebula?',a:'A cloud of gas and dust in space, often a star-forming region',w:['A type of galaxy','A group of planets','A dying sun']},
+    {q:'What is the order of the planets from the Sun?',a:'Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune',w:['Mercury, Earth, Venus, Mars, Jupiter, Saturn, Uranus, Neptune','Venus, Mercury, Earth, Mars, Jupiter, Saturn, Uranus, Neptune','Mercury, Venus, Mars, Earth, Jupiter, Saturn, Uranus, Neptune']},
+    {q:'What keeps planets in orbit around the Sun?',a:'The gravitational pull of the Sun balanced by the planet\'s orbital velocity',w:['Dark matter','Magnetic fields from the Sun','The planet\'s own rotation']},
+    {q:'What is a red giant?',a:'An expanded, cooler phase of a star near the end of its life',w:['A very massive young star','A failed star that never ignited','A type of nebula']},
+  ],
+  hard:[
+    {q:'What is the Hertzsprung-Russell diagram used for?',a:'Classifying stars by their luminosity and surface temperature',w:['Mapping the positions of galaxies','Measuring the age of the universe','Calculating the speed of planets']},
+    {q:'What is dark matter?',a:'An unobserved form of matter inferred from its gravitational effects on visible matter',w:['Matter inside black holes','The material between stars','Dead stars that no longer emit light']},
+    {q:'What is meant by the redshift of distant galaxies?',a:'Their light is shifted to longer wavelengths because they are moving away from us',w:['They emit only red light','They absorb blue light','They are cooling down rapidly']},
+    {q:'What is a pulsar?',a:'A rapidly rotating neutron star that emits beams of electromagnetic radiation',w:['An exploding star','A type of black hole','A star with unusual chemical composition']},
+    {q:'What is the Chandrasekhar limit?',a:'The maximum mass of a stable white dwarf star (~1.4 solar masses)',w:['The minimum mass needed to form a black hole','The maximum size of a neutron star','The distance at which a star can be observed']},
+  ]
+},
+humanbody:{
+  easy:[
+    {q:'What is the job of the heart?',a:'To pump blood around the body',w:['To filter waste from blood','To produce red blood cells','To digest food']},
+    {q:'How many bones are in the adult human body?',a:'206',w:['150','300','250']},
+    {q:'What is the largest organ in the human body?',a:'Skin',w:['Liver','Brain','Lungs']},
+    {q:'What do the lungs do?',a:'Exchange oxygen and carbon dioxide',w:['Filter blood','Produce hormones','Pump blood']},
+    {q:'What type of blood vessel carries blood away from the heart?',a:'Artery',w:['Vein','Capillary','Lymph vessel']},
+    {q:'What is the function of red blood cells?',a:'Carry oxygen around the body',w:['Fight infection','Clot blood','Produce antibodies']},
+    {q:'What does the brain control?',a:'All body functions and thoughts',w:['Only movement','Only breathing','Only senses']},
+    {q:'Which organ produces insulin?',a:'Pancreas',w:['Liver','Kidney','Stomach']},
+    {q:'What is the function of the kidneys?',a:'Filter waste from blood and produce urine',w:['Produce digestive enzymes','Exchange oxygen and CO₂','Control body temperature']},
+    {q:'How many chambers does the human heart have?',a:'Four',w:['Two','Three','Six']},
+    {q:'What is the role of white blood cells?',a:'Fight infection and disease',w:['Carry oxygen','Clot wounds','Transport nutrients']},
+    {q:'What covers and protects the brain?',a:'The skull',w:['The spine','Cartilage','Muscle']},
+  ],
+  medium:[
+    {q:'What is the difference between arteries and veins?',a:'Arteries carry oxygenated blood from the heart; veins carry deoxygenated blood to the heart (usually)',w:['Veins carry blood from the heart; arteries to the heart','They are identical','Arteries only exist in the arms and legs']},
+    {q:'What is the role of the liver?',a:'Metabolise nutrients, detoxify blood and produce bile',w:['Filter urine','Exchange gases','Regulate heartbeat']},
+    {q:'What is the nervous system divided into?',a:'Central nervous system (brain and spinal cord) and peripheral nervous system',w:['Voluntary and autonomic only','Sensory and motor only','Somatic and cardiac only']},
+    {q:'What does the immune system do?',a:'Defends the body against pathogens and disease',w:['Controls movement','Regulates temperature only','Transports oxygen']},
+    {q:'What is the role of platelets?',a:'Help blood to clot and seal wounds',w:['Carry oxygen','Fight bacteria','Produce hormones']},
+    {q:'Where does digestion of proteins primarily begin?',a:'Stomach (with pepsin)',w:['Mouth','Small intestine','Large intestine']},
+    {q:'What is peristalsis?',a:'Muscular contractions that move food through the digestive system',w:['The absorption of nutrients in the intestine','The production of digestive enzymes','The filtration of blood in the kidneys']},
+    {q:'Which part of the brain controls balance and coordination?',a:'Cerebellum',w:['Cerebrum','Brain stem','Hypothalamus']},
+  ],
+  hard:[
+    {q:'What is the role of the hypothalamus?',a:'Regulates temperature, hunger, thirst, and links the nervous and endocrine systems',w:['Controls conscious thought','Manages immune responses only','Coordinates muscle movement only']},
+    {q:'What is the mechanism of action of antibiotics?',a:'They kill or inhibit the growth of bacteria (various mechanisms)',w:['They destroy viruses directly','They stimulate the immune system only','They neutralise toxins in blood']},
+    {q:'What is the difference between Type 1 and Type 2 diabetes?',a:'Type 1: autoimmune destruction of insulin-producing cells. Type 2: insulin resistance, often linked to lifestyle.',w:['They are identical conditions','Type 1 is less serious than Type 2','Type 2 is caused by a virus']},
+    {q:'What is the action potential in neurons?',a:'A rapid electrical signal caused by ion flow across the neuron membrane',w:['A chemical released at the synapse','The physical movement of a neuron','A hormone produced in the brain']},
+    {q:'What is the function of the lymphatic system?',a:'Drain excess fluid from tissues, absorb dietary fat, and support immunity',w:['Pump blood through the body','Produce hormones for digestion','Regulate breathing only']},
+  ]
+}
+};
+
+// ── AI GENERATION ──
+const SCI_TOPIC_PROMPTS = {
+  biology: (diff) => `Generate exactly 10 biology multiple-choice questions for ${diff} level school students.
+Return ONLY a valid JSON array, no markdown. Each object:
+{"q": "Question text", "a": "Correct answer", "w": ["wrong1","wrong2","wrong3"]}
+Focus on: ${diff==='easy'?'basic life processes, plant/animal classification, ecosystems':diff==='medium'?'cells, genetics basics, body systems, ecology':'DNA, evolution, biochemistry, advanced physiology'}
+Wrong answers must be plausible. Return JSON only.`,
+  chemistry: (diff) => `Generate exactly 10 chemistry multiple-choice questions for ${diff} level school students.
+Return ONLY a valid JSON array, no markdown. Each object:
+{"q": "Question text", "a": "Correct answer", "w": ["wrong1","wrong2","wrong3"]}
+Focus on: ${diff==='easy'?'states of matter, elements vs compounds, acids and bases, common symbols':diff==='medium'?'atomic structure, bonding, reactions, periodic table trends':'thermodynamics, equilibrium, organic chemistry, electrochemistry'}
+Wrong answers must be plausible. Return JSON only.`,
+  physics: (diff) => `Generate exactly 10 physics multiple-choice questions for ${diff} level school students.
+Return ONLY a valid JSON array, no markdown. Each object:
+{"q": "Question text", "a": "Correct answer", "w": ["wrong1","wrong2","wrong3"]}
+Focus on: ${diff==='easy'?'forces, motion, energy, light, sound, electricity basics':diff==='medium'?'Newton\'s laws, circuits, waves, pressure, work and power':'quantum physics, relativity, electromagnetism, thermodynamics'}
+Wrong answers must be plausible. Return JSON only.`,
+  earth: (diff) => `Generate exactly 10 earth science multiple-choice questions for ${diff} level school students.
+Return ONLY a valid JSON array, no markdown. Each object:
+{"q": "Question text", "a": "Correct answer", "w": ["wrong1","wrong2","wrong3"]}
+Focus on: ${diff==='easy'?'rock types, water cycle, seasons, weather, fossils':diff==='medium'?'plate tectonics, rock cycle, climate, erosion, volcanoes':'geological time, seismology, atmospheric science, ocean systems'}
+Wrong answers must be plausible. Return JSON only.`,
+  space: (diff) => `Generate exactly 10 space science multiple-choice questions for ${diff} level school students.
+Return ONLY a valid JSON array, no markdown. Each object:
+{"q": "Question text", "a": "Correct answer", "w": ["wrong1","wrong2","wrong3"]}
+Focus on: ${diff==='easy'?'solar system, planets, Moon, stars, day and night':diff==='medium'?'star life cycles, black holes, galaxies, Big Bang, space exploration':'cosmology, dark matter, pulsars, exoplanets, relativistic effects'}
+Wrong answers must be plausible. Return JSON only.`,
+  humanbody: (diff) => `Generate exactly 10 human body multiple-choice questions for ${diff} level school students.
+Return ONLY a valid JSON array, no markdown. Each object:
+{"q": "Question text", "a": "Correct answer", "w": ["wrong1","wrong2","wrong3"]}
+Focus on: ${diff==='easy'?'major organs and their functions, skeleton, blood, senses':diff==='medium'?'body systems, digestion, circulation, immunity, nervous system':'biochemistry, hormones, neural mechanisms, genetics and disease'}
+Wrong answers must be plausible. Return JSON only.`
+};
+
+function showAILoader(show){ const l=document.getElementById('ai-loader'); show?l.classList.add('show'):l.classList.remove('show'); }
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+async function buildQuestionsAI(){
+  const promptFn=SCI_TOPIC_PROMPTS[sciTopic];
+  if(!promptFn) return buildQuestionsFallback();
+  try{
+    const response=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:3000,system:"You are an expert science teacher. Return ONLY valid JSON arrays with no markdown, no backticks, no preamble. Just the raw JSON array.",messages:[{role:"user",content:promptFn(difficulty)}]})});
+    if(!response.ok) throw new Error('API '+response.status);
+    const data=await response.json();
+    const text=(data.content||[]).map(i=>i.text||'').join('');
+    const clean=text.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+    const bank=JSON.parse(clean);
+    if(!Array.isArray(bank)||bank.length<5) throw new Error('Invalid');
+    return convertAIBank(bank);
+  }catch(err){ console.error('AI failed, using fallback:',err); return buildQuestionsFallback(); }
+}
+function convertAIBank(bank){
+  return shuffle([...bank]).slice(0,TOTAL_QS).map(q=>({
+    text:q.q||q.question||'',
+    answer:q.a||q.answer||'',
+    options:shuffle([q.a||q.answer,...(q.w||q.wrong||[])].slice(0,4)),
+    hint:'Think carefully!'
+  }));
+}
+function buildQuestionsFallback(){
+  const bank=BANKS[sciTopic]||{};
+  const pool=shuffle([...(bank[difficulty]||[]),...(bank.easy||[]),...(bank.medium||[]),...(bank.hard||[])]);
+  return pool.slice(0,TOTAL_QS).map(q=>({
+    text:q.q,answer:q.a,options:shuffle([q.a,...q.w]),hint:'Think carefully!'
+  }));
+}
+
+// ── GAME FLOW ──
+async function startGame(){
+  if(!sciTopic||getLockInfo(sciTopic))return;
+  currentQ=0;score=0;maxStreakThisGame=0;streak=0;
+  segStates=new Array(TOTAL_QS).fill('');
+  const bar=document.getElementById('prog-bar-outer');bar.innerHTML='';
+  for(let i=0;i<TOTAL_QS;i++){const s=document.createElement('div');s.id='seg-'+i;bar.appendChild(s);}
+  showAILoader(true);
+  showScreen('screen-game');
+  questions=await buildQuestionsAI();
+  showAILoader(false);
+  loadQuestion();
+}
+
+function paintSegs(){for(let i=0;i<TOTAL_QS;i++){const s=document.getElementById('seg-'+i);if(!s)continue;const base='flex:1;height:16px;border-radius:50px;transition:all 0.3s ease;';if(i===currentQ)s.style.cssText=base+'background:#80CBC4;transform:scaleY(1.4);box-shadow:0 0 8px rgba(128,203,196,0.9);';else if(segStates[i]==='correct')s.style.cssText=base+'background:#43A047;';else if(segStates[i]==='wrong')s.style.cssText=base+'background:#E53935;';else if(segStates[i]==='timeout')s.style.cssText=base+'background:#FF8F00;';else s.style.cssText=base+'background:#E0E0E0;';}}
+
+function loadQuestion(){
+  const q=questions[currentQ];paintSegs();
+  document.getElementById('q-counter').textContent=`${currentQ+1} / ${TOTAL_QS}`;
+  document.getElementById('q-topic-tag').textContent=SCI_TOPIC_NAMES[sciTopic]||sciTopic;
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('next-btn').style.display='none';
+  document.getElementById('question-text').innerHTML=q.text;
+  const grid=document.getElementById('answers-grid');grid.innerHTML='';
+  q.options.forEach(opt=>{const btn=document.createElement('button');btn.className='answer-btn';btn.textContent=opt;btn.addEventListener('click',()=>checkAnswer(opt,btn));grid.appendChild(btn);});
+  startTimer();
+}
+function checkAnswer(chosen,btn){
+  clearInterval(timerInterval);document.querySelectorAll('#answers-grid .answer-btn').forEach(b=>b.disabled=true);
+  const q=questions[currentQ];const correct=chosen===q.answer;
+  if(!correct)document.querySelectorAll('#answers-grid .answer-btn').forEach(b=>{if(b.textContent===q.answer)b.classList.add('ans-correct');});
+  btn.classList.add(correct?'ans-correct':'ans-wrong');
+  if(correct){score++;streak++;if(streak>maxStreakThisGame)maxStreakThisGame=streak;segStates[currentQ]='correct';paintSegs();const bonus=streak>=3?30:10;showFeedback(true,streak>=3?`🔥 ${streak} in a row! +${bonus} XP!`:getCorrectMsg());addXP(bonus);spawnCoins(btn);}
+  else{streak=0;segStates[currentQ]='wrong';paintSegs();showFeedback(false,`❌ ${q.hint||('Answer: '+q.answer)}`);}
+  document.getElementById('streak-count').textContent=streak;save();document.getElementById('next-btn').style.display='block';
+}
+function timeUp(){
+  clearInterval(timerInterval);const q=questions[currentQ];
+  document.querySelectorAll('#answers-grid .answer-btn').forEach(b=>{b.disabled=true;if(b.textContent===q.answer)b.classList.add('ans-correct');});
+  segStates[currentQ]='timeout';paintSegs();streak=0;
+  showFeedback(false,`⏰ Time's up! Answer: ${q.answer}`);save();document.getElementById('next-btn').style.display='block';
+}
+function nextQuestion(){currentQ++;if(currentQ>=TOTAL_QS)showResults();else loadQuestion();}
+
+function showResults(){
+  const pct=score/TOTAL_QS;const xpEarned=score*10+(score===TOTAL_QS?50:0);const stars=pct>=0.9?3:pct>=0.7?2:pct>=0.5?1:0;const idx=Math.min(Math.floor(pct*4+0.1),4);
+  ['😢','😅','😊','🌟','🏆'].forEach((t,i)=>{if(i===idx)document.getElementById('results-trophy').textContent=t;});
+  document.getElementById('results-title').textContent=["Keep Trying!","Good Effort!","Well Done!","Excellent!","PERFECT! 🎉"][idx];
+  document.getElementById('results-score').textContent=`${score}/${TOTAL_QS}`;
+  document.getElementById('score-stars').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
+  document.getElementById('stat-correct').textContent=score;document.getElementById('stat-wrong').textContent=TOTAL_QS-score;
+  document.getElementById('stat-xp').textContent=`+${xpEarned}`;
+  gamesPlayed++;document.getElementById('stat-games').textContent=gamesPlayed;
+  document.getElementById('results-message').textContent=["Keep studying!","Good try!","Nice work!","Great job!","PERFECT SCORE! 🎉"][idx];
+  totalStars+=stars;addXP(xpEarned);
+  const prevUnlocked=SCI_TOPICS.filter(t=>isUnlocked(t));
+  if(!topicGames[sciTopic])topicGames[sciTopic]={};if(!topicGames[sciTopic][difficulty])topicGames[sciTopic][difficulty]={};
+  for(let thresh=1;thresh<=score;thresh++){const key=`q${thresh}`;topicGames[sciTopic][difficulty][key]=(topicGames[sciTopic][difficulty][key]||0)+1;}
+  const nowUnlocked=SCI_TOPICS.filter(t=>isUnlocked(t));
+  const newlyUnlocked=nowUnlocked.filter(t=>!prevUnlocked.includes(t));
+  if(newlyUnlocked.length>0)setTimeout(()=>showUnlockToast(newlyUnlocked.map(t=>SCI_TOPIC_NAMES[t].replace(/^.+? /,''))),800);
+  updateQuestTrackers(score,sciTopic);save();showScreen('screen-results');if(score===TOTAL_QS)launchConfetti();
+}
+function showUnlockToast(topics){const label=topics.length===1?topics[0]:topics.length+' topics';const toast=document.getElementById('unlock-toast');toast.textContent=`🔓 ${label} Unlocked!`;toast.classList.add('show');launchConfetti();setTimeout(()=>toast.classList.remove('show'),3500);}
+async function retryGame(){questions=[];await startGame();}
+
+// ── XP ──
+function addXP(amount){playerXP+=amount;const needed=playerLevel*100;if(playerXP>=needed){playerXP-=needed;playerLevel++;setTimeout(()=>showLevelUp(playerLevel),600);}updatePlayerUI();}
+function showLevelUp(newLvl){const av=getAvatar(newLvl);const popup=document.createElement('div');popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center';popup.innerHTML=`<div style="background:white;border-radius:28px;padding:40px 32px;text-align:center;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);border:4px solid #80CBC4"><div style="font-size:4rem;margin-bottom:8px">${av.emoji}</div><div style="font-family:'Fredoka One',cursive;font-size:2rem;color:#1A237E;margin-bottom:6px">LEVEL UP! 🎉</div><div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#00695C;margin-bottom:8px">Level ${newLvl} reached!</div><button onclick="this.parentElement.parentElement.remove()" style="background:linear-gradient(135deg,#00695C,#00897B);color:white;border:none;border-radius:16px;padding:14px 32px;font-family:'Fredoka One',cursive;font-size:1.2rem;cursor:pointer">Awesome! 🚀</button></div>`;document.body.appendChild(popup);launchConfetti();}
+
+// ── TIMER ──
+function startTimer(){clearInterval(timerInterval);const secs=difficulty==='easy'?25:difficulty==='medium'?20:15;timeLeft=secs;updateTimerUI(secs,secs);timerInterval=setInterval(()=>{timeLeft--;updateTimerUI(timeLeft,secs);if(timeLeft<=0){clearInterval(timerInterval);timeUp();}},1000);}
+function updateTimerUI(t,max){const deg=360*(1-t/max);document.getElementById('timer-ring').style.background=`conic-gradient(#00695C ${deg}deg, #E0E0E0 ${deg}deg)`;const inner=document.getElementById('timer-text');inner.textContent=t;inner.style.color=t<=5?'#E53935':t<=10?'#FF8F00':'#1A237E';}
+
+// ── FEEDBACK & EFFECTS ──
+function showFeedback(correct,msg){const fb=document.getElementById('feedback');fb.textContent=msg;fb.className='feedback '+(correct?'fb-correct':'fb-wrong');fb.style.display='block';}
+function getCorrectMsg(){return['✅ Correct!','🌟 Brilliant!','🎯 Spot on!','🧪 Exactly right!','🚀 Perfect!','⭐ Amazing!'][Math.floor(Math.random()*6)];}
+function spawnCoins(btn){const rect=btn.getBoundingClientRect();const burst=document.createElement('div');burst.className='coin-burst';burst.style.left=rect.left+'px';burst.style.top=rect.top+'px';['⭐','✨','🔬'].forEach((_,i)=>{for(let j=0;j<2;j++){const c=document.createElement('div');c.className='coin';c.textContent=['⭐','✨','🧪'][rnd(0,2)];c.style.left=rnd(-10,60)+'px';c.style.animationDelay=(i*0.1+j*0.05)+'s';burst.appendChild(c);}});document.body.appendChild(burst);setTimeout(()=>burst.remove(),1500);}
+function launchConfetti(){const emojis=['🎉','⭐','🌟','🏆','🎊','🔬','⚗️'];for(let i=0;i<20;i++)setTimeout(()=>{const el=document.createElement('div');el.style.cssText=`position:fixed;top:0;left:${rnd(10,90)}%;font-size:${rnd(20,40)}px;z-index:9999;animation:coinFly ${rnd(8,15)*0.1}s ease forwards;pointer-events:none`;el.textContent=emojis[rnd(0,emojis.length-1)];document.body.appendChild(el);setTimeout(()=>el.remove(),2000);},i*80);}
+
+// ── MASCOT ──
+const TIPS=["All living things are made of cells! 🦠","DNA carries the instructions for life! 🧬","Atoms are the building blocks of matter! ⚛️","Gravity pulls objects towards each other! 🌍","The Sun is a giant ball of plasma! ☀️","Your heart beats about 100,000 times a day! 🫀","Photosynthesis turns sunlight into sugar! 🌿","The speed of light is ~300,000 km/s! ⚡","Water is H₂O — two hydrogen, one oxygen! 💧","The Moon causes tides on Earth! 🌊"];
+let tipTimeout;
+function showTip(){const b=document.getElementById('speech-bubble');b.textContent=TIPS[rnd(0,TIPS.length-1)];b.style.display='block';clearTimeout(tipTimeout);tipTimeout=setTimeout(()=>b.style.display='none',4000);}
+function makeClouds(){const c=document.getElementById('clouds');for(let i=0;i<5;i++){const cl=document.createElement('div');const w=rnd(80,200);cl.className='cloud';cl.style.cssText=`width:${w}px;height:${w*0.4}px;top:${rnd(0,80)}px;left:-300px;animation-duration:${rnd(30,60)}s;animation-delay:-${rnd(0,40)}s`;c.appendChild(cl);}}
+
+// ── QUESTS ──
+const QUEST_DEFS=[{id:'first_game',icon:'🔬',name:'First Experiment',desc:'Complete your first game',type:'games',target:1,xp:50},{id:'games2',icon:'🧪',name:'Lab Regular',desc:'Complete 2 games',type:'games',target:2,xp:80},{id:'streak3',icon:'🔥',name:'On Fire',desc:'Get a 3-answer streak',type:'streak',target:3,xp:75},{id:'streak5',icon:'💥',name:'Unstoppable',desc:'Get a 5-answer streak',type:'streak',target:5,xp:150},{id:'perfect1',icon:'⭐',name:'Perfect Score',desc:'Get 10/10 in a game',type:'perfect',target:1,xp:120},{id:'perfect5',icon:'🌟',name:'Science Genius',desc:'Get 10/10 five times',type:'perfect',target:5,xp:400},{id:'stars10',icon:'✨',name:'Star Collector',desc:'Earn 10 stars',type:'stars',target:10,xp:100},{id:'stars30',icon:'🌠',name:'Star Hoarder',desc:'Earn 30 stars',type:'stars',target:30,xp:250},{id:'level5',icon:'🧬',name:'Level Up!',desc:'Reach Level 5',type:'level',target:5,xp:200},{id:'level10',icon:'⚛️',name:'Physicist',desc:'Reach Level 10',type:'level',target:10,xp:500},{id:'correct50',icon:'✅',name:'Answer Machine',desc:'Answer 50 correctly',type:'correct',target:50,xp:150},{id:'correct200',icon:'🧠',name:'Science Brain',desc:'Answer 200 correctly',type:'correct',target:200,xp:500},{id:'topics3',icon:'🗺️',name:'Explorer',desc:'Play 3 different topics',type:'topics',target:3,xp:80},{id:'topics6',icon:'🌍',name:'Science Master',desc:'Play all 6 topics',type:'topics',target:6,xp:200}];
+let questProgress={},perfectCount=0,totalCorrect=0,topicsPlayed=new Set(),dailyQuestIds=[],dailyQuestDate='';
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function pickDailyQuests(){const unclaimed=QUEST_DEFS.filter(d=>!(questProgress[d.id]?.claimed));const pool=unclaimed.length>=3?unclaimed:QUEST_DEFS;dailyQuestIds=[...pool].sort(()=>Math.random()-0.5).slice(0,3).map(d=>d.id);dailyQuestDate=todayStr();}
+function saveQuests(){localStorage.setItem('mq_sci_quests_'+currentUser.username,JSON.stringify({questProgress,perfectCount,totalCorrect,topicsPlayed:[...topicsPlayed],dailyQuestIds,dailyQuestDate}));}
+function loadQuests(){const raw=localStorage.getItem('mq_sci_quests_'+currentUser.username);if(raw){const d=JSON.parse(raw);questProgress=d.questProgress||{};perfectCount=d.perfectCount||0;totalCorrect=d.totalCorrect||0;topicsPlayed=new Set(d.topicsPlayed||[]);dailyQuestIds=d.dailyQuestIds||[];dailyQuestDate=d.dailyQuestDate||'';}if(dailyQuestDate!==todayStr()||!dailyQuestIds.length){pickDailyQuests();saveQuests();}}
+function getQuestProgress(def){const p=questProgress[def.id]||{progress:0,claimed:false};if(def.type==='games')p.progress=gamesPlayed;if(def.type==='stars')p.progress=totalStars;if(def.type==='level')p.progress=playerLevel;if(def.type==='correct')p.progress=totalCorrect;if(def.type==='topics')p.progress=topicsPlayed.size;if(def.type==='streak')p.progress=questProgress[def.id]?.progress||0;if(def.type==='perfect')p.progress=perfectCount;return p;}
+function isClaimable(def){const p=getQuestProgress(def);return !p.claimed&&p.progress>=def.target;}
+function anyClaimable(){return dailyQuestIds.some(id=>{const def=QUEST_DEFS.find(d=>d.id===id);return def&&isClaimable(def);});}
+function updateQuestNotif(){const notif=document.getElementById('quest-notif');anyClaimable()?notif.classList.add('show'):notif.classList.remove('show');}
+function claimQuest(id){const def=QUEST_DEFS.find(d=>d.id===id);if(!def||!isClaimable(def))return;if(!questProgress[id])questProgress[id]={progress:0,claimed:false};questProgress[id].claimed=true;addXP(def.xp);saveQuests();updateQuestNotif();renderQuestList();launchConfetti();}
+function renderQuestList(){
+  const list=document.getElementById('quest-list');list.innerHTML='';
+  const note=document.createElement('div');note.style.cssText='text-align:center;font-size:0.82rem;color:#90A4AE;font-weight:700;padding:4px 0 10px';
+  const now=new Date();const msLeft=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1)-now;
+  note.textContent=`🕛 New quests in ${Math.floor(msLeft/3600000)}h ${Math.floor((msLeft%3600000)/60000)}m`;list.appendChild(note);
+  dailyQuestIds.map(id=>QUEST_DEFS.find(d=>d.id===id)).filter(Boolean).forEach(def=>{
+    const p=getQuestProgress(def);const prog=Math.min(p.progress,def.target);const pct=Math.round(prog/def.target*100);const claimable=!p.claimed&&prog>=def.target;const done=p.claimed;
+    const card=document.createElement('div');card.className='quest-card'+(done?' q-done':claimable?' q-claimable':'');if(claimable)card.onclick=()=>claimQuest(def.id);
+    card.innerHTML=`<div class="quest-icon">${def.icon}</div><div class="quest-info"><div class="quest-name">${def.name}</div><div class="quest-desc">${def.desc}</div><div class="quest-prog-wrap"><div class="quest-prog-fill" style="width:${pct}%"></div></div><div class="quest-prog-text">${prog} / ${def.target}</div></div>${done?'<div class="quest-done-badge">✅</div>':claimable?`<button class="quest-claim-btn" onclick="event.stopPropagation();claimQuest('${def.id}')">Claim +${def.xp}XP</button>`:`<div class="quest-reward">+${def.xp} XP</div>`}`;
+    list.appendChild(card);
+  });
+}
+function openQuests(){renderQuestList();document.getElementById('quest-overlay').classList.add('open');}
+function closeQuests(){document.getElementById('quest-overlay').classList.remove('open');}
+function closeQuestsIfBg(e){if(e.target===document.getElementById('quest-overlay'))closeQuests();}
+function updateQuestTrackers(gameScore,gameTopic){topicsPlayed.add(gameTopic);totalCorrect+=gameScore;if(gameScore===TOTAL_QS)perfectCount++;QUEST_DEFS.filter(d=>d.type==='streak').forEach(def=>{if(!questProgress[def.id])questProgress[def.id]={progress:0,claimed:false};if(maxStreakThisGame>=def.target)questProgress[def.id].progress=Math.max(questProgress[def.id].progress,maxStreakThisGame);});saveQuests();updateQuestNotif();}
+
+// ── RESET ──
+function confirmReset(){if(!confirm(`Reset ALL Science progress for ${currentUser.username}?`))return;totalStars=0;playerXP=0;playerLevel=1;streak=0;gamesPlayed=0;topicGames={};questProgress={};perfectCount=0;totalCorrect=0;topicsPlayed=new Set();pickDailyQuests();save();saveQuests();updatePlayerUI();updateQuestNotif();}
+
+// ── INIT ──
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+makeClouds();
+load();
+loadQuests();
+updatePlayerUI();
+updateQuestNotif();
+setTimeout(()=>showTip(),1500);
+</script>
+</body>
+</html>

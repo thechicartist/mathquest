@@ -88,7 +88,7 @@
   </div>
 </div>
 
-<script src="api.js"></script>
+<script src="js/api.js"></script>
 <script>
 async function renderSavedUsers(){
   const res = await apiGet('/students');
@@ -96,11 +96,10 @@ async function renderSavedUsers(){
   const list = document.getElementById('saved-users-list');
   if(!res || !res.students || !res.students.length){ wrap.style.display='none'; return; }
   wrap.style.display='';
-  const pills = await Promise.all(res.students.map(async n => {
-    const u = await apiGet('/user/'+encodeURIComponent(n));
-    return `<span class="user-pill" onclick="quickLogin('${n}')">${u?.avatar||'🐣'} ${n} <span style="font-size:0.75rem;opacity:0.7">Gr.${u?.grade||1}</span></span>`;
-  }));
-  list.innerHTML = pills.join('');
+  // Single request only — no per-user fetches
+  list.innerHTML = res.students.map(n =>
+    `<span class="user-pill" onclick="quickLogin('${n}')">🐣 ${n}</span>`
+  ).join('');
 }
 
 function quickLogin(username){
@@ -120,7 +119,7 @@ async function doLogin(){
   if(userData.password !== btoa(p)){ err.style.color='#E53935'; err.textContent='Wrong password. Try again!'; return; }
   // Save session and go to game
   sessionStorage.setItem('mq_user', JSON.stringify({username:u, ...userData}));
-  location.href = 'student.html';
+  location.href = 'math.html';
 }
 
 renderSavedUsers();
