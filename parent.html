@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MathQuest — Parent Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:'Nunito',sans-serif;
+    background:linear-gradient(180deg,#E8F5E9 0%,#F1F8E9 40%,#E3F2FD 100%);
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    padding:24px; padding-top:80px;
+  }
+  .card {
+    background:white; border-radius:28px; padding:40px 36px;
+    width:100%; max-width:460px;
+    box-shadow:0 16px 50px rgba(0,0,0,0.13);
+    border:4px solid #E8F5E9;
+  }
+  .logo { font-family:'Fredoka One',cursive; font-size:2.2rem; color:#FF7043; text-align:center; margin-bottom:2px; }
+  .logo span { color:#3F51B5; }
+  .badge {
+    background:#E8F5E9; border-radius:50px; padding:5px 14px;
+    font-weight:800; font-size:0.82rem; color:#2E7D32;
+    width:fit-content; margin:0 auto 24px; display:block; text-align:center;
+  }
+
+  /* Step indicator */
+  .steps { display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:28px; }
+  .step-dot {
+    width:32px; height:32px; border-radius:50%; border:3px solid #E0E0E0;
+    background:white; display:flex; align-items:center; justify-content:center;
+    font-family:'Fredoka One',cursive; font-size:0.9rem; color:#B0BEC5;
+    transition:all 0.3s; flex-shrink:0;
+  }
+  .step-dot.active { border-color:#43A047; background:#43A047; color:white; }
+  .step-dot.done { border-color:#43A047; background:#E8F5E9; color:#43A047; }
+  .step-line { flex:1; height:3px; background:#E0E0E0; max-width:60px; transition:background 0.3s; }
+  .step-line.done { background:#43A047; }
+  .step-label { font-size:0.72rem; font-weight:800; color:#B0BEC5; text-align:center; margin-top:5px; }
+  .step-label.active { color:#43A047; }
+  .steps-wrap { margin-bottom:28px; }
+  .steps-labels { display:flex; justify-content:space-between; padding:0 4px; }
+
+  /* Panels */
+  .panel { display:none; }
+  .panel.active { display:block; }
+
+  .panel-title { font-family:'Fredoka One',cursive; font-size:1.45rem; color:#1A237E; margin-bottom:4px; }
+  .panel-sub { font-size:0.88rem; color:#90A4AE; font-weight:600; margin-bottom:22px; }
+
+  /* Fields */
+  .field { margin-bottom:14px; }
+  .field label { display:block; font-weight:800; font-size:0.85rem; color:#546E7A; margin-bottom:6px; }
+  .field input {
+    width:100%; padding:13px 16px; border-radius:14px;
+    border:3px solid #E0E0E0; font-family:'Nunito',sans-serif;
+    font-size:1rem; font-weight:700; color:#1A237E;
+    outline:none; transition:border-color 0.2s;
+  }
+  .field input:focus { border-color:#66BB6A; }
+  .field-row { display:flex; gap:12px; }
+  .field-row .field { flex:1; }
+
+  /* Password strength */
+  .pw-bars { display:flex; gap:4px; margin-top:6px; }
+  .pw-bar { height:5px; border-radius:4px; flex:1; background:#E0E0E0; transition:background 0.3s; }
+  .pw-hint { font-size:0.78rem; font-weight:700; color:#90A4AE; margin-top:4px; }
+
+  /* Price box */
+  .price-box {
+    background:linear-gradient(135deg,#E8F5E9,#F1F8E9);
+    border:3px solid #A5D6A7; border-radius:18px;
+    padding:20px; margin-bottom:20px; text-align:center;
+  }
+  .price-amount { font-family:'Fredoka One',cursive; font-size:2.8rem; color:#2E7D32; line-height:1; }
+  .price-currency { font-size:1.1rem; vertical-align:super; }
+  .price-period { font-size:0.85rem; color:#66BB6A; font-weight:800; margin-top:2px; }
+  .price-perks { display:flex; flex-direction:column; gap:6px; margin-top:14px; text-align:left; }
+  .perk { display:flex; align-items:center; gap:8px; font-weight:700; font-size:0.88rem; color:#388E3C; }
+
+  /* Stripe card element */
+  .stripe-wrap {
+    border:3px solid #E0E0E0; border-radius:14px;
+    padding:14px 16px; transition:border-color 0.2s; background:white;
+  }
+  .stripe-wrap.focused { border-color:#66BB6A; }
+  .stripe-label { font-weight:800; font-size:0.85rem; color:#546E7A; margin-bottom:8px; display:block; }
+
+  /* Secure badge */
+  .secure-note { display:flex; align-items:center; justify-content:center; gap:6px;
+    font-size:0.78rem; color:#90A4AE; font-weight:700; margin-top:10px; }
+
+  /* Buttons */
+  .btn-primary {
+    width:100%; padding:15px; border:none; border-radius:16px;
+    background:linear-gradient(135deg,#43A047,#2E7D32); color:white;
+    font-family:'Fredoka One',cursive; font-size:1.25rem; cursor:pointer;
+    box-shadow:0 6px 20px rgba(46,125,50,0.35); transition:all 0.2s; margin-top:6px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .btn-primary:hover:not(:disabled) { transform:translateY(-3px); }
+  .btn-primary:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+  .btn-ghost {
+    background:none; border:none; color:#90A4AE; font-family:'Nunito',sans-serif;
+    font-weight:800; font-size:0.88rem; cursor:pointer; margin-top:10px;
+    display:block; width:100%; text-align:center; padding:6px;
+  }
+  .btn-ghost:hover { color:#546E7A; }
+
+  /* Messages */
+  .msg { font-weight:700; font-size:0.88rem; margin-top:10px; min-height:20px; text-align:center; }
+  .msg.err { color:#E53935; }
+  .msg.ok { color:#43A047; }
+
+  /* Success screen */
+  .success-icon { font-size:4rem; text-align:center; margin-bottom:12px; }
+  .success-title { font-family:'Fredoka One',cursive; font-size:1.8rem; color:#1A237E; text-align:center; margin-bottom:8px; }
+  .success-sub { font-size:0.92rem; color:#546E7A; font-weight:600; text-align:center; margin-bottom:24px; }
+  .creds-box {
+    background:#F8FBF8; border:2px solid #E8F5E9; border-radius:16px;
+    padding:16px; margin-bottom:20px;
+  }
+  .creds-row { display:flex; justify-content:space-between; align-items:center;
+    padding:6px 0; border-bottom:1px solid #F0F4F0; }
+  .creds-row:last-child { border:none; }
+  .creds-key { font-size:0.82rem; color:#90A4AE; font-weight:800; }
+  .creds-val { font-size:0.92rem; color:#1A237E; font-weight:800; }
+
+  /* Tabs (dashboard) */
+  .tabs { display:flex; gap:8px; margin-bottom:22px; }
+  .tab {
+    flex:1; padding:11px; border-radius:14px; border:3px solid #E0E0E0;
+    background:white; font-family:'Nunito',sans-serif; font-weight:800;
+    font-size:0.9rem; color:#90A4AE; cursor:pointer; transition:all 0.2s;
+  }
+  .tab.active { background:#3F51B5; border-color:#3F51B5; color:white; }
+  .tab:hover:not(.active) { border-color:#7986CB; color:#3F51B5; }
+
+  /* Kids */
+  .kids-list { display:flex; flex-direction:column; gap:10px; }
+  .kid-card {
+    display:flex; align-items:center; justify-content:space-between;
+    background:#F8FBF8; border-radius:16px; padding:14px 16px;
+    border:2px solid #E8F5E9;
+  }
+  .kid-info { display:flex; align-items:center; gap:10px; }
+  .kid-avatar {
+    width:40px; height:40px; border-radius:50%;
+    background:linear-gradient(135deg,#66BB6A,#43A047);
+    display:flex; align-items:center; justify-content:center; font-size:1.3rem;
+  }
+  .kid-name { font-weight:800; color:#1A237E; font-size:0.95rem; }
+  .kid-meta { font-size:0.78rem; color:#90A4AE; font-weight:600; }
+  .btn-del {
+    background:#FFEBEE; border:2px solid #FFCDD2; border-radius:10px;
+    padding:6px 12px; color:#E53935; font-weight:800; font-size:0.8rem;
+    cursor:pointer; transition:all 0.2s;
+  }
+  .btn-del:hover { background:#E53935; color:white; }
+  .empty-state { text-align:center; padding:28px 0; color:#B0BEC5; font-weight:700; }
+
+  /* Add child fields */
+  .pw-bars2 { display:flex; gap:4px; margin-top:6px; }
+
+  /* Nav */
+  .top-nav { position:fixed; top:16px; right:16px; display:flex; gap:10px; }
+  .nav-btn {
+    border:none; border-radius:50px; padding:10px 18px;
+    font-family:'Fredoka One',cursive; font-size:0.9rem; cursor:pointer; transition:all 0.2s;
+  }
+  .nav-btn:hover { transform:translateY(-2px); }
+  .nav-back { background:white; color:#3F51B5; box-shadow:0 4px 14px rgba(0,0,0,0.12); border:2px solid #E8EAF6; left:16px; position:fixed; top:16px; }
+  .nav-edu  { background:linear-gradient(135deg,#1A237E,#3949AB); color:white; box-shadow:0 4px 18px rgba(26,35,126,0.4); }
+
+  /* Divider */
+  .or-divider { display:flex; align-items:center; gap:10px; margin:18px 0; }
+  .or-divider span { font-size:0.82rem; color:#B0BEC5; font-weight:700; white-space:nowrap; }
+  .or-divider::before, .or-divider::after { content:''; flex:1; height:2px; background:#F5F5F5; }
+
+  /* Modal */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4);
+    align-items:center; justify-content:center; z-index:100; padding:24px; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:white; border-radius:24px; padding:30px 26px; max-width:360px;
+    width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.25); text-align:center; }
+  .modal h3 { font-family:'Fredoka One',cursive; color:#1A237E; font-size:1.35rem; margin-bottom:8px; }
+  .modal p { color:#546E7A; font-weight:600; font-size:0.88rem; margin-bottom:18px; }
+  .modal-btns { display:flex; gap:10px; }
+  .modal-btns button { flex:1; padding:12px; border-radius:14px; border:none;
+    font-family:'Nunito',sans-serif; font-weight:800; font-size:0.92rem; cursor:pointer; transition:all 0.2s; }
+  .btn-cancel { background:#F5F5F5; color:#546E7A; }
+  .btn-confirm-del { background:#E53935; color:white; }
+
+  /* Spinner */
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .spinner { width:18px; height:18px; border:3px solid rgba(255,255,255,0.4);
+    border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; }
+</style>
+</head>
+<body>
+
+<button class="student-btn" onclick="location.href='index.html'">Student</button>
+<button class="parent-btn" onclick="location.href='parent.html'">👨‍👩‍👧‍👦 Parents</button>
+<button class="edu-btn" onclick="location.href='educator.html'">🎓 Educators</button>
+
+<div class="card">
+  <div class="logo">Math<span>Quest</span> 🚀</div>
+  <div class="badge">👨‍👩‍👧 Parent Portal</div>
+
+  <!-- ═══════════════════════════════════════
+       SIGNUP FLOW  (3 steps)
+  ════════════════════════════════════════ -->
+  <div id="signup-flow">
+
+    <!-- Step indicator -->
+    <div class="steps-wrap">
+      <div class="steps">
+        <div class="step-dot active" id="dot1">1</div>
+        <div class="step-line" id="line1"></div>
+        <div class="step-dot" id="dot2">2</div>
+        <div class="step-line" id="line2"></div>
+        <div class="step-dot" id="dot3">3</div>
+      </div>
+      <div class="steps-labels">
+        <span class="step-label active" id="lbl1">Account</span>
+        <span class="step-label" id="lbl2">Payment</span>
+        <span class="step-label" id="lbl3">Done!</span>
+      </div>
+    </div>
+
+    <!-- Step 1 — Account details -->
+    <div class="panel active" id="step1">
+      <div class="panel-title">Create your account</div>
+      <div class="panel-sub">One account for all your children</div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>First name</label>
+          <input type="text" id="s-fname" placeholder="Jane" autocomplete="given-name">
+        </div>
+        <div class="field">
+          <label>Last name</label>
+          <input type="text" id="s-lname" placeholder="Smith" autocomplete="family-name">
+        </div>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="s-email" placeholder="jane@email.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="s-username" placeholder="janesmith" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="s-pass" placeholder="Choose a password" oninput="checkPw1()">
+        <div class="pw-bars">
+          <div class="pw-bar" id="pb1"></div><div class="pw-bar" id="pb2"></div>
+          <div class="pw-bar" id="pb3"></div><div class="pw-bar" id="pb4"></div>
+        </div>
+        <div class="pw-hint" id="pw-hint1">Enter a password</div>
+      </div>
+      <div class="field">
+        <label>Confirm password</label>
+        <input type="password" id="s-pass2" placeholder="Repeat password">
+      </div>
+
+      <button class="btn-primary" onclick="goToPayment()">Continue to Payment →</button>
+      <div class="msg err" id="err1"></div>
+
+      <div class="or-divider"><span>already have an account?</span></div>
+      <button class="btn-ghost" onclick="showLogin()">Sign in instead</button>
+    </div>
+
+    <!-- Step 2 — Payment -->
+    <div class="panel" id="step2">
+      <div class="price-box">
+        <div class="price-amount"><span class="price-currency">$</span>4.99</div>
+        <div class="price-period">CAD · one-time payment</div>
+        <div class="price-perks">
+          <div class="perk">✅ Unlimited children on one account</div>
+          <div class="perk">✅ Full access to all MathQuest games</div>
+          <div class="perk">✅ Track every child's progress</div>
+          <div class="perk">✅ Yours forever — no subscription</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Name on card</label>
+        <input type="text" id="card-name" placeholder="Jane Smith" autocomplete="cc-name">
+      </div>
+      <div class="field">
+        <span class="stripe-label">Card details</span>
+        <div class="stripe-wrap" id="stripe-wrap">
+          <div id="card-element"></div>
+        </div>
+      </div>
+
+      <div class="secure-note">🔒 Payments secured by Stripe. We never store card details.</div>
+
+      <button class="btn-primary" id="pay-btn" onclick="doPayment()">
+        <span id="pay-btn-text">Pay $4.99 CAD</span>
+        <div class="spinner" id="pay-spinner" style="display:none"></div>
+      </button>
+      <div class="msg err" id="err2"></div>
+      <button class="btn-ghost" onclick="goToStep(1)">← Back</button>
+    </div>
+
+    <!-- Step 3 — Success -->
+    <div class="panel" id="step3">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">You're all set!</div>
+      <div class="success-sub">Your parent account is ready. Save these details — you'll need them to sign in.</div>
+      <div class="creds-box">
+        <div class="creds-row"><span class="creds-key">Username</span><span class="creds-val" id="done-username">—</span></div>
+        <div class="creds-row"><span class="creds-key">Email</span><span class="creds-val" id="done-email">—</span></div>
+      </div>
+      <button class="btn-primary" onclick="goToDashboard()">Go to My Dashboard →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       LOGIN GATE  (existing parents)
+  ════════════════════════════════════════ -->
+  <div id="login-gate" style="display:none">
+    <div class="panel-title">Welcome back!</div>
+    <div class="panel-sub">Sign in to manage your children's accounts</div>
+    <div class="field">
+      <label>Username or Email</label>
+      <input type="text" id="g-user" placeholder="janesmith" onkeydown="if(event.key==='Enter')gateLogin()">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="g-pass" placeholder="Your password" onkeydown="if(event.key==='Enter')gateLogin()">
+    </div>
+    <button class="btn-primary" onclick="gateLogin()">🔑 Sign In</button>
+    <div class="msg err" id="gate-err"></div>
+    <div class="or-divider"><span>new parent?</span></div>
+    <button class="btn-ghost" onclick="showSignup()">Create an account — $4.99 CAD</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       DASHBOARD
+  ════════════════════════════════════════ -->
+  <div id="dashboard" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#1A237E" id="dash-greeting">Hi!</div>
+        <div style="font-size:0.82rem;color:#90A4AE;font-weight:700">Manage your children's accounts</div>
+      </div>
+      <button onclick="signOut()" style="background:#F5F5F5;border:2px solid #E0E0E0;border-radius:12px;padding:7px 13px;font-weight:800;font-size:0.8rem;color:#546E7A;cursor:pointer;">Sign Out</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" id="tab-add" onclick="switchTab('add')">➕ Add Child</button>
+      <button class="tab" id="tab-kids" onclick="switchTab('kids')">👧 My Children</button>
+    </div>
+
+    <!-- Add child -->
+    <div id="dash-add">
+      <div class="field">
+        <label>Child's First Name</label>
+        <input type="text" id="c-name" placeholder="e.g. Emma" oninput="autoUsername()">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="c-user" placeholder="emma2025" oninput="markEdited()">
+        </div>
+        <div class="field">
+          <label>Grade</label>
+          <select id="c-grade" style="width:100%;padding:13px 16px;border-radius:14px;border:3px solid #E0E0E0;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;color:#1A237E;outline:none;background:white;">
+            <option value="">— Grade —</option>
+            <option value="1">Grade 1</option><option value="2">Grade 2</option><option value="3">Grade 3</option>
+            <option value="4">Grade 4</option><option value="5">Grade 5</option><option value="6">Grade 6</option>
+            <option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="c-pass" placeholder="Choose a password" oninput="checkPw2()">
+        <div class="pw-bars2">
+          <div class="pw-bar" id="cp1"></div><div class="pw-bar" id="cp2"></div>
+          <div class="pw-bar" id="cp3"></div><div class="pw-bar" id="cp4"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Confirm Password</label>
+        <input type="password" id="c-pass2" placeholder="Repeat password">
+      </div>
+      <button class="btn-primary" onclick="createChild()">🌟 Create Account</button>
+      <div class="msg" id="add-msg"></div>
+    </div>
+
+    <!-- Kids list -->
+    <div id="dash-kids" style="display:none">
+      <div class="kids-list" id="kids-list"><div class="empty-state">Loading...</div></div>
+      <div class="msg" id="kids-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div class="modal-overlay" id="del-modal">
+  <div class="modal">
+    <div style="font-size:2.2rem;margin-bottom:8px">🗑️</div>
+    <h3>Remove Account?</h3>
+    <p id="del-modal-text">This will permanently delete this child's account.</p>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeDelModal()">Cancel</button>
+      <button class="btn-confirm-del" onclick="confirmDelete()">Remove</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+// ─── CONFIG ────────────────────────────────────────────────
+// Replace with your actual Stripe publishable key
+const STRIPE_PK = 'pk_live_XXXXXXXXXXXXXXXXXXXXXXXX';
+
+let stripe, cardElement;
+let pendingAccount = null; // account details held between step 1 → 2
+let currentParent  = null;
+let deleteTarget   = null;
+let usernameEdited = false;
+
+// ─── STRIPE INIT ───────────────────────────────────────────
+function initStripe() {
+  if (stripe) return;
+  stripe = Stripe(STRIPE_PK);
+  const elements = stripe.elements();
+  cardElement = elements.create('card', {
+    style: {
+      base: { fontFamily: "'Nunito', sans-serif", fontSize: '16px', fontWeight: '700',
+              color: '#1A237E', '::placeholder': { color: '#B0BEC5' } }
+    }
+  });
+  cardElement.mount('#card-element');
+  cardElement.on('focus',  () => document.getElementById('stripe-wrap').classList.add('focused'));
+  cardElement.on('blur',   () => document.getElementById('stripe-wrap').classList.remove('focused'));
+}
+
+// ─── STEP NAVIGATION ──────────────────────────────────────
+function goToStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('step'+i).classList.toggle('active', i === n);
+    const dot = document.getElementById('dot'+i);
+    dot.classList.toggle('active', i === n);
+    dot.classList.toggle('done',   i < n);
+    if (i < 3) {
+      document.getElementById('line'+i).classList.toggle('done', i < n);
+    }
+    const lbl = document.getElementById('lbl'+i);
+    lbl.classList.toggle('active', i === n);
+  });
+  if (n === 2) initStripe();
+}
+
+// ─── STEP 1 → 2 ───────────────────────────────────────────
+async function goToPayment() {
+  const fname = document.getElementById('s-fname').value.trim();
+  const lname = document.getElementById('s-lname').value.trim();
+  const email = document.getElementById('s-email').value.trim();
+  const uname = document.getElementById('s-username').value.trim();
+  const pass  = document.getElementById('s-pass').value;
+  const pass2 = document.getElementById('s-pass2').value;
+  const err   = document.getElementById('err1');
+
+  if (!fname || !lname || !email || !uname || !pass || !pass2) {
+    return setErr(err, 'Please fill in all fields!');
+  }
+  if (!/\S+@\S+\.\S+/.test(email)) return setErr(err, 'Enter a valid email address.');
+  if (pass.length < 6) return setErr(err, 'Password must be at least 6 characters.');
+  if (pass !== pass2)  return setErr(err, "Passwords don't match!");
+
+  // Check username not taken
+  err.className = 'msg ok'; err.textContent = 'Checking username... ⏳';
+  const existing = await apiGet('/parent/' + encodeURIComponent(uname));
+  if (existing && !existing.error) return setErr(err, 'Username already taken. Try another!');
+  err.textContent = '';
+
+  pendingAccount = { fname, lname, email, username: uname, password: btoa(pass) };
+  goToStep(2);
+}
+
+// ─── STEP 2 — PAYMENT ─────────────────────────────────────
+async function doPayment() {
+  const cardName = document.getElementById('card-name').value.trim();
+  const err = document.getElementById('err2');
+  if (!cardName) return setErr(err, 'Enter the name on your card.');
+
+  setLoading(true);
+  err.textContent = '';
+
+  try {
+    // 1. Ask our backend to create a Stripe PaymentIntent
+    const intentRes = await apiPost('/create-payment-intent', {
+      amount: 499,       // CAD cents
+      currency: 'cad',
+      username: pendingAccount.username
+    });
+    if (!intentRes || intentRes.error) {
+      setLoading(false);
+      return setErr(err, intentRes?.error || 'Could not start payment. Try again.');
+    }
+
+    // 2. Confirm the payment with Stripe.js
+    const { error: stripeErr, paymentIntent } = await stripe.confirmCardPayment(
+      intentRes.clientSecret,
+      { payment_method: { card: cardElement, billing_details: { name: cardName, email: pendingAccount.email } } }
+    );
+
+    if (stripeErr) {
+      setLoading(false);
+      return setErr(err, stripeErr.message);
+    }
+
+    if (paymentIntent.status === 'succeeded') {
+      // 3. Create the parent account in KV
+      await apiPost('/parent/' + encodeURIComponent(pendingAccount.username), {
+        name:     pendingAccount.fname + ' ' + pendingAccount.lname,
+        email:    pendingAccount.email,
+        password: pendingAccount.password,
+        paid:     true,
+        paidAt:   Date.now(),
+        stripePaymentIntentId: paymentIntent.id
+      });
+
+      document.getElementById('done-username').textContent = pendingAccount.username;
+      document.getElementById('done-email').textContent    = pendingAccount.email;
+      goToStep(3);
+    } else {
+      setErr(err, 'Payment not completed. Please try again.');
+    }
+  } catch (e) {
+    setErr(err, 'Something went wrong. Please try again.');
+  }
+  setLoading(false);
+}
+
+function setLoading(on) {
+  document.getElementById('pay-btn').disabled = on;
+  document.getElementById('pay-btn-text').textContent = on ? 'Processing...' : 'Pay $4.99 CAD';
+  document.getElementById('pay-spinner').style.display = on ? '' : 'none';
+}
+
+// ─── STEP 3 → DASHBOARD ──────────────────────────────────
+function goToDashboard() {
+  currentParent = pendingAccount;
+  showDashboard();
+}
+
+// ─── VIEW SWITCHING ───────────────────────────────────────
+function showLogin()  {
+  document.getElementById('signup-flow').style.display = 'none';
+  document.getElementById('login-gate').style.display  = '';
+  document.getElementById('dashboard').style.display   = 'none';
+}
+function showSignup() {
+  document.getElementById('signup-flow').style.display = '';
+  document.getElementById('login-gate').style.display  = 'none';
+  document.getElementById('dashboard').style.display   = 'none';
+}
+function showDashboard() {
+  document.getElementById('signup-flow').style.display = 'none';
+  document.getElementById('login-gate').style.display  = 'none';
+  document.getElementById('dashboard').style.display   = '';
+  document.getElementById('dash-greeting').textContent =
+    'Hi, ' + (currentParent.fname || currentParent.name || currentParent.username) + '!';
+}
+
+// ─── LOGIN GATE ───────────────────────────────────────────
+async function gateLogin() {
+  const u = document.getElementById('g-user').value.trim();
+  const p = document.getElementById('g-pass').value;
+  const err = document.getElementById('gate-err');
+  if (!u || !p) return setErr(err, 'Please fill in both fields!');
+  err.className = 'msg ok'; err.textContent = 'Signing in... ⏳';
+  const data = await apiGet('/parent/' + encodeURIComponent(u));
+  if (!data || data.error) return setErr(err, 'Account not found.');
+  if (data.password !== btoa(p)) return setErr(err, 'Wrong password. Try again!');
+  currentParent = { username: u, fname: data.name?.split(' ')[0] || u, ...data };
+  showDashboard();
+}
+
+function signOut() {
+  currentParent = null;
+  document.getElementById('g-user').value = '';
+  document.getElementById('g-pass').value = '';
+  showLogin();
+}
+
+// ─── DASHBOARD TABS ──────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('tab-add').classList.toggle('active',  tab === 'add');
+  document.getElementById('tab-kids').classList.toggle('active', tab === 'kids');
+  document.getElementById('dash-add').style.display  = tab === 'add'  ? '' : 'none';
+  document.getElementById('dash-kids').style.display = tab === 'kids' ? '' : 'none';
+  if (tab === 'kids') loadChildren();
+}
+
+// ─── ADD CHILD ────────────────────────────────────────────
+function autoUsername() {
+  if (usernameEdited) return;
+  const n = document.getElementById('c-name').value.trim().toLowerCase().replace(/\s+/g,'');
+  if (n) document.getElementById('c-user').value = n + new Date().getFullYear();
+}
+function markEdited() { usernameEdited = true; }
+
+function checkPw1() {
+  const pw = document.getElementById('s-pass').value;
+  const bars = ['pb1','pb2','pb3','pb4'].map(id => document.getElementById(id));
+  const hint = document.getElementById('pw-hint1');
+  applyStrength(pw, bars, hint);
+}
+function checkPw2() {
+  const pw = document.getElementById('c-pass').value;
+  const bars = ['cp1','cp2','cp3','cp4'].map(id => document.getElementById(id));
+  applyStrength(pw, bars, null);
+}
+function applyStrength(pw, bars, hint) {
+  let s = 0;
+  if (pw.length >= 4) s++;
+  if (pw.length >= 7) s++;
+  if (/[A-Z\d]/.test(pw)) s++;
+  if (pw.length >= 10) s++;
+  const colors = ['#E53935','#FF9800','#FFC107','#43A047'];
+  const labels = ['Too short','Weak','Good','Strong 💪'];
+  bars.forEach((b, i) => b.style.background = i < s ? colors[s-1] : '#E0E0E0');
+  if (hint) { hint.textContent = pw ? labels[s-1] || '' : 'Enter a password'; hint.style.color = pw && s ? colors[s-1] : '#90A4AE'; }
+}
+
+async function createChild() {
+  const name  = document.getElementById('c-name').value.trim();
+  const uname = document.getElementById('c-user').value.trim();
+  const grade = document.getElementById('c-grade').value;
+  const pass  = document.getElementById('c-pass').value;
+  const pass2 = document.getElementById('c-pass2').value;
+  const msg   = document.getElementById('add-msg');
+  if (!name||!uname||!grade||!pass||!pass2) return setMsg(msg,'Please fill in all fields!',true);
+  if (pass !== pass2) return setMsg(msg,"Passwords don't match!",true);
+  if (pass.length < 4) return setMsg(msg,'Password must be at least 4 characters.',true);
+  setMsg(msg,'Creating account... ⏳',false,'#43A047');
+  const res = await apiPost('/student', { username:uname, name, grade, password:btoa(pass), parentUsername:currentParent.username });
+  if (!res||res.error) return setMsg(msg, res?.error||'Something went wrong.',true);
+  setMsg(msg, `🎉 ${name}'s account is ready!`, false, '#43A047');
+  document.getElementById('c-name').value=''; document.getElementById('c-user').value='';
+  document.getElementById('c-grade').value=''; document.getElementById('c-pass').value='';
+  document.getElementById('c-pass2').value=''; usernameEdited=false;
+  checkPw2();
+}
+
+// ─── CHILDREN LIST ────────────────────────────────────────
+async function loadChildren() {
+  const list = document.getElementById('kids-list');
+  list.innerHTML = '<div class="empty-state">Loading...</div>';
+  const res = await apiGet('/students?parent=' + encodeURIComponent(currentParent.username));
+  if (!res||!res.students||!res.students.length) {
+    list.innerHTML='<div class="empty-state">No children added yet.<br>Use ➕ Add Child!</div>'; return;
+  }
+  const em = ['🐣','🐥','🦊','🐼','🐨','🦁','🐸','🦋'];
+  list.innerHTML = res.students.map((k,i) => `
+    <div class="kid-card">
+      <div class="kid-info">
+        <div class="kid-avatar">${em[i%em.length]}</div>
+        <div>
+          <div class="kid-name">${k.name||k.username}</div>
+          <div class="kid-meta">@${k.username} · ${k.grade||'No grade'}</div>
+        </div>
+      </div>
+      <button class="btn-del" onclick="askDelete('${k.username}','${k.name||k.username}')">Remove</button>
+    </div>`).join('');
+}
+
+function askDelete(username, display) {
+  deleteTarget = username;
+  document.getElementById('del-modal-text').textContent =
+    `This will permanently delete ${display}'s account and all their progress.`;
+  document.getElementById('del-modal').classList.add('open');
+}
+function closeDelModal() { document.getElementById('del-modal').classList.remove('open'); deleteTarget=null; }
+async function confirmDelete() {
+  if (!deleteTarget) return; closeDelModal();
+  const msg = document.getElementById('kids-msg');
+  setMsg(msg,'Removing... ⏳',false,'#43A047');
+  const res = await apiDelete('/student/'+encodeURIComponent(deleteTarget));
+  if (!res||res.error) return setMsg(msg,res?.error||'Could not remove.',true);
+  setMsg(msg,'✅ Removed.',false,'#43A047');
+  loadChildren();
+}
+
+// ─── HELPERS ──────────────────────────────────────────────
+function setErr(el, txt) { el.className='msg err'; el.textContent=txt; }
+function setMsg(el, txt, isErr, color) {
+  el.className='msg'+(isErr?' err':' ok');
+  if(color) el.style.color=color; el.textContent=txt;
+}
+
+if (typeof apiDelete === 'undefined') {
+  window.apiDelete = async (path) => {
+    try { const r = await fetch('/api'+path,{method:'DELETE'}); return await r.json(); }
+    catch { return {error:'Network error'}; }
+  };
+}
+if (typeof apiPost === 'undefined') {
+  window.apiPost = async (path, body) => {
+    try {
+      const r = await fetch('/api'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      return await r.json();
+    } catch { return {error:'Network error'}; }
+  };
+}
+</script>
+  <link rel="stylesheet" href="css/style.css">
+</body>
+</html>

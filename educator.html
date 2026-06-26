@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MathQuest — Educator Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="css/style.css">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
 
@@ -186,11 +187,10 @@
     <button class="auth-btn" onclick="doSignup()">✨ Create Account</button>
     <div class="auth-err" id="signup-err"></div>
   </div>
-  <div style="margin-top:16px;padding-top:14px;border-top:2px solid #F5F5F5">
-    <button onclick="location.href='index.html'" style="background:none;border:none;color:#90A4AE;font-size:0.85rem;font-weight:700;cursor:pointer;">← Back to Student Login</button>
-  </div>
 </div>
-
+<button class="student-btn" onclick="location.href='index.html'">Student</button>
+<button class="parent-btn" onclick="location.href='parent.html'">👨‍👩‍👧‍👦 Parents</button>
+<button class="edu-btn" onclick="location.href='educator.html'">🎓 Educators</button>
 <!-- ══ CLASSES DASHBOARD ══ -->
 <div class="page" id="classes-page">
   <div class="dash-header">
@@ -313,7 +313,9 @@
 </div>
 
 <script src="js/api.js"></script>
+
 <script>
+ 
 // ══════════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════════
