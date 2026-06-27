@@ -199,6 +199,28 @@
   @keyframes spin { to { transform:rotate(360deg); } }
   .spinner { width:18px; height:18px; border:3px solid rgba(255,255,255,0.4);
     border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; }
+
+  /* Kid stats card */
+  .kid-card {
+    background:#F8FBF8; border-radius:16px; padding:16px;
+    border:2px solid #E8F5E9; margin-bottom:12px;
+  }
+  .kid-card-top {
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;
+  }
+  .kid-stats-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+  }
+  .kid-stat {
+    background:white; border-radius:12px; padding:10px 6px;
+    text-align:center; border:2px solid #E8F5E9;
+  }
+  .kid-stat-val {
+    font-family:'Fredoka One',cursive; font-size:1.3rem; color:#1A237E; line-height:1;
+  }
+  .kid-stat-lbl {
+    font-size:0.7rem; font-weight:800; color:#90A4AE; margin-top:3px;
+  }
 </style>
 </head>
 <body>
@@ -575,11 +597,13 @@ function showLogin() {
   document.getElementById('signup-flow').style.display = 'none';
   document.getElementById('login-gate').style.display  = '';
   document.getElementById('dashboard').style.display   = 'none';
+  document.querySelector('.card').style.maxWidth = '460px';
 }
 function showSignup() {
   document.getElementById('signup-flow').style.display = '';
   document.getElementById('login-gate').style.display  = 'none';
   document.getElementById('dashboard').style.display   = 'none';
+  document.querySelector('.card').style.maxWidth = '460px';
 }
 function showDashboard() {
   document.getElementById('signup-flow').style.display = 'none';
@@ -587,6 +611,7 @@ function showDashboard() {
   document.getElementById('dashboard').style.display   = '';
   document.getElementById('dash-greeting').textContent =
     'Hi, ' + (currentParent.fname || currentParent.name || currentParent.username) + '!';
+  document.querySelector('.card').style.maxWidth = '720px';
 }
 
 // ─── LOGIN GATE ───────────────────────────────────────────
@@ -679,16 +704,31 @@ async function loadChildren() {
     list.innerHTML='<div class="empty-state">No children added yet.<br>Use ➕ Add Child!</div>'; return;
   }
   const em = ['🐣','🐥','🦊','🐼','🐨','🦁','🐸','🦋'];
-  list.innerHTML = res.students.map((k,i) => `
+  // Fetch progress for each child in parallel
+  const withStats = await Promise.all(res.students.map(async (k, i) => {
+    const prog = await apiGet('/progress/' + encodeURIComponent(k.username));
+    return { ...k, emoji: em[i % em.length],
+      level: prog?.playerLevel || 1, stars: prog?.totalStars || 0,
+      games: prog?.gamesPlayed || 0, streak: prog?.streak || 0 };
+  }));
+  list.innerHTML = withStats.map(k => `
     <div class="kid-card">
-      <div class="kid-info">
-        <div class="kid-avatar">${em[i%em.length]}</div>
-        <div>
-          <div class="kid-name">${k.name||k.username}</div>
-          <div class="kid-meta">@${k.username} · ${k.grade||'No grade'}</div>
+      <div class="kid-card-top">
+        <div class="kid-info">
+          <div class="kid-avatar">${k.emoji}</div>
+          <div>
+            <div class="kid-name">${k.name||k.username}</div>
+            <div class="kid-meta">@${k.username} &nbsp;·&nbsp; Grade ${k.grade||'—'}</div>
+          </div>
         </div>
+        <button class="btn-del" onclick="askDelete('${k.username}','${k.name||k.username}')">Remove</button>
       </div>
-      <button class="btn-del" onclick="askDelete('${k.username}','${k.name||k.username}')">Remove</button>
+      <div class="kid-stats-grid">
+        <div class="kid-stat"><span class="kid-stat-val">⚡ ${k.level}</span><span class="kid-stat-lbl">Level</span></div>
+        <div class="kid-stat"><span class="kid-stat-val">⭐ ${k.stars}</span><span class="kid-stat-lbl">Stars</span></div>
+        <div class="kid-stat"><span class="kid-stat-val">🎮 ${k.games}</span><span class="kid-stat-lbl">Games</span></div>
+        <div class="kid-stat"><span class="kid-stat-val">🔥 ${k.streak}</span><span class="kid-stat-lbl">Streak</span></div>
+      </div>
     </div>`).join('');
 }
 
