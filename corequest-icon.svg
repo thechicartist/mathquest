@@ -1,0 +1,29 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="coreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#1E3A8A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded square backdrop -->
+  <rect x="4" y="4" width="192" height="192" rx="42" fill="url(#coreGradient)"/>
+
+  <!-- Quest path: dashed orbit ring, open at the top-right like a "C" -->
+  <circle cx="100" cy="100" r="62" fill="none" stroke="#FFFFFF" stroke-width="7"
+          stroke-linecap="round" stroke-dasharray="10 11"
+          stroke-dashoffset="2"
+          transform="rotate(-38 100 100)"
+          opacity="0.9"/>
+
+  <!-- Arrowhead at the end of the path, suggesting forward motion / quest -->
+  <path d="M 156 63 L 170 55 L 166 71 Z" fill="#FB923C"/>
+
+  <!-- Core: solid center circle representing core subjects -->
+  <circle cx="100" cy="100" r="30" fill="#FFFFFF"/>
+
+  <!-- Three small dots inside the core representing Math, English, Science -->
+  <circle cx="86" cy="108" r="6.5" fill="#2563EB"/>
+  <circle cx="100" cy="86" r="6.5" fill="#FB923C"/>
+  <circle cx="114" cy="108" r="6.5" fill="#16A34A"/>
+</svg>
