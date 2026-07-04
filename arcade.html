@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Star Fuel Arcade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep: #0A0E27;
+    --bg-panel: #131933;
+    --bg-panel-2: #1C2444;
+    --nebula: #8B5CF6;
+    --magenta: #EC4899;
+    --fuel: #FBBF24;
+    --fuel-dim: #92650f;
+    --text: #E2E8F0;
+    --muted: #64748B;
+    --danger: #F87171;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; height:100%;
+    background:var(--bg-deep);
+    color:var(--text);
+    font-family:'Space Grotesk', sans-serif;
+    overflow:hidden;
+  }
+  .stars, .stars2, .stars3{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-repeat:repeat;
+  }
+  .stars{
+    background-image: radial-gradient(1px 1px at 20px 30px, #fff, transparent),
+                       radial-gradient(1px 1px at 90px 80px, #fff, transparent),
+                       radial-gradient(1px 1px at 160px 40px, #fff, transparent),
+                       radial-gradient(1px 1px at 220px 110px, #fff, transparent);
+    background-size: 240px 160px;
+    opacity:0.5;
+    animation: drift 60s linear infinite;
+  }
+  .stars2{
+    background-image: radial-gradient(1.5px 1.5px at 50px 60px, var(--fuel), transparent),
+                       radial-gradient(1.5px 1.5px at 140px 20px, var(--nebula), transparent),
+                       radial-gradient(1.5px 1.5px at 200px 140px, var(--magenta), transparent);
+    background-size: 260px 200px;
+    opacity:0.35;
+    animation: drift 90s linear infinite reverse;
+  }
+  @keyframes drift{
+    from{ background-position: 0 0; }
+    to{ background-position: -1000px 500px; }
+  }
+
+  #app{
+    position:relative; z-index:1;
+    height:100%;
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+  }
+
+  .panel{
+    background: linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+    border:1px solid rgba(139,92,246,0.35);
+    border-radius:18px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.02), 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(139,92,246,0.08);
+    padding:36px 40px;
+    max-width:480px;
+    width:100%;
+    text-align:center;
+  }
+
+  h1.brand{
+    font-family:'Orbitron', sans-serif;
+    font-weight:900;
+    font-size:1.6rem;
+    letter-spacing:0.08em;
+    margin:0 0 4px 0;
+    background: linear-gradient(90deg, var(--fuel), var(--magenta));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .tagline{ color:var(--muted); font-size:0.85rem; margin-bottom:28px; letter-spacing:0.03em; }
+
+  .gauge-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:22px; }
+  .gauge{
+    position:relative; width:150px; height:150px;
+  }
+  .gauge svg{ transform: rotate(-90deg); width:100%; height:100%; }
+  .gauge-track{ stroke: rgba(255,255,255,0.08); }
+  .gauge-fill{ stroke: var(--fuel); stroke-linecap:round; transition: stroke-dashoffset 0.4s ease; filter: drop-shadow(0 0 6px var(--fuel)); }
+  .gauge-center{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .gauge-xp{ font-family:'Orbitron', sans-serif; font-size:1.5rem; font-weight:700; color:var(--fuel); }
+  .gauge-label{ font-size:0.65rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin-top:2px; }
+
+  .rate-note{ font-size:0.78rem; color:var(--muted); margin-bottom:22px; line-height:1.5; }
+  .rate-note b{ color:var(--text); }
+
+  button.primary{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:1rem;
+    padding:14px 28px;
+    border-radius:12px;
+    border:none;
+    cursor:pointer;
+    background: linear-gradient(90deg, var(--nebula), var(--magenta));
+    color:white;
+    width:100%;
+    letter-spacing:0.02em;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 8px 24px rgba(236,72,153,0.25);
+  }
+  button.primary:hover{ transform: translateY(-1px); box-shadow: 0 10px 28px rgba(236,72,153,0.35); }
+  button.primary:disabled{
+    background: var(--bg-panel-2);
+    color:var(--muted);
+    cursor:not-allowed;
+    box-shadow:none;
+    transform:none;
+  }
+  button.secondary{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:0.85rem;
+    padding:10px 18px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.15);
+    background:transparent;
+    color:var(--muted);
+    cursor:pointer;
+    margin-top:12px;
+  }
+  button.secondary:hover{ color:var(--text); border-color:rgba(255,255,255,0.3); }
+
+  .locked-msg{
+    background: rgba(248,113,113,0.1);
+    border:1px solid rgba(248,113,113,0.3);
+    color:#FCA5A5;
+    font-size:0.82rem;
+    padding:10px 14px;
+    border-radius:10px;
+    margin-bottom:18px;
+  }
+
+  /* ---- Game screen ---- */
+  #gameScreen{ display:none; }
+  .hud{
+    display:flex; justify-content:space-between; align-items:center;
+    width:100%; max-width:640px; margin: 0 auto 10px auto;
+    font-family:'Orbitron', sans-serif; font-size:0.85rem;
+    padding:0 4px;
+  }
+  .hud .fuel-bar-wrap{
+    flex:1; margin:0 16px; height:10px; border-radius:6px; background:rgba(255,255,255,0.08); overflow:hidden;
+  }
+  .hud .fuel-bar{
+    height:100%; background: linear-gradient(90deg, var(--fuel), var(--magenta));
+    width:100%; transition: width 0.2s linear;
+  }
+  #canvasWrap{
+    position:relative; width:100%; max-width:640px; margin:0 auto;
+    border-radius:16px; overflow:hidden; border:1px solid rgba(139,92,246,0.35);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  canvas{ display:block; width:100%; background: radial-gradient(ellipse at 50% 0%, #16204a, #05070f 80%); touch-action:none; }
+
+  .touch-controls{
+    display:flex; justify-content:space-between; max-width:640px; margin:14px auto 0 auto; gap:12px;
+  }
+  .touch-btn{
+    flex:1; padding:16px; text-align:center; font-family:'Orbitron'; font-size:1.2rem;
+    background: var(--bg-panel-2); border:1px solid rgba(255,255,255,0.1); border-radius:12px;
+    color:var(--text); user-select:none; -webkit-user-select:none;
+  }
+  .touch-btn:active{ background: var(--nebula); }
+
+  #endScreen{
+    display:none;
+  }
+  #endScreen .score-big{
+    font-family:'Orbitron', sans-serif; font-size:2.4rem; font-weight:900; color:var(--fuel);
+    margin: 10px 0;
+  }
+
+  @media (min-width: 700px){
+    .touch-controls{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars"></div>
+<div class="stars2"></div>
+
+<div id="app">
+
+  <!-- GATE SCREEN -->
+  <div class="panel" id="gateScreen">
+    <a href="math.html" style="display:inline-block; color:var(--muted); font-size:0.8rem; text-decoration:none; margin-bottom:14px;">← Back to CoreQuest</a>
+    <h1 class="brand">STAR FUEL ARCADE</h1>
+    <div class="tagline">Trade XP for flight time. Dodge asteroids, collect stardust.</div>
+
+    <div class="gauge-wrap">
+      <div class="gauge">
+        <svg viewBox="0 0 150 150">
+          <circle class="gauge-track" cx="75" cy="75" r="64" fill="none" stroke-width="10"/>
+          <circle class="gauge-fill" id="gateGaugeFill" cx="75" cy="75" r="64" fill="none" stroke-width="10"
+                  stroke-dasharray="402" stroke-dashoffset="402"/>
+        </svg>
+        <div class="gauge-center">
+          <div class="gauge-xp" id="gateXpValue">0</div>
+          <div class="gauge-label">XP available</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="lockedMsg" class="locked-msg" style="display:none;">
+      You need at least 1000 XP to launch. Keep solving problems to refuel!
+    </div>
+
+    <div class="rate-note">Rate: <b>1000 XP = 5 minutes</b> of flight time.<br>Your full balance converts to playtime and is spent when you launch.</div>
+
+    <button class="primary" id="launchBtn">Launch (— min —s)</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="gameScreen" style="width:100%; max-width:640px;">
+    <div class="hud">
+      <span id="hudTime">05:00</span>
+      <div class="fuel-bar-wrap"><div class="fuel-bar" id="fuelBar"></div></div>
+      <span id="hudScore">0 ✦</span>
+    </div>
+    <div id="canvasWrap">
+      <canvas id="gameCanvas" width="640" height="420"></canvas>
+    </div>
+    <div class="touch-controls">
+      <div class="touch-btn" id="btnLeft">◀</div>
+      <div class="touch-btn" id="btnRight">▶</div>
+    </div>
+    <div style="text-align:center;">
+      <button class="secondary" id="quitBtn">End session</button>
+    </div>
+  </div>
+
+  <!-- END SCREEN -->
+  <div class="panel" id="endScreen">
+    <h1 class="brand" id="endTitle">FUEL EMPTY</h1>
+    <div class="tagline">Session complete</div>
+    <div class="score-big" id="finalScore">0</div>
+    <div class="tagline">stardust collected</div>
+    <button class="primary" id="backBtn">Back to base</button>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================================
+   XP INTEGRATION LAYER — wired to MathQuest's real storage
+   -------------------------------------------------------------------------
+   Reads/writes the same "mq_progress_<username>" blob that math.html /
+   english.html / science.html already save to localStorage.
+
+   IMPORTANT: this uses a NEW field, `arcadeXP`, as the spendable wallet —
+   NOT `playerXP`. That's deliberate: `playerXP` resets every level-up
+   (it's progress toward the next level, capped under playerLevel*100), so
+   a Level 1 student could never reach 1000 even after weeks of practice.
+   `arcadeXP` accumulates every time addXP() runs and only goes down when
+   spent here, so it behaves like a real currency while leaving your
+   leveling bar completely untouched.
+
+   This means addXP() in math.html / english.html / science.html needs ONE
+   extra line so the wallet actually fills up:
+
+     function addXP(amount){
+       const old=playerLevel;
+       playerXP+=amount;
+       arcadeXP=(arcadeXP||0)+amount;   // <-- add this line
+       const needed=playerLevel*100;
+       ...
+     }
+
+   And add `arcadeXP` to the two spots that build/read the save blob:
+     save():  const data={totalStars,playerXP,playerLevel,streak,gamesPlayed,topicGames,engTopicGames,engGamesPlayed,arcadeXP};
+     load():  arcadeXP = d.arcadeXP || 0;
+   ========================================================================= */
+
+  const currentUser = JSON.parse(sessionStorage.getItem('mq_user'));
+  if (!currentUser) {
+    location.href = 'index.html'; // same guard math.html/english.html use
+  }
+
+  function loadProgress() {
+    const raw = localStorage.getItem('mq_progress_' + currentUser.username);
+    return raw ? JSON.parse(raw) : {
+      totalStars: 0, playerXP: 0, playerLevel: 1, streak: 0, gamesPlayed: 0,
+      topicGames: {}, engTopicGames: {}, engGamesPlayed: 0, arcadeXP: 0
+    };
+  }
+
+  function saveProgress(data) {
+    localStorage.setItem('mq_progress_' + currentUser.username, JSON.stringify(data));
+  }
+
+  async function getStudentXP() {
+    const data = loadProgress();
+    return data.arcadeXP || 0;
+  }
+
+  async function spendStudentXP(amount) {
+    const data = loadProgress();
+    data.arcadeXP = Math.max(0, (data.arcadeXP || 0) - amount);
+    saveProgress(data); // preserves every other field (stars, level, quests, etc.)
+    return data.arcadeXP;
+  }
+
+/* ========================= GAME CONFIG ========================= */
+  const XP_PER_BLOCK = 0;        // XP cost
+  const SECONDS_PER_BLOCK = 300;    // 5 minutes per block
+  const SEC_PER_XP = SECONDS_PER_BLOCK / XP_PER_BLOCK; // 0.3 sec per XP point
+
+  const gateScreen = document.getElementById('gateScreen');
+  const gameScreen = document.getElementById('gameScreen');
+  const endScreen  = document.getElementById('endScreen');
+
+  const gateXpValue = document.getElementById('gateXpValue');
+  const gateGaugeFill = document.getElementById('gateGaugeFill');
+  const lockedMsg = document.getElementById('lockedMsg');
+  const launchBtn = document.getElementById('launchBtn');
+
+  const GAUGE_CIRC = 402; // 2 * PI * r(64)
+
+  function formatMinSec(totalSeconds){
+    const m = Math.floor(totalSeconds/60);
+    const s = Math.floor(totalSeconds%60);
+    return `${m}:${s.toString().padStart(2,'0')}`;
+  }
+
+  async function refreshGate(){
+    const xp = await getStudentXP();
+    gateXpValue.textContent = xp;
+    const pct = Math.min(1, xp / (XP_PER_BLOCK * 5)); // gauge maxes visually at 5000xp
+    gateGaugeFill.setAttribute('stroke-dashoffset', GAUGE_CIRC * (1 - pct));
+
+    if (xp < XP_PER_BLOCK){
+      lockedMsg.style.display = 'block';
+      launchBtn.disabled = true;
+      launchBtn.textContent = 'Need 1000 XP to launch';
+    } else {
+      lockedMsg.style.display = 'none';
+      launchBtn.disabled = false;
+      const seconds = Math.floor(xp * SEC_PER_XP);
+      launchBtn.textContent = `Launch (${formatMinSec(seconds)} flight time)`;
+    }
+  }
+
+  launchBtn.addEventListener('click', async () => {
+    const xp = await getStudentXP();
+    if (xp < XP_PER_BLOCK) return;
+    const playSeconds = Math.floor(xp * SEC_PER_XP);
+    await spendStudentXP(xp); // spend the FULL balance up front — this is the "consumed" cost of the session
+    startGame(playSeconds);
+  });
+
+/* ========================= GAME ========================= */
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const hudTime = document.getElementById('hudTime');
+  const hudScore = document.getElementById('hudScore');
+  const fuelBar = document.getElementById('fuelBar');
+  const quitBtn = document.getElementById('quitBtn');
+  const btnLeft = document.getElementById('btnLeft');
+  const btnRight = document.getElementById('btnRight');
+
+  let raf = null;
+  let totalPlaySeconds = 0;
+  let remainingMs = 0;
+  let lastTs = 0;
+  let score = 0;
+  let ship, asteroids, stardust, keys;
+
+  function resetGameState(){
+    ship = { x: canvas.width/2, y: canvas.height - 40, w: 34, h: 24, speed: 5, vx: 0 };
+    asteroids = [];
+    stardust = [];
+    keys = { left:false, right:false };
+    score = 0;
+    lastSpawnA = 0;
+    lastSpawnS = 0;
+    difficultyTimer = 0;
+    fallSpeed = 2.2;
+  }
+
+  let lastSpawnA = 0, lastSpawnS = 0, difficultyTimer = 0, fallSpeed = 2.2;
+
+  function startGame(playSeconds){
+    totalPlaySeconds = playSeconds;
+    remainingMs = playSeconds * 1000;
+    resetGameState();
+    gateScreen.style.display = 'none';
+    endScreen.style.display = 'none';
+    gameScreen.style.display = 'block';
+    fitCanvas(); // container was hidden (width 0) until now, so size it after it's visible
+    lastTs = performance.now();
+    raf = requestAnimationFrame(loop);
+  }
+
+  function endGame(reason){
+    cancelAnimationFrame(raf);
+    gameScreen.style.display = 'none';
+    endScreen.style.display = 'block';
+    document.getElementById('endTitle').textContent = reason === 'empty' ? 'FUEL EMPTY' : 'SESSION ENDED';
+    document.getElementById('finalScore').textContent = score;
+  }
+
+  function loop(ts){
+    const dt = ts - lastTs;
+    lastTs = ts;
+    remainingMs -= dt;
+    difficultyTimer += dt;
+
+    if (remainingMs <= 0){
+      endGame('empty');
+      return;
+    }
+
+    update(dt);
+    draw();
+
+    hudTime.textContent = formatMinSec(remainingMs/1000);
+    hudScore.textContent = score + ' ✦';
+    fuelBar.style.width = Math.max(0, (remainingMs / (totalPlaySeconds*1000)) * 100) + '%';
+
+    raf = requestAnimationFrame(loop);
+  }
+
+  function update(dt){
+    // difficulty ramps slowly over the session
+    fallSpeed = 2.2 + Math.min(3, difficultyTimer / 15000);
+
+    // ship movement
+    if (keys.left) ship.vx = -ship.speed;
+    else if (keys.right) ship.vx = ship.speed;
+    else ship.vx = 0;
+    ship.x += ship.vx * (dt/16.6);
+    ship.x = Math.max(ship.w/2, Math.min(canvas.width - ship.w/2, ship.x));
+
+    // spawn asteroids
+    lastSpawnA += dt;
+    if (lastSpawnA > 750){
+      lastSpawnA = 0;
+      asteroids.push({ x: Math.random()*canvas.width, y:-20, r: 14 + Math.random()*14, spin: Math.random()*0.1 });
+    }
+    // spawn stardust
+    lastSpawnS += dt;
+    if (lastSpawnS > 1100){
+      lastSpawnS = 0;
+      stardust.push({ x: Math.random()*canvas.width, y:-10, r:6 });
+    }
+
+    // move + collide asteroids
+    for (let i = asteroids.length-1; i>=0; i--){
+      const a = asteroids[i];
+      a.y += fallSpeed * (dt/16.6);
+      if (a.y > canvas.height + 30) { asteroids.splice(i,1); continue; }
+      if (dist(a.x,a.y, ship.x, ship.y) < a.r + 14){
+        asteroids.splice(i,1);
+        score = Math.max(0, score - 5);
+        flash = 8;
+      }
+    }
+    // move + collide stardust
+    for (let i = stardust.length-1; i>=0; i--){
+      const s = stardust[i];
+      s.y += (fallSpeed*0.9) * (dt/16.6);
+      if (s.y > canvas.height + 20) { stardust.splice(i,1); continue; }
+      if (dist(s.x,s.y, ship.x, ship.y) < s.r + 14){
+        stardust.splice(i,1);
+        score += 10;
+      }
+    }
+    if (flash > 0) flash -= 1;
+  }
+
+  let flash = 0;
+  function dist(x1,y1,x2,y2){ return Math.hypot(x1-x2, y1-y2); }
+
+  function draw(){
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+
+    if (flash > 0){
+      ctx.fillStyle = `rgba(248,113,113,${flash/24})`;
+      ctx.fillRect(0,0,canvas.width, canvas.height);
+    }
+
+    // stardust
+    ctx.fillStyle = '#FBBF24';
+    stardust.forEach(s => {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.shadowColor = '#FBBF24';
+      ctx.shadowBlur = 10;
+      ctx.fill();
+    });
+    ctx.shadowBlur = 0;
+
+    // asteroids
+    ctx.fillStyle = '#5B4636';
+    ctx.strokeStyle = '#8B5CF6';
+    asteroids.forEach(a => {
+      ctx.beginPath();
+      ctx.arc(a.x, a.y, a.r, 0, Math.PI*2);
+      ctx.fill();
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    });
+
+    // ship
+    ctx.save();
+    ctx.translate(ship.x, ship.y);
+    ctx.fillStyle = '#EC4899';
+    ctx.beginPath();
+    ctx.moveTo(0, -ship.h/2);
+    ctx.lineTo(ship.w/2, ship.h/2);
+    ctx.lineTo(-ship.w/2, ship.h/2);
+    ctx.closePath();
+    ctx.shadowColor = '#EC4899';
+    ctx.shadowBlur = 12;
+    ctx.fill();
+    ctx.restore();
+    ctx.shadowBlur = 0;
+  }
+
+  // controls
+  window.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
+    if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
+  });
+  window.addEventListener('keyup', e => {
+    if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
+    if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
+  });
+  function bindTouch(el, dir){
+    const set = v => e => { e.preventDefault(); keys[dir] = v; };
+    el.addEventListener('touchstart', set(true));
+    el.addEventListener('touchend', set(false));
+    el.addEventListener('mousedown', set(true));
+    el.addEventListener('mouseup', set(false));
+    el.addEventListener('mouseleave', set(false));
+  }
+  bindTouch(btnLeft, 'left');
+  bindTouch(btnRight, 'right');
+
+  quitBtn.addEventListener('click', () => endGame('quit'));
+  document.getElementById('backBtn').addEventListener('click', async () => {
+    endScreen.style.display = 'none';
+    gateScreen.style.display = 'block';
+    await refreshGate();
+  });
+
+  // responsive canvas
+  function fitCanvas(){
+    const wrap = document.getElementById('canvasWrap');
+    const w = wrap.clientWidth;
+    canvas.style.height = (w * (420/640)) + 'px';
+  }
+  window.addEventListener('resize', fitCanvas);
+  fitCanvas();
+
+  refreshGate();
+</script>
+
+</body>
+</html>

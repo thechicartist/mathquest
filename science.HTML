@@ -192,6 +192,7 @@
     <a href="math.html" class="switch-btn">🚀 Math</a>
     <a href="english.html" class="switch-btn">📖 English</a>
     <a href="science.html" class="switch-btn">🔬 Science</a>
+    <a href="arcade.html" class="switch-btn">🎮 Arcade</a>
   </div>
   <div class="header-right">
     <div class="quest-btn-wrap">
@@ -336,7 +337,7 @@ const TOTAL_QS=10;
 let sciTopic=null, difficulty='easy';
 let questions=[], currentQ=0, score=0;
 let timerInterval, timeLeft=20;
-let totalStars=0, streak=0, playerXP=0, playerLevel=1, gamesPlayed=0;
+let totalStars=0, streak=0, playerXP=0, playerLevel=1, arcadeXP=0, gamesPlayed=0;
 let segStates=[], maxStreakThisGame=0;
 let topicGames={};
 
@@ -764,7 +765,7 @@ function showUnlockToast(topics){const label=topics.length===1?topics[0]:topics.
 async function retryGame(){questions=[];await startGame();}
 
 // ── XP ──
-function addXP(amount){playerXP+=amount;const needed=playerLevel*100;if(playerXP>=needed){playerXP-=needed;playerLevel++;setTimeout(()=>showLevelUp(playerLevel),600);}updatePlayerUI();}
+function addXP(amount){playerXP+=amount;arcadeXP=(arcadeXP||0)+amount;const needed=playerLevel*100;if(playerXP>=needed){playerXP-=needed;playerLevel++;setTimeout(()=>showLevelUp(playerLevel),600);}updatePlayerUI();}
 function showLevelUp(newLvl){const av=getAvatar(newLvl);const popup=document.createElement('div');popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center';popup.innerHTML=`<div style="background:white;border-radius:28px;padding:40px 32px;text-align:center;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);border:4px solid #80CBC4"><div style="font-size:4rem;margin-bottom:8px">${av.emoji}</div><div style="font-family:'Fredoka One',cursive;font-size:2rem;color:#1A237E;margin-bottom:6px">LEVEL UP! 🎉</div><div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#00695C;margin-bottom:8px">Level ${newLvl} reached!</div><button onclick="this.parentElement.parentElement.remove()" style="background:linear-gradient(135deg,#00695C,#00897B);color:white;border:none;border-radius:16px;padding:14px 32px;font-family:'Fredoka One',cursive;font-size:1.2rem;cursor:pointer">Awesome! 🚀</button></div>`;document.body.appendChild(popup);launchConfetti();}
 
 // ── TIMER ──
