@@ -136,8 +136,7 @@
   .btn-secondary { flex:1; padding:14px; background:#E8EAF6; border:3px solid #9FA8DA; color:#3949AB; border-radius:16px; font-family:'Fredoka One',cursive; font-size:1.1rem; cursor:pointer; transition:all 0.2s; }
   .btn-secondary:hover { background:#3F51B5; color:white; transform:translateY(-3px); }
   .btn-primary { flex:1; padding:14px; background:linear-gradient(135deg,#FF7043,#FF5722); border:none; color:white; border-radius:16px; font-family:'Fredoka One',cursive; font-size:1.1rem; cursor:pointer; transition:all 0.2s; box-shadow:0 6px 20px rgba(255,87,34,0.4); }
-  .btn-primary:hover:not(:disabled) { transform:translateY(-3px); }
-  .btn-primary:disabled { opacity:0.4; cursor:not-allowed; box-shadow:none; }
+  .btn-primary:hover { transform:translateY(-3px); }
 
   .unlock-toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px); background:linear-gradient(135deg,#7C4DFF,#651FFF); color:white; border-radius:20px; padding:14px 24px; font-family:'Fredoka One',cursive; font-size:1.1rem; box-shadow:0 8px 30px rgba(124,77,255,0.5); z-index:9999; opacity:0; pointer-events:none; transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1); white-space:nowrap; }
   .unlock-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
@@ -174,10 +173,6 @@
   .quest-claim-btn:hover { transform:scale(1.05); }
   .quest-done-badge { flex-shrink:0; color:#AB47BC; font-size:1.5rem; }
 
-.palette-btn { font-size:1.6rem; background:white; border:3px solid #CFD8DC; border-radius:14px; padding:8px 12px; cursor:pointer; transition:all 0.2s; }
-  .palette-btn.selected { border-color:#7C4DFF; background:#F3E5F5; transform:translateY(-3px); }
-  .build-cell { aspect-ratio:1; background:#F5F5F5; border:2px solid #E0E0E0; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; cursor:pointer; transition:all 0.15s; }
-  .build-cell:hover { background:#EDE7F6; transform:scale(1.08); }
   @media(max-width:500px){
     .hero-title{font-size:2rem} .answers-grid{grid-template-columns:1fr}
     .question-text{font-size:1.5rem} .topics-grid{grid-template-columns:1fr 1fr}
@@ -279,29 +274,6 @@
       </div>
     </div>
     <button class="play-btn" id="play-btn" onclick="startGame()" disabled>🚀 Pick a Topic First!</button>
-
-    <div class="grade-section" style="margin-top:24px;">
-      <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">🏗️ Your World <span id="world-completion" style="font-size:0.85rem;color:#7C4DFF;">0% built</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-        <div style="font-size:0.9rem;color:#78909C;font-weight:700;">XP to next session: <span id="world-xp-total">0</span> / 1000</div>
-        <div style="font-size:0.9rem;color:#78909C;font-weight:700;">Sessions banked: <span id="world-sessions">0</span></div>
-      </div>
-      <div class="lock-progress-wrap" style="margin-bottom:16px;">
-        <div class="lock-progress-fill" id="world-progress-fill" style="width:0%"></div>
-      </div>
-      <div id="world-grid" style="display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-bottom:18px;"></div>
-      <div style="font-size:0.9rem;font-weight:800;color:#3949AB;margin-bottom:8px;">👪 Parent settings: minutes per session</div>
-      <div style="display:flex;gap:8px;margin-bottom:16px;">
-        <button class="min-btn diff-btn d-easy" data-min="0" onclick="setParentMinutes(0)">0</button>
-        <button class="min-btn diff-btn d-easy" data-min="5" onclick="setParentMinutes(5)">5</button>
-        <button class="min-btn diff-btn d-easy" data-min="10" onclick="setParentMinutes(10)">10</button>
-        <button class="min-btn diff-btn d-easy" data-min="15" onclick="setParentMinutes(15)">15</button>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div id="world-status" style="font-size:0.9rem;color:#78909C;font-weight:700;">Earn 1000 more XP for a session</div>
-        <button class="btn-primary" id="world-play-btn" onclick="playSession()" disabled style="flex:none;padding:10px 20px;">▶️ Play</button>
-      </div>
-    </div>
   </div>
 
   <!-- MATH GAME -->
@@ -320,16 +292,7 @@
     <div class="feedback" id="feedback"></div>
     <button class="next-btn" id="next-btn" onclick="nextQuestion()" style="display:none">Next Question →</button>
   </div>
-  <!-- PLAYTIME GAME -->
-  <div class="screen" id="screen-playtime">
-    <div class="game-header">
-      <button class="back-btn" onclick="endSession()">🚪 End Early</button>
-      <div style="flex:1;text-align:center;font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--navy);">🏗️ Build Your World</div>
-      <div id="playtime-timer" style="font-family:'Fredoka One',cursive;font-size:1.2rem;color:#FF7043;">⏱️ 5:00</div>
-    </div>
-    <div id="block-palette" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;"></div>
-    <div id="build-grid" style="display:grid;gap:4px;background:white;border-radius:20px;padding:16px;box-shadow:0 8px 30px var(--shadow);border:3px solid #E8EAF6;"></div>
-  </div>
+
   <!-- MATH RESULTS -->
   <div class="screen" id="screen-results">
     <div class="results-card">
@@ -383,15 +346,7 @@ let totalStars=0, streak=0, playerXP=0, playerLevel=1, gamesPlayed=0;
 let segStates=[], maxStreakThisGame=0;
 let topicGames={};
 let engTopicGames={}, engGamesPlayed=0;
-let worldXP=0, sessionsBanked=0, sessionActive=false, sessionSecondsLeft=0, sessionTimerId=null;
-let parentMinutes=5;
-let worldBlocks={}, selectedBlock='🌳';
-let unlockedBlocks=['🌳','🧱','🌊','🌿'];
-let milestonesHit=[];
-const GRID_COLS=14, GRID_ROWS=8;
-const TOTAL_CELLS=GRID_COLS*GRID_ROWS;
-const MILESTONES=[{pct:0.25,title:'Getting Started!',unlock:'🪨'},{pct:0.5,title:'Halfway Hero!',unlock:'🏠'},{pct:0.75,title:'Almost There!',unlock:'🌸'},{pct:1.0,title:'World Complete!',unlock:'⭐'}];
-const CREATURE_COMBOS=[{a:'🌳',b:'🌊',creature:'🦆'},{a:'🌿',b:'🪨',creature:'🐰'},{a:'🏠',b:'🌸',creature:'🦋'},{a:'🌳',b:'🌳',creature:'🐿️'}];
+
 const UNLOCK_CHAIN = {
   counting  : [{ prereq:'addsubt',   needed:4,  difficulty:'easy',   minScore:6  }],
   addsubt   : [{ prereq:'counting',  needed:4,  difficulty:'easy',   minScore:6  },
@@ -430,12 +385,12 @@ function getLockInfo(t){
 
 // ── PERSISTENCE (localStorage shared with english.html) ──
 function save(){
-  const data={totalStars,playerXP,playerLevel,streak,gamesPlayed,topicGames,engTopicGames,engGamesPlayed,worldXP,sessionsBanked,parentMinutes,worldBlocks,unlockedBlocks,milestonesHit};
+  const data={totalStars,playerXP,playerLevel,streak,gamesPlayed,topicGames,engTopicGames,engGamesPlayed};
   localStorage.setItem('mq_progress_'+currentUser.username, JSON.stringify(data));
 }
 function load(){
   const raw=localStorage.getItem('mq_progress_'+currentUser.username);
-  if(raw){const d=JSON.parse(raw);totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.gamesPlayed||0;topicGames=d.topicGames||{};engTopicGames=d.engTopicGames||{};engGamesPlayed=d.engGamesPlayed||0;worldXP=d.worldXP||0;sessionsBanked=d.sessionsBanked||0;parentMinutes=d.parentMinutes!==undefined?d.parentMinutes:5;worldBlocks=d.worldBlocks||{};unlockedBlocks=d.unlockedBlocks||['🌳','🧱','🌊','🌿'];milestonesHit=d.milestonesHit||[];}
+  if(raw){const d=JSON.parse(raw);totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.gamesPlayed||0;topicGames=d.topicGames||{};engTopicGames=d.engTopicGames||{};engGamesPlayed=d.engGamesPlayed||0;}
 }
 
 // ── TOPIC CARDS ──
@@ -573,7 +528,7 @@ function checkAnswer(chosen,btn){
 function timeUp(){clearInterval(timerInterval);document.querySelectorAll('.answer-btn').forEach(b=>b.disabled=true);const q=questions[currentQ];document.querySelectorAll('.answer-btn').forEach(b=>{if(b.textContent===String(q.answer))b.classList.add('ans-correct');});segStates[currentQ]='timeout';paintSegs();streak=0;document.getElementById('streak-count').textContent=streak;showFeedback(false,`⏰ Time's up! Answer: ${q.answer}`);save();document.getElementById('next-btn').style.display='block';}
 function nextQuestion(){currentQ++;if(currentQ>=TOTAL_QS)showResults();else loadQuestion();}
 function showResults(){
-  const pct=score/TOTAL_QS;const xpEarned=score*2+(score===TOTAL_QS?50:0);const stars=pct>=0.9?3:pct>=0.7?2:pct>=0.5?1:0;
+  const pct=score/TOTAL_QS;const xpEarned=score*10+(score===TOTAL_QS?50:0);const stars=pct>=0.9?3:pct>=0.7?2:pct>=0.5?1:0;
   const idx=Math.min(Math.floor(pct*4+0.1),4);
   ['😢','😅','😊','🌟','🏆'].forEach((t,i)=>{if(i===idx)document.getElementById('results-trophy').textContent=t;});
   document.getElementById('results-title').textContent=["Don't Give Up!","Good Effort!","Well Done!","Excellent!","PERFECT! 🎉"][idx];
@@ -599,7 +554,7 @@ function showUnlockToast(topics){const label=topics.length===1?TOPIC_NAMES[topic
 function retryGame(){currentQ=0;score=0;startGame();}
 
 // ── XP ──
-function addXP(amount){const old=playerLevel;playerXP+=amount;const needed=playerLevel*100;if(playerXP>=needed){playerXP-=needed;playerLevel++;setTimeout(()=>showLevelUp(old,playerLevel),600);}worldXP+=amount;while(worldXP>=1000){worldXP-=1000;sessionsBanked++;}updatePlayerUI();updateWorldUI();save();}
+function addXP(amount){const old=playerLevel;playerXP+=amount;const needed=playerLevel*100;if(playerXP>=needed){playerXP-=needed;playerLevel++;setTimeout(()=>showLevelUp(old,playerLevel),600);}updatePlayerUI();}
 function showLevelUp(oldLvl,newLvl){const av=getAvatar(newLvl),oldAv=getAvatar(oldLvl);const changed=av.emoji!==oldAv.emoji;const popup=document.createElement('div');popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center';popup.innerHTML=`<div style="background:white;border-radius:28px;padding:40px 32px;text-align:center;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);border:4px solid #FFD54F"><div style="font-size:4rem;margin-bottom:8px">${av.emoji}</div><div style="font-family:'Fredoka One',cursive;font-size:2rem;color:#1A237E;margin-bottom:6px">LEVEL UP! 🎉</div><div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#FF7043;margin-bottom:8px">Level ${newLvl} reached!</div>${changed?`<div style="font-size:1rem;font-weight:700;color:#5C6BC0;margin:12px 0">✨ New avatar: <strong>${av.title}</strong> ${av.emoji}</div>`:''}<button onclick="this.parentElement.parentElement.remove()" style="background:linear-gradient(135deg,#FF7043,#FF5722);color:white;border:none;border-radius:16px;padding:14px 32px;font-family:'Fredoka One',cursive;font-size:1.2rem;cursor:pointer">Awesome! 🚀</button></div>`;document.body.appendChild(popup);launchConfetti();}
 
 // ── TIMER ──
@@ -647,147 +602,6 @@ function closeQuests(){document.getElementById('quest-overlay').classList.remove
 function closeQuestsIfBg(e){if(e.target===document.getElementById('quest-overlay'))closeQuests();}
 function updateQuestTrackers(gameScore,gameTopic){topicsPlayed.add(gameTopic);totalCorrect+=gameScore;if(gameScore===TOTAL_QS)perfectCount++;QUEST_DEFS.filter(d=>d.type==='streak').forEach(def=>{if(!questProgress[def.id])questProgress[def.id]={progress:0,claimed:false};if(maxStreakThisGame>=def.target)questProgress[def.id].progress=Math.max(questProgress[def.id].progress,maxStreakThisGame);});saveQuests();updateQuestNotif();}
 
-// ── WORLD & PLAYTIME ──
-function setParentMinutes(m){parentMinutes=m;save();updateWorldUI();}
-function updateWorldUI(){
-  const totalEl=document.getElementById('world-xp-total');if(totalEl)totalEl.textContent=worldXP;
-  const bankedEl=document.getElementById('world-sessions');if(bankedEl)bankedEl.textContent=sessionsBanked;
-  const fillEl=document.getElementById('world-progress-fill');if(fillEl)fillEl.style.width=(worldXP/1000*100)+'%';
-  document.querySelectorAll('.min-btn').forEach(b=>{
-    const active=Number(b.dataset.min)===parentMinutes;
-    b.style.background=active?'#7C4DFF':'';b.style.color=active?'white':'';
-  });
-  const playBtn=document.getElementById('world-play-btn');
-  const statusEl=document.getElementById('world-status');
-  if(!playBtn||!statusEl)return;
-  if(sessionActive){
-    const m=Math.floor(sessionSecondsLeft/60),s=sessionSecondsLeft%60;
-    statusEl.textContent=`🎮 Playing: ${m}:${String(s).padStart(2,'0')} left`;
-    playBtn.disabled=true;
-  }else if(parentMinutes===0){
-    statusEl.textContent='Playtime is set to 0 min by parent';playBtn.disabled=true;
-  }else if(sessionsBanked>0){
-    statusEl.textContent=`${sessionsBanked} session(s) ready!`;playBtn.disabled=false;
-  }else{
-    statusEl.textContent=`Earn ${1000-worldXP} more XP for a play session`;playBtn.disabled=true;
-  }
-  const grid=document.getElementById('world-grid');
-  if(grid){
-    grid.innerHTML='';
-    grid.style.gridTemplateColumns=`repeat(${GRID_COLS},1fr)`;
-    for(let r=0;r<GRID_ROWS;r++){
-      for(let c=0;c<GRID_COLS;c++){
-        const key=r+'_'+c;
-        const cell=document.createElement('div');
-        cell.style.cssText='aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;';
-        if(worldBlocks[key]){cell.textContent=worldBlocks[key];cell.style.background='#F3E5F5';}
-        else{cell.style.background='#F5F5F5';cell.style.border='1px dashed #E0E0E0';}
-        grid.appendChild(cell);
-      }
-    }
-  }
-  const filled=Object.keys(worldBlocks).length;
-  const completionEl=document.getElementById('world-completion');
-  if(completionEl)completionEl.textContent=Math.round(filled/TOTAL_CELLS*100)+'% built';
-}
-function playSession(){
-  if(sessionsBanked<=0||parentMinutes===0||sessionActive)return;
-  sessionsBanked--;sessionActive=true;sessionSecondsLeft=parentMinutes*60;save();
-  showScreen('screen-playtime');
-  renderBuildGrid();renderPalette();
-  sessionTimerId=setInterval(()=>{
-    sessionSecondsLeft--;
-    updatePlaytimeTimer();
-    if(sessionSecondsLeft<=0){endSession();}
-  },1000);
-  updatePlaytimeTimer();
-}
-function updatePlaytimeTimer(){
-  const el=document.getElementById('playtime-timer');if(!el)return;
-  const m=Math.floor(sessionSecondsLeft/60),s=sessionSecondsLeft%60;
-  el.textContent=`⏱️ ${m}:${String(s).padStart(2,'0')}`;
-}
-function endSession(){
-  clearInterval(sessionTimerId);sessionActive=false;save();updateWorldUI();
-  goHome();
-  setTimeout(()=>alert('🎉 Playtime over! Great job building. Earn more XP for your next session!'),200);
-}
-function renderPalette(){
-  const bar=document.getElementById('block-palette');if(!bar)return;
-  bar.innerHTML='';
-  unlockedBlocks.forEach(b=>{x
-    const btn=document.createElement('button');
-    btn.textContent=b;btn.className='palette-btn'+(b===selectedBlock?' selected':'');
-    btn.onclick=()=>{selectedBlock=b;renderPalette();};
-    bar.appendChild(btn);
-  });
-  const eraseBtn=document.createElement('button');
-  eraseBtn.textContent='🧹';eraseBtn.className='palette-btn'+(selectedBlock===''?' selected':'');
-  eraseBtn.onclick=()=>{selectedBlock='';renderPalette();};
-  bar.appendChild(eraseBtn);
-}
-function renderBuildGrid(){
-  const grid=document.getElementById('build-grid');if(!grid)return;
-  grid.innerHTML='';
-  grid.style.gridTemplateColumns=`repeat(${GRID_COLS},1fr)`;
-  for(let r=0;r<GRID_ROWS;r++){
-    for(let c=0;c<GRID_COLS;c++){
-      const key=r+'_'+c;
-      const cell=document.createElement('div');
-      cell.className='build-cell';
-      cell.textContent=worldBlocks[key]||'';
-      cell.onclick=()=>{
-        if(selectedBlock===''){delete worldBlocks[key];}
-        else{worldBlocks[key]=selectedBlock;checkCreatureSpawn(r,c);}
-        save();
-        cell.textContent=worldBlocks[key]||'';
-        checkMilestones();
-      };
-      grid.appendChild(cell);
-    }
-  }
-}
-
-function checkMilestones(){
-  const filled=Object.keys(worldBlocks).length;
-  const pct=filled/TOTAL_CELLS;
-  MILESTONES.forEach(m=>{
-    if(pct>=m.pct && !milestonesHit.includes(m.pct)){
-      milestonesHit.push(m.pct);
-      if(!unlockedBlocks.includes(m.unlock))unlockedBlocks.push(m.unlock);
-      save();
-      showMilestonePopup(m);
-      renderPalette();
-    }
-  });
-}
-function showMilestonePopup(m){
-  const popup=document.createElement('div');
-  popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center';
-  popup.innerHTML=`<div style="background:white;border-radius:28px;padding:40px 32px;text-align:center;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);border:4px solid #FFD54F"><div style="font-size:4rem;margin-bottom:8px">🏆</div><div style="font-family:'Fredoka One',cursive;font-size:1.8rem;color:#1A237E;margin-bottom:6px">${m.title}</div><div style="font-size:1rem;font-weight:700;color:#5C6BC0;margin:12px 0">✨ New block unlocked: <span style="font-size:1.5rem">${m.unlock}</span></div><button onclick="this.parentElement.parentElement.remove()" style="background:linear-gradient(135deg,#FF7043,#FF5722);color:white;border:none;border-radius:16px;padding:14px 32px;font-family:'Fredoka One',cursive;font-size:1.2rem;cursor:pointer">Awesome! 🚀</button></div>`;
-  document.body.appendChild(popup);
-  launchConfetti();
-}
-function checkCreatureSpawn(r,c){
-  const placed=worldBlocks[r+'_'+c];
-  const neighbors=[[r-1,c],[r+1,c],[r,c-1],[r,c+1]];
-  for(const [nr,nc] of neighbors){
-    if(nr<0||nc<0||nr>=GRID_ROWS||nc>=GRID_COLS)continue;
-    const nVal=worldBlocks[nr+'_'+nc];
-    if(!nVal)continue;
-    const combo=CREATURE_COMBOS.find(cb=>(cb.a===placed&&cb.b===nVal)||(cb.b===placed&&cb.a===nVal));
-    if(combo){
-      const emptySpots=neighbors.filter(([er,ec])=>er>=0&&ec>=0&&er<GRID_ROWS&&ec<GRID_COLS&&!worldBlocks[er+'_'+ec]);
-      if(emptySpots.length>0&&Math.random()<0.5){
-        const [er,ec]=emptySpots[rnd(0,emptySpots.length-1)];
-        worldBlocks[er+'_'+ec]=combo.creature;
-        const cellEl=document.querySelectorAll('#build-grid > div')[er*GRID_COLS+ec];
-        if(cellEl)cellEl.textContent=combo.creature;
-      }
-      break;
-    }
-  }
-}
 // ── RESET ──
 function confirmReset(){if(!confirm(`Reset ALL progress for ${currentUser.username}?`))return;totalStars=0;playerXP=0;playerLevel=1;streak=0;gamesPlayed=0;topicGames={};engTopicGames={};engGamesPlayed=0;questProgress={};perfectCount=0;totalCorrect=0;topicsPlayed=new Set();pickDailyQuests();save();saveQuests();updatePlayerUI();updateQuestNotif();}
 
@@ -797,7 +611,6 @@ load();
 loadQuests();
 updatePlayerUI();
 updateQuestNotif();
-updateWorldUI();
 setGrade(currentUser.grade||1);
 setTimeout(()=>showTip(),1500);
 </script>

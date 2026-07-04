@@ -742,7 +742,7 @@ function timeUp(){
 function nextQuestion(){currentQ++;if(currentQ>=TOTAL_QS)showResults();else loadQuestion();}
 
 function showResults(){
-  const pct=score/TOTAL_QS;const xpEarned=score*2+(score===TOTAL_QS?50:0);const stars=pct>=0.9?3:pct>=0.7?2:pct>=0.5?1:0;const idx=Math.min(Math.floor(pct*4+0.1),4);
+  const pct=score/TOTAL_QS;const xpEarned=score*10+(score===TOTAL_QS?50:0);const stars=pct>=0.9?3:pct>=0.7?2:pct>=0.5?1:0;const idx=Math.min(Math.floor(pct*4+0.1),4);
   ['😢','😅','😊','🌟','🏆'].forEach((t,i)=>{if(i===idx)document.getElementById('results-trophy').textContent=t;});
   document.getElementById('results-title').textContent=["Keep Trying!","Good Effort!","Well Done!","Excellent!","PERFECT! 🎉"][idx];
   document.getElementById('results-score').textContent=`${score}/${TOTAL_QS}`;
