@@ -528,7 +528,7 @@ function checkAnswer(chosen,btn){
 function timeUp(){clearInterval(timerInterval);document.querySelectorAll('.answer-btn').forEach(b=>b.disabled=true);const q=questions[currentQ];document.querySelectorAll('.answer-btn').forEach(b=>{if(b.textContent===String(q.answer))b.classList.add('ans-correct');});segStates[currentQ]='timeout';paintSegs();streak=0;document.getElementById('streak-count').textContent=streak;showFeedback(false,`⏰ Time's up! Answer: ${q.answer}`);save();document.getElementById('next-btn').style.display='block';}
 function nextQuestion(){currentQ++;if(currentQ>=TOTAL_QS)showResults();else loadQuestion();}
 function showResults(){
-  const pct=score/TOTAL_QS;const xpEarned=score*10+(score===TOTAL_QS?50:0);const stars=pct>=0.9?3:pct>=0.7?2:pct>=0.5?1:0;
+  const pct=score/TOTAL_QS;const xpEarned=score*2+(score===TOTAL_QS?50:0);const stars=pct>=0.9?3:pct>=0.7?2:pct>=0.5?1:0;
   const idx=Math.min(Math.floor(pct*4+0.1),4);
   ['😢','😅','😊','🌟','🏆'].forEach((t,i)=>{if(i===idx)document.getElementById('results-trophy').textContent=t;});
   document.getElementById('results-title').textContent=["Don't Give Up!","Good Effort!","Well Done!","Excellent!","PERFECT! 🎉"][idx];
