@@ -869,7 +869,7 @@ function loadQuestion(){
 function checkAnswer(chosen,btn){
   clearInterval(timerInterval);document.querySelectorAll('.answer-btn').forEach(b=>b.disabled=true);
   const q=questions[currentQ];const correct=chosen===q.answer;
-  if(correct){btn.classList.add('ans-correct');score++;streak++;if(streak>maxStreakThisGame)maxStreakThisGame=streak;segStates[currentQ]='correct';paintSegs();const bonus=streak>=3?30:10;showFeedback(true,streak>=3?`🔥 ${streak} in a row! +${bonus} XP!`:getCorrectMsg());addXP(bonus);spawnCoins(btn);}
+  if(correct){btn.classList.add('ans-correct');score++;streak++;if(streak>maxStreakThisGame)maxStreakThisGame=streak;segStates[currentQ]='correct';paintSegs();const diffXP=difficulty==='easy'?2:difficulty==='medium'?5:10;showFeedback(true,streak>=3?`🔥 ${streak} in a row!`:getCorrectMsg());addXP(diffXP);spawnCoins(btn);}
   else{btn.classList.add('ans-wrong');streak=0;segStates[currentQ]='wrong';paintSegs();document.querySelectorAll('.answer-btn').forEach(b=>{if(b.textContent===q.answer)b.classList.add('ans-correct');});showFeedback(false,`❌ Not quite! ${q.hint}`);}
   document.getElementById('streak-count').textContent=streak;save();document.getElementById('next-btn').style.display='block';
 }
@@ -877,7 +877,7 @@ function timeUp(){clearInterval(timerInterval);document.querySelectorAll('.answe
 function nextQuestion(){currentQ++;if(currentQ>=TOTAL_QS)showResults();else{loadQuestion();startTimer();}}
 
 function showResults(){
-  const pct=score/TOTAL_QS;const xpEarned=score*2+(score===TOTAL_QS?50:0);const stars=pct>=0.9?3:pct>=0.7?2:pct>=0.5?1:0;
+  const pct=score/TOTAL_QS;const diffXP=difficulty==='easy'?2:difficulty==='medium'?5:10;const xpEarned=score*diffXP+(score===TOTAL_QS?diffXP*5:0);const stars=pct>=0.9?3:pct>=0.7?2:pct>=0.5?1:0;
   const idx=Math.min(Math.floor(pct*4+0.1),4);
   ['😢','😅','😊','🌟','🏆'].forEach((t,i)=>{if(i===idx)document.getElementById('results-trophy').textContent=t;});
   document.getElementById('results-title').textContent=["Don't Give Up!","Good Effort!","Well Done!","Excellent!","PERFECT! 🎉"][idx];
@@ -903,15 +903,16 @@ function showUnlockToast(topics){const label=topics.length===1?TOPIC_NAMES[topic
 function retryGame(){currentQ=0;score=0;startGame();}
 
 function addXP(amount){
+  const old=playerLevel;
   playerXP+=amount;
   arcadeXP=(arcadeXP||0)+amount;
-  const needed=playerLevel*100;
-  if(playerXP>=needed)
-  {
-    const old=playerLevel;
-    playerXP-=needed;playerLevel++;
-    setTimeout(()=>showLevelUp(old,playerLevel),600);
+  let leveled=false;
+  while(playerXP>=playerLevel*100){
+    playerXP-=playerLevel*100;
+    playerLevel++;
+    leveled=true;
   }
+  if(leveled) setTimeout(()=>showLevelUp(old,playerLevel),600);
   updatePlayerUI();
 }
 function showLevelUp(oldLvl,newLvl){const av=getAvatar(newLvl),oldAv=getAvatar(oldLvl);const changed=av.emoji!==oldAv.emoji;const popup=document.createElement('div');popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center';popup.innerHTML=`<div style="background:white;border-radius:28px;padding:40px 32px;text-align:center;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);border:4px solid #A5D6A7"><div style="font-size:4rem;margin-bottom:8px">${av.emoji}</div><div style="font-family:'Fredoka One',cursive;font-size:2rem;color:#1A237E;margin-bottom:6px">LEVEL UP! 🎉</div><div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#43A047;margin-bottom:8px">Level ${newLvl} reached!</div>${changed?`<div style="font-size:1rem;font-weight:700;color:#5C6BC0;margin:12px 0">✨ New avatar: <strong>${av.title}</strong> ${av.emoji}</div>`:''}<button onclick="this.parentElement.parentElement.remove()" style="background:linear-gradient(135deg,#43A047,#2E7D32);color:white;border:none;border-radius:16px;padding:14px 32px;font-family:'Fredoka One',cursive;font-size:1.2rem;cursor:pointer">Awesome! 🚀</button></div>`;document.body.appendChild(popup);launchConfetti();}
@@ -923,9 +924,6 @@ function showFeedback(correct,msg){const fb=document.getElementById('feedback');
 function getCorrectMsg(){return['✅ Correct!','🌟 Brilliant!','📚 Spot on!','💪 You got it!','🦉 Perfect!','⭐ Amazing!'][Math.floor(Math.random()*6)];}
 function spawnCoins(btn){const rect=btn.getBoundingClientRect();const burst=document.createElement('div');burst.className='coin-burst';burst.style.left=rect.left+'px';burst.style.top=rect.top+'px';['⭐','✨','📚'].forEach((_,i)=>{for(let j=0;j<2;j++){const c=document.createElement('div');c.className='coin';c.textContent=['⭐','✨','📖'][rnd(0,2)];c.style.left=rnd(-10,60)+'px';c.style.animationDelay=(i*0.1+j*0.05)+'s';burst.appendChild(c);}});document.body.appendChild(burst);setTimeout(()=>burst.remove(),1500);}
 function launchConfetti(){const emojis=['🎉','⭐','🌟','🏆','🎊','📚','✏️'];for(let i=0;i<20;i++)setTimeout(()=>{const el=document.createElement('div');el.style.cssText=`position:fixed;top:0;left:${rnd(10,90)}%;font-size:${rnd(20,40)}px;z-index:9999;animation:coinFly ${rnd(8,15)*0.1}s ease forwards;pointer-events:none`;el.textContent=emojis[rnd(0,emojis.length-1)];document.body.appendChild(el);setTimeout(()=>el.remove(),2000);},i*80);}
-
-const TIPS=["Sound out tricky words letter by letter! 🔤","A simile uses 'like' or 'as' to compare! 🔁","Every sentence needs a capital letter! ✏️","Synonyms mean the same, antonyms are opposite! ↔️","Use a dictionary when you're unsure! 📖","Read the whole sentence before choosing! 👀","Prefixes come at the START of a word! 🔧","Check your punctuation at the end of each sentence! ❗"];
-let tipTimeout;
 function showTip(){const b=document.getElementById('speech-bubble');b.textContent=TIPS[rnd(0,TIPS.length-1)];b.style.display='block';clearTimeout(tipTimeout);tipTimeout=setTimeout(()=>b.style.display='none',4000);}
 function makeClouds(){const c=document.getElementById('clouds');for(let i=0;i<5;i++){const cl=document.createElement('div');const w=rnd(80,200);cl.className='cloud';cl.style.cssText=`width:${w}px;height:${w*0.4}px;top:${rnd(0,80)}px;left:-300px;animation-duration:${rnd(30,60)}s;animation-delay:-${rnd(0,40)}s`;c.appendChild(cl);}}
 

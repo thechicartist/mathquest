@@ -237,6 +237,18 @@
         <span class="topic-icon">✖️</span><div class="topic-name">Multiplication</div><div class="topic-desc">Times tables &amp; more</div>
         <div class="lock-overlay" id="lock-multiply"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-multiply"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-multiply" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-multiply"></div></div>
       </div>
+      <div class="topic-card t-measurement" id="tc-measurement" onclick="handleTopicClick('measurement')">
+        <span class="topic-icon">📏</span><div class="topic-name">Measurement</div><div class="topic-desc">Units &amp; conversions</div>
+        <div class="lock-overlay" id="lock-measurement"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-measurement"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-measurement" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-measurement"></div></div>
+      </div>
+      <div class="topic-card t-geometry"  id="tc-geometry"  onclick="handleTopicClick('geometry')">
+        <span class="topic-icon">📐</span><div class="topic-name">Geometry</div><div class="topic-desc">Shapes &amp; angles</div>
+        <div class="lock-overlay" id="lock-geometry"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-geometry"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-geometry" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-geometry"></div></div>
+      </div>
+      <div class="topic-card t-wordprob" id="tc-wordprob" onclick="handleTopicClick('wordprob')">
+        <span class="topic-icon">📝</span><div class="topic-name">Word Problems</div><div class="topic-desc">Real-world math</div>
+        <div class="lock-overlay" id="lock-wordprob"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-wordprob"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-wordprob" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-wordprob"></div></div>
+      </div>
       <div class="topic-card t-fractions" id="tc-fractions" onclick="handleTopicClick('fractions')">
         <span class="topic-icon">🍕</span><div class="topic-name">Fractions</div><div class="topic-desc">Add, subtract &amp; compare</div>
         <div class="lock-overlay" id="lock-fractions"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-fractions"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-fractions" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-fractions"></div></div>
@@ -252,18 +264,6 @@
       <div class="topic-card t-algebra"   id="tc-algebra"   onclick="handleTopicClick('algebra')">
         <span class="topic-icon">🔍</span><div class="topic-name">Algebra</div><div class="topic-desc">Find the unknown</div>
         <div class="lock-overlay" id="lock-algebra"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-algebra"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-algebra" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-algebra"></div></div>
-      </div>
-      <div class="topic-card t-geometry"  id="tc-geometry"  onclick="handleTopicClick('geometry')">
-        <span class="topic-icon">📐</span><div class="topic-name">Geometry</div><div class="topic-desc">Shapes &amp; angles</div>
-        <div class="lock-overlay" id="lock-geometry"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-geometry"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-geometry" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-geometry"></div></div>
-      </div>
-      <div class="topic-card t-wordprob" id="tc-wordprob" onclick="handleTopicClick('wordprob')">
-        <span class="topic-icon">📝</span><div class="topic-name">Word Problems</div><div class="topic-desc">Real-world math</div>
-        <div class="lock-overlay" id="lock-wordprob"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-wordprob"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-wordprob" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-wordprob"></div></div>
-      </div>
-      <div class="topic-card t-measurement" id="tc-measurement" onclick="handleTopicClick('measurement')">
-        <span class="topic-icon">📏</span><div class="topic-name">Measurement</div><div class="topic-desc">Units &amp; conversions</div>
-        <div class="lock-overlay" id="lock-measurement"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-measurement"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-measurement" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-measurement"></div></div>
       </div>
     </div>
     <div class="grade-section">
@@ -521,15 +521,14 @@ function loadQuestion(){
 }
 function checkAnswer(chosen,btn){
   clearInterval(timerInterval);document.querySelectorAll('.answer-btn').forEach(b=>b.disabled=true);
-  const q=questions[currentQ];const correct=String(chosen)===String(q.answer);
-  if(correct){btn.classList.add('ans-correct');score++;streak++;if(streak>maxStreakThisGame)maxStreakThisGame=streak;segStates[currentQ]='correct';paintSegs();const bonus=streak>=3?30:10;showFeedback(true,streak>=3?`🔥 ${streak} in a row! +${bonus} XP!`:getCorrectMsg());addXP(bonus);spawnCoins(btn);}
+  const q=questions[currentQ];const correct=String(chosen)===String(q.answer);if(correct){btn.classList.add('ans-correct');score++;streak++;if(streak>maxStreakThisGame)maxStreakThisGame=streak;segStates[currentQ]='correct';paintSegs();const diffXP=difficulty==='easy'?2:difficulty==='medium'?5:10;showFeedback(true,streak>=3?`🔥 ${streak} in a row!`:getCorrectMsg());addXP(diffXP);spawnCoins(btn);}  
   else{btn.classList.add('ans-wrong');streak=0;segStates[currentQ]='wrong';paintSegs();document.querySelectorAll('.answer-btn').forEach(b=>{if(b.textContent===String(q.answer))b.classList.add('ans-correct');});showFeedback(false,`❌ Not quite! ${q.hint}`);}
   document.getElementById('streak-count').textContent=streak;save();document.getElementById('next-btn').style.display='block';
 }
 function timeUp(){clearInterval(timerInterval);document.querySelectorAll('.answer-btn').forEach(b=>b.disabled=true);const q=questions[currentQ];document.querySelectorAll('.answer-btn').forEach(b=>{if(b.textContent===String(q.answer))b.classList.add('ans-correct');});segStates[currentQ]='timeout';paintSegs();streak=0;document.getElementById('streak-count').textContent=streak;showFeedback(false,`⏰ Time's up! Answer: ${q.answer}`);save();document.getElementById('next-btn').style.display='block';}
 function nextQuestion(){currentQ++;if(currentQ>=TOTAL_QS)showResults();else loadQuestion();}
 function showResults(){
-  const pct=score/TOTAL_QS;const xpEarned=score*2+(score===TOTAL_QS?50:0);const stars=pct>=0.9?3:pct>=0.7?2:pct>=0.5?1:0;
+  const pct=score/TOTAL_QS;const diffXP=difficulty==='easy'?2:difficulty==='medium'?5:10;const xpEarned=score*diffXP+(score===TOTAL_QS?diffXP*5:0);const stars=pct>=0.9?3:pct>=0.7?2:pct>=0.5?1:0;
   const idx=Math.min(Math.floor(pct*4+0.1),4);
   ['😢','😅','😊','🌟','🏆'].forEach((t,i)=>{if(i===idx)document.getElementById('results-trophy').textContent=t;});
   document.getElementById('results-title').textContent=["Don't Give Up!","Good Effort!","Well Done!","Excellent!","PERFECT! 🎉"][idx];
@@ -569,9 +568,6 @@ function spawnCoins(btn){const rect=btn.getBoundingClientRect();const burst=docu
 function launchConfetti(){const emojis=['🎉','⭐','🌟','🏆','🎊','💥'];for(let i=0;i<20;i++)setTimeout(()=>{const el=document.createElement('div');el.style.cssText=`position:fixed;top:0;left:${rnd(10,90)}%;font-size:${rnd(20,40)}px;z-index:9999;animation:coinFly ${rnd(8,15)*0.1}s ease forwards;pointer-events:none`;el.textContent=emojis[rnd(0,emojis.length-1)];document.body.appendChild(el);setTimeout(()=>el.remove(),2000);},i*80);}
 
 // ── MASCOT ──
-const TIPS=["Count on your fingers! 🖐️","Add fractions: find common denominator first! 🍕","Algebra: same to both sides! ⚖️","Percent = per hundred! 💯","Area = length × width 📐","Line up decimal points! 🔢","Right angle = 90°! 📐","Skip count by 2s: 2,4,6,8... 🐸","Doubles: 6+6=12! ✌️"];
-let tipTimeout;
-function showTip(){const b=document.getElementById('speech-bubble');b.textContent=TIPS[rnd(0,TIPS.length-1)];b.style.display='block';clearTimeout(tipTimeout);tipTimeout=setTimeout(()=>b.style.display='none',4000);}
 function makeClouds(){const c=document.getElementById('clouds');for(let i=0;i<5;i++){const cl=document.createElement('div');const w=rnd(80,200);cl.className='cloud';cl.style.cssText=`width:${w}px;height:${w*0.4}px;top:${rnd(0,80)}px;left:-300px;animation-duration:${rnd(30,60)}s;animation-delay:-${rnd(0,40)}s`;c.appendChild(cl);}}
 
 // ── QUESTS ──

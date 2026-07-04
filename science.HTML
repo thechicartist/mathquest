@@ -730,7 +730,7 @@ function checkAnswer(chosen,btn){
   const q=questions[currentQ];const correct=chosen===q.answer;
   if(!correct)document.querySelectorAll('#answers-grid .answer-btn').forEach(b=>{if(b.textContent===q.answer)b.classList.add('ans-correct');});
   btn.classList.add(correct?'ans-correct':'ans-wrong');
-  if(correct){score++;streak++;if(streak>maxStreakThisGame)maxStreakThisGame=streak;segStates[currentQ]='correct';paintSegs();const bonus=streak>=3?30:10;showFeedback(true,streak>=3?`🔥 ${streak} in a row! +${bonus} XP!`:getCorrectMsg());addXP(bonus);spawnCoins(btn);}
+  if(correct){score++;streak++;if(streak>maxStreakThisGame)maxStreakThisGame=streak;segStates[currentQ]='correct';paintSegs();const diffXP=difficulty==='easy'?2:difficulty==='medium'?5:10;showFeedback(true,streak>=3?`🔥 ${streak} in a row!`:getCorrectMsg());addXP(diffXP);spawnCoins(btn);}
   else{streak=0;segStates[currentQ]='wrong';paintSegs();showFeedback(false,`❌ ${q.hint||('Answer: '+q.answer)}`);}
   document.getElementById('streak-count').textContent=streak;save();document.getElementById('next-btn').style.display='block';
 }
@@ -743,7 +743,7 @@ function timeUp(){
 function nextQuestion(){currentQ++;if(currentQ>=TOTAL_QS)showResults();else loadQuestion();}
 
 function showResults(){
-  const pct=score/TOTAL_QS;const xpEarned=score*2+(score===TOTAL_QS?50:0);const stars=pct>=0.9?3:pct>=0.7?2:pct>=0.5?1:0;const idx=Math.min(Math.floor(pct*4+0.1),4);
+  const pct=score/TOTAL_QS;const diffXP=difficulty==='easy'?2:difficulty==='medium'?5:10;const xpEarned=score*diffXP+(score===TOTAL_QS?diffXP*5:0);const stars=pct>=0.9?3:pct>=0.7?2:pct>=0.5?1:0;const idx=Math.min(Math.floor(pct*4+0.1),4);
   ['😢','😅','😊','🌟','🏆'].forEach((t,i)=>{if(i===idx)document.getElementById('results-trophy').textContent=t;});
   document.getElementById('results-title').textContent=["Keep Trying!","Good Effort!","Well Done!","Excellent!","PERFECT! 🎉"][idx];
   document.getElementById('results-score').textContent=`${score}/${TOTAL_QS}`;
@@ -765,7 +765,7 @@ function showUnlockToast(topics){const label=topics.length===1?topics[0]:topics.
 async function retryGame(){questions=[];await startGame();}
 
 // ── XP ──
-function addXP(amount){playerXP+=amount;arcadeXP=(arcadeXP||0)+amount;const needed=playerLevel*100;if(playerXP>=needed){playerXP-=needed;playerLevel++;setTimeout(()=>showLevelUp(playerLevel),600);}updatePlayerUI();}
+function addXP(amount){playerXP+=amount;arcadeXP=(arcadeXP||0)+amount;let leveled=false;while(playerXP>=playerLevel*100){playerXP-=playerLevel*100;playerLevel++;leveled=true;}if(leveled)setTimeout(()=>showLevelUp(playerLevel),600);updatePlayerUI();}
 function showLevelUp(newLvl){const av=getAvatar(newLvl);const popup=document.createElement('div');popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center';popup.innerHTML=`<div style="background:white;border-radius:28px;padding:40px 32px;text-align:center;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);border:4px solid #80CBC4"><div style="font-size:4rem;margin-bottom:8px">${av.emoji}</div><div style="font-family:'Fredoka One',cursive;font-size:2rem;color:#1A237E;margin-bottom:6px">LEVEL UP! 🎉</div><div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#00695C;margin-bottom:8px">Level ${newLvl} reached!</div><button onclick="this.parentElement.parentElement.remove()" style="background:linear-gradient(135deg,#00695C,#00897B);color:white;border:none;border-radius:16px;padding:14px 32px;font-family:'Fredoka One',cursive;font-size:1.2rem;cursor:pointer">Awesome! 🚀</button></div>`;document.body.appendChild(popup);launchConfetti();}
 
 // ── TIMER ──
@@ -779,8 +779,6 @@ function spawnCoins(btn){const rect=btn.getBoundingClientRect();const burst=docu
 function launchConfetti(){const emojis=['🎉','⭐','🌟','🏆','🎊','🔬','⚗️'];for(let i=0;i<20;i++)setTimeout(()=>{const el=document.createElement('div');el.style.cssText=`position:fixed;top:0;left:${rnd(10,90)}%;font-size:${rnd(20,40)}px;z-index:9999;animation:coinFly ${rnd(8,15)*0.1}s ease forwards;pointer-events:none`;el.textContent=emojis[rnd(0,emojis.length-1)];document.body.appendChild(el);setTimeout(()=>el.remove(),2000);},i*80);}
 
 // ── MASCOT ──
-const TIPS=["All living things are made of cells! 🦠","DNA carries the instructions for life! 🧬","Atoms are the building blocks of matter! ⚛️","Gravity pulls objects towards each other! 🌍","The Sun is a giant ball of plasma! ☀️","Your heart beats about 100,000 times a day! 🫀","Photosynthesis turns sunlight into sugar! 🌿","The speed of light is ~300,000 km/s! ⚡","Water is H₂O — two hydrogen, one oxygen! 💧","The Moon causes tides on Earth! 🌊"];
-let tipTimeout;
 function showTip(){const b=document.getElementById('speech-bubble');b.textContent=TIPS[rnd(0,TIPS.length-1)];b.style.display='block';clearTimeout(tipTimeout);tipTimeout=setTimeout(()=>b.style.display='none',4000);}
 function makeClouds(){const c=document.getElementById('clouds');for(let i=0;i<5;i++){const cl=document.createElement('div');const w=rnd(80,200);cl.className='cloud';cl.style.cssText=`width:${w}px;height:${w*0.4}px;top:${rnd(0,80)}px;left:-300px;animation-duration:${rnd(30,60)}s;animation-delay:-${rnd(0,40)}s`;c.appendChild(cl);}}
 
