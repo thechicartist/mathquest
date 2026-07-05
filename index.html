@@ -74,32 +74,13 @@
   <button class="login-btn" onclick="doLogin()">🚀 Let's Go!</button>
   <div class="login-err" id="login-err"></div>
 
-  <div class="login-users" id="saved-users-wrap" style="display:none">
-
   <div style="margin-top:20px;padding-top:16px;border-top:2px solid #F5F5F5;text-align:center;font-size:0.82rem;color:#B0BEC5;font-weight:600">
     🎓 Accounts are created by your educator or parent
   </div>
-</div>
 
 <script src="js/api.js"></script>
 <script>
-async function renderSavedUsers(){
-  const res = await apiGet('/students');
-  const wrap = document.getElementById('saved-users-wrap');
-  const list = document.getElementById('saved-users-list');
-  if(!res || !res.students || !res.students.length){ wrap.style.display='none'; return; }
-  wrap.style.display='';
-  // Single request only — no per-user fetches
-  list.innerHTML = res.students.map(n =>
-    `<span class="user-pill" onclick="quickLogin('${n}')">🐣 ${n}</span>`
-  ).join('');
-}
 
-function quickLogin(username){
-  document.getElementById('login-username').value = username;
-  document.getElementById('login-password').focus();
-  document.getElementById('login-err').textContent='';
-}
 
 async function doLogin(){
   const u = document.getElementById('login-username').value.trim();
@@ -115,7 +96,6 @@ async function doLogin(){
   location.href = 'math.html';
 }
 
-renderSavedUsers();
 </script>
 </body>
 </html>
