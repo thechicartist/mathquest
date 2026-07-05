@@ -385,13 +385,33 @@ function getLockInfo(t){
 }
 
 // ── PERSISTENCE (localStorage shared with english.html) ──
-function save(){
+const API_BASE = 'https://your-worker.your-subdomain.workers.dev'; // ← put your deployed Worker URL here
+
+async function save(){
   const data={totalStars,playerXP,playerLevel,streak,gamesPlayed,topicGames,engTopicGames,engGamesPlayed};
   localStorage.setItem('mq_progress_'+currentUser.username, JSON.stringify(data));
+  try{
+    await fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    });
+  }catch(e){ console.error('Failed to save progress to server:', e); }
 }
-function load(){
+
+async function load(){
   const raw=localStorage.getItem('mq_progress_'+currentUser.username);
   if(raw){const d=JSON.parse(raw);totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.gamesPlayed||0;topicGames=d.topicGames||{};engTopicGames=d.engTopicGames||{};engGamesPlayed=d.engGamesPlayed||0;}
+  try{
+    const res=await fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`);
+    if(res.ok){
+      const d=await res.json();
+      if(d && Object.keys(d).length){
+        totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.gamesPlayed||0;topicGames=d.topicGames||{};engTopicGames=d.engTopicGames||{};engGamesPlayed=d.engGamesPlayed||0;
+        localStorage.setItem('mq_progress_'+currentUser.username, JSON.stringify(d));
+      }
+    }
+  }catch(e){ console.error('Failed to load progress from server:', e); }
 }
 
 // ── TOPIC CARDS ──
@@ -604,12 +624,14 @@ function confirmReset(){if(!confirm(`Reset ALL progress for ${currentUser.userna
 
 // ── INIT ──
 makeClouds();
-load();
-loadQuests();
-updatePlayerUI();
-updateQuestNotif();
-setGrade(currentUser.grade||1);
-setTimeout(()=>showTip(),1500);
+(async function init(){
+  await load();
+  loadQuests();
+  updatePlayerUI();
+  updateQuestNotif();
+  setGrade(currentUser.grade||1);
+  setTimeout(()=>showTip(),1500);
+})();
 </script>
 </body>
 </html>

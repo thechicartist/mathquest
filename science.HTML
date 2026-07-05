@@ -352,16 +352,42 @@ const SCI_UNLOCK_CHAIN = {
                 { prereq:'chemistry', needed:8, difficulty:'medium', minScore:7 }],
 };
 
-// ── PERSISTENCE ──
-function save(){
+// ── PERSISTENCE (now backed by the database instead of localStorage) ──
+const API_BASE = 'https://your-worker.your-subdomain.workers.dev'; // ← same Worker URL as math.html / english.html
+
+async function fetchServerProgress(){
+  try{
+    const res=await fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`);
+    if(res.ok) return await res.json();
+  }catch(e){ console.error('Failed to fetch progress from server:', e); }
+  return null;
+}
+
+async function save(){
   const raw=localStorage.getItem('mq_progress_'+currentUser.username);
-  const existing=raw?JSON.parse(raw):{};
+  const localExisting=raw?JSON.parse(raw):{};
+  // pull latest server state first so we don't clobber math.html's fields
+  const serverExisting=await fetchServerProgress();
+  const existing={...localExisting,...(serverExisting||{})};
   const data={...existing,totalStars,playerXP,playerLevel,streak,sciGamesPlayed:gamesPlayed,sciTopicGames:topicGames};
   localStorage.setItem('mq_progress_'+currentUser.username,JSON.stringify(data));
+  try{
+    await fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    });
+  }catch(e){ console.error('Failed to save progress to server:', e); }
 }
-function load(){
+
+async function load(){
   const raw=localStorage.getItem('mq_progress_'+currentUser.username);
   if(raw){const d=JSON.parse(raw);totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.sciGamesPlayed||0;topicGames=d.sciTopicGames||{};}
+  const d=await fetchServerProgress();
+  if(d && Object.keys(d).length){
+    totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.sciGamesPlayed||0;topicGames=d.sciTopicGames||{};
+    localStorage.setItem('mq_progress_'+currentUser.username, JSON.stringify(d));
+  }
 }
 
 function isNative(t){ return t==='biology'; }
@@ -817,11 +843,13 @@ function confirmReset(){if(!confirm(`Reset ALL Science progress for ${currentUse
 // ── INIT ──
 function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
 makeClouds();
-load();
-loadQuests();
-updatePlayerUI();
-updateQuestNotif();
-setTimeout(()=>showTip(),1500);
+(async function init(){
+  await load();
+  loadQuests();
+  updatePlayerUI();
+  updateQuestNotif();
+  setTimeout(()=>showTip(),1500);
+})();
 </script>
 </body>
 </html>

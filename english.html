@@ -374,14 +374,35 @@ function getLockInfo(t){
   return{prereqKey:best.prereq,prereqName:TOPIC_NAMES[best.prereq],difficulty:best.difficulty,diffLabel,minScore:best.minScore,played:best.played,needed:best.needed,remaining};
 }
 
-// ── PERSISTENCE ──
-function save(){
+// ── PERSISTENCE (now backed by the database instead of localStorage) ──
+const API_BASE = 'https://your-worker.your-subdomain.workers.dev'; // ← put your deployed Worker URL here
+const PROGRESS_KEY = currentUser.username + '-english';
+
+async function save(){
   const data={totalStars,playerXP,playerLevel,streak,gamesPlayed,topicGames,mathTopicGames,mathGamesPlayed};
   localStorage.setItem('mq_eng_progress_'+currentUser.username,JSON.stringify(data));
+  try{
+    await fetch(`${API_BASE}/progress/${encodeURIComponent(PROGRESS_KEY)}`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    });
+  }catch(e){ console.error('Failed to save progress to server:', e); }
 }
-function load(){
+
+async function load(){
   const raw=localStorage.getItem('mq_eng_progress_'+currentUser.username);
   if(raw){const d=JSON.parse(raw);totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.gamesPlayed||0;topicGames=d.topicGames||{};mathTopicGames=d.mathTopicGames||{};mathGamesPlayed=d.mathGamesPlayed||0;}
+  try{
+    const res=await fetch(`${API_BASE}/progress/${encodeURIComponent(PROGRESS_KEY)}`);
+    if(res.ok){
+      const d=await res.json();
+      if(d && Object.keys(d).length){
+        totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.gamesPlayed||0;topicGames=d.topicGames||{};mathTopicGames=d.mathTopicGames||{};mathGamesPlayed=d.mathGamesPlayed||0;
+        localStorage.setItem('mq_eng_progress_'+currentUser.username, JSON.stringify(d));
+      }
+    }
+  }catch(e){ console.error('Failed to load progress from server:', e); }
 }
 
 // ── TOPIC CARDS ──
@@ -958,11 +979,13 @@ function updateQuestTrackers(gameScore,gameTopic){topicsPlayed.add(gameTopic);to
 function confirmReset(){if(!confirm(`Reset ALL English progress for ${currentUser.username}?`))return;totalStars=0;playerXP=0;playerLevel=1;streak=0;gamesPlayed=0;topicGames={};questProgress={};perfectCount=0;totalCorrect=0;topicsPlayed=new Set();pickDailyQuests();save();saveQuests();updatePlayerUI();updateQuestNotif();}
 
 makeClouds();
-load();
-loadQuests();
-updatePlayerUI();
-updateQuestNotif();
-setTimeout(()=>showTip(),1500);
+(async function init(){
+  await load();
+  loadQuests();
+  updatePlayerUI();
+  updateQuestNotif();
+  setTimeout(()=>showTip(),1500);
+})();
 </script>
 </body>
 </html>
