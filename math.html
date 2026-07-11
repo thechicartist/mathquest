@@ -385,10 +385,22 @@ function getLockInfo(t){
 }
 
 // ── PERSISTENCE (localStorage shared with english.html) ──
-const API_BASE = 'https://your-worker.your-subdomain.workers.dev'; // ← put your deployed Worker URL here
+const API_BASE = 'https://dash.cloudflare.com/531d690943a0dc4d7b54c9c533cbcec9/workers/services/edit/mathquest-api/production';
+
+async function fetchServerProgress(){
+  try{
+    const res=await fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`);
+    if(res.ok) return await res.json();
+  }catch(e){ console.error('Failed to fetch progress from server:', e); }
+  return null;
+}
 
 async function save(){
-  const data={totalStars,playerXP,playerLevel,streak,gamesPlayed,topicGames,engTopicGames,engGamesPlayed};
+  const raw=localStorage.getItem('mq_progress_'+currentUser.username);
+  const localExisting=raw?JSON.parse(raw):{};
+  const serverExisting=await fetchServerProgress();
+  const existing={...localExisting,...(serverExisting||{})};
+  const data={...existing,totalStars,playerXP,playerLevel,streak,gamesPlayed,topicGames};
   localStorage.setItem('mq_progress_'+currentUser.username, JSON.stringify(data));
   try{
     await fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`, {

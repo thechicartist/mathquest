@@ -375,14 +375,25 @@ function getLockInfo(t){
 }
 
 // ── PERSISTENCE (now backed by the database instead of localStorage) ──
-const API_BASE = 'https://your-worker.your-subdomain.workers.dev'; // ← put your deployed Worker URL here
-const PROGRESS_KEY = currentUser.username + '-english';
+const API_BASE = 'https://mathquest-api.YOUR-SUBDOMAIN.workers.dev'; // ← put your deployed Worker URL here
+
+async function fetchServerProgress(){
+  try{
+    const res=await fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`);
+    if(res.ok) return await res.json();
+  }catch(e){ console.error('Failed to fetch progress from server:', e); }
+  return null;
+}
 
 async function save(){
-  const data={totalStars,playerXP,playerLevel,streak,gamesPlayed,topicGames,mathTopicGames,mathGamesPlayed};
-  localStorage.setItem('mq_eng_progress_'+currentUser.username,JSON.stringify(data));
+  const raw=localStorage.getItem('mq_progress_'+currentUser.username);
+  const localExisting=raw?JSON.parse(raw):{};
+  const serverExisting=await fetchServerProgress();
+  const existing={...localExisting,...(serverExisting||{})};
+  const data={...existing,totalStars,playerXP,playerLevel,streak,engGamesPlayed:gamesPlayed,engTopicGames:topicGames};
+  localStorage.setItem('mq_progress_'+currentUser.username, JSON.stringify(data));
   try{
-    await fetch(`${API_BASE}/progress/${encodeURIComponent(PROGRESS_KEY)}`, {
+    await fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(data)
@@ -391,18 +402,13 @@ async function save(){
 }
 
 async function load(){
-  const raw=localStorage.getItem('mq_eng_progress_'+currentUser.username);
-  if(raw){const d=JSON.parse(raw);totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.gamesPlayed||0;topicGames=d.topicGames||{};mathTopicGames=d.mathTopicGames||{};mathGamesPlayed=d.mathGamesPlayed||0;}
-  try{
-    const res=await fetch(`${API_BASE}/progress/${encodeURIComponent(PROGRESS_KEY)}`);
-    if(res.ok){
-      const d=await res.json();
-      if(d && Object.keys(d).length){
-        totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.gamesPlayed||0;topicGames=d.topicGames||{};mathTopicGames=d.mathTopicGames||{};mathGamesPlayed=d.mathGamesPlayed||0;
-        localStorage.setItem('mq_eng_progress_'+currentUser.username, JSON.stringify(d));
-      }
-    }
-  }catch(e){ console.error('Failed to load progress from server:', e); }
+  const raw=localStorage.getItem('mq_progress_'+currentUser.username);
+  if(raw){const d=JSON.parse(raw);totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.engGamesPlayed||0;topicGames=d.engTopicGames||{};}
+  const d=await fetchServerProgress();
+  if(d && Object.keys(d).length){
+    totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.engGamesPlayed||0;topicGames=d.engTopicGames||{};
+    localStorage.setItem('mq_progress_'+currentUser.username, JSON.stringify(d));
+  }
 }
 
 // ── TOPIC CARDS ──

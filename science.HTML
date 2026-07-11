@@ -369,7 +369,7 @@ async function save(){
   // pull latest server state first so we don't clobber math.html's fields
   const serverExisting=await fetchServerProgress();
   const existing={...localExisting,...(serverExisting||{})};
-  const data={...existing,totalStars,playerXP,playerLevel,streak,sciGamesPlayed:gamesPlayed,sciTopicGames:topicGames};
+  const API_BASE = 'https://dash.cloudflare.com/531d690943a0dc4d7b54c9c533cbcec9/workers/services/edit/mathquest-api/production'; // ← same Worker URL as math.html / english.html
   localStorage.setItem('mq_progress_'+currentUser.username,JSON.stringify(data));
   try{
     await fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`, {
