@@ -219,9 +219,64 @@
   .kid-stat-val {
     font-family:'Fredoka One',cursive; font-size:1.3rem; color:#1A237E; line-height:1;
   }
-  .kid-stat-lbl {
+.kid-stat-lbl {
     font-size:0.7rem; font-weight:800; color:#90A4AE; margin-top:3px;
   }
+  .kid-card { cursor:pointer; transition:all 0.2s; }
+  .kid-card:hover { border-color:#A5D6A7; box-shadow:0 4px 14px rgba(0,0,0,0.08); }
+
+  /* Full-screen activity view */
+  .fullscreen-view {
+    display:none; position:fixed; inset:0; background:linear-gradient(180deg,#E8F5E9 0%,#F1F8E9 40%,#E3F2FD 100%);
+    z-index:200; overflow-y:auto; padding:24px;
+  }
+  .fullscreen-view.open { display:block; }
+  .fs-inner { max-width:640px; margin:0 auto; padding-top:56px; }
+  .fs-back {
+    position:fixed; top:16px; left:16px; background:white; color:#3F51B5;
+    border:2px solid #E8EAF6; border-radius:50px; padding:10px 18px;
+    font-family:'Fredoka One',cursive; font-size:0.9rem; cursor:pointer;
+    box-shadow:0 4px 14px rgba(0,0,0,0.12); transition:all 0.2s;
+  }
+  .fs-back:hover { transform:translateY(-2px); }
+  .fs-header { display:flex; align-items:center; gap:16px; margin-bottom:24px;
+    background:white; border-radius:22px; padding:20px; border:3px solid #E8F5E9; }
+  .fs-avatar { width:64px; height:64px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,#66BB6A,#43A047); display:flex; align-items:center;
+    justify-content:center; font-size:2rem; }
+  .fs-name { font-family:'Fredoka One',cursive; font-size:1.4rem; color:#1A237E; }
+  .fs-meta { font-size:0.85rem; color:#90A4AE; font-weight:700; margin-top:2px; }
+  .fs-section-title { font-family:'Fredoka One',cursive; font-size:1.1rem; color:#1A237E;
+    margin:22px 0 12px; }
+  .activity-list { display:flex; flex-direction:column; gap:10px; }
+  .activity-item { display:flex; align-items:center; justify-content:space-between;
+    background:white; border:2px solid #E8F5E9; border-radius:16px; padding:14px 16px; }
+  .activity-item-left { display:flex; align-items:center; gap:12px; }
+  .activity-emoji { font-size:1.4rem; }
+  .activity-game { font-weight:800; color:#1A237E; font-size:0.95rem; }
+  .activity-date { font-size:0.75rem; color:#90A4AE; font-weight:700; }
+  .activity-score { font-weight:800; color:#43A047; font-size:0.95rem; }
+
+  /* Subject / chapter / difficulty breakdown */
+  .subject-card { background:white; border:2px solid #E8F5E9; border-radius:18px; margin-bottom:14px; overflow:hidden; }
+  .subject-head { display:flex; align-items:center; gap:12px; padding:16px 18px; cursor:pointer; user-select:none; }
+  .subject-icon { font-size:1.6rem; }
+  .subject-name { font-family:'Fredoka One',cursive; font-size:1.05rem; color:#1A237E; flex:1; }
+  .subject-count { font-size:0.78rem; font-weight:800; color:#90A4AE; }
+  .subject-caret { font-size:0.85rem; color:#B0BEC5; transition:transform 0.2s; }
+  .subject-card.open .subject-caret { transform:rotate(90deg); }
+  .subject-chapters { display:none; border-top:2px solid #F5F5F5; padding:6px 12px 12px; }
+  .subject-card.open .subject-chapters { display:block; }
+  .chapter-row { padding:10px 8px; border-bottom:1px solid #F8FBF8; }
+  .chapter-row:last-child { border-bottom:none; }
+  .chapter-name { font-weight:800; color:#37474F; font-size:0.88rem; margin-bottom:6px; }
+  .diff-pills { display:flex; gap:8px; }
+  .diff-pill { flex:1; border-radius:10px; padding:6px 4px; text-align:center; font-size:0.72rem; font-weight:800; border:2px solid; }
+  .diff-pill .dp-n { font-family:'Fredoka One',cursive; font-size:1rem; display:block; }
+  .diff-pill.easy { border-color:#A5D6A7; background:#E8F5E9; color:#2E7D32; }
+  .diff-pill.medium { border-color:#FFCC80; background:#FFF3E0; color:#E65100; }
+  .diff-pill.hard { border-color:#EF9A9A; background:#FFEBEE; color:#B71C1C; }
+  .subject-empty { text-align:center; color:#B0BEC5; font-weight:700; font-size:0.85rem; padding:16px; }
 </style>
 </head>
 <body>
@@ -438,6 +493,28 @@
   </div>
 </div>
 
+<!-- Full-screen activity view -->
+<div class="fullscreen-view" id="activity-view">
+  <button class="fs-back" onclick="closeActivity()">← Back</button>
+  <div class="fs-inner">
+    <div class="fs-header">
+      <div class="fs-avatar" id="activity-avatar">🐣</div>
+      <div>
+        <div class="fs-name" id="activity-name">Kid</div>
+        <div class="fs-meta" id="activity-meta">@username</div>
+      </div>
+    </div>
+    <div class="kid-stats-grid">
+      <div class="kid-stat"><span class="kid-stat-val" id="activity-level">⚡ 1</span><span class="kid-stat-lbl">Level</span></div>
+      <div class="kid-stat"><span class="kid-stat-val" id="activity-stars">⭐ 0</span><span class="kid-stat-lbl">Stars</span></div>
+      <div class="kid-stat"><span class="kid-stat-val" id="activity-games">🎮 0</span><span class="kid-stat-lbl">Games</span></div>
+      <div class="kid-stat"><span class="kid-stat-val" id="activity-streak">🔥 0</span><span class="kid-stat-lbl">Streak</span></div>
+    </div>
+    <div class="fs-section-title">Progress by Subject</div>
+    <div id="subjects-container"></div>
+  </div>
+</div>
+
 <script src="js/api.js"></script>
 <script>
 // ─── STATE ─────────────────────────────────────────────────
@@ -445,6 +522,23 @@ let pendingAccount = null;
 let currentParent  = null;
 let deleteTarget   = null;
 let usernameEdited = false;
+let kidsCache      = [];
+
+const SUBJECTS = [
+  { key:'topicGames',    label:'Math',    icon:'🚀',
+    chapters:{counting:'Counting',addsubt:'Add & Subtract',multiply:'Multiplication',fractions:'Fractions',decimals:'Decimals',percent:'Percentages',algebra:'Algebra',geometry:'Geometry',wordprob:'Word Problems',measurement:'Measurement'} },
+  { key:'engTopicGames', label:'English', icon:'📖',
+    chapters:{vocab:'Vocabulary',spelling:'Spelling',grammar:'Grammar',punctuation:'Punctuation',reading:'Comprehension',synonyms:'Synonyms',antonyms:'Antonyms',figurative:'Figurative Language',prefixes:'Prefixes & Suffixes',sentences:'Sentences'} },
+  { key:'sciTopicGames', label:'Science', icon:'🔬',
+    chapters:{biology:'Biology',chemistry:'Chemistry',physics:'Physics',earth:'Earth Science',space:'Space',humanbody:'Human Body'} },
+];
+
+// topicGames[topic][difficulty].q1 = count of games played at that
+// difficulty where the child scored at least 1/10 — i.e. effectively
+// "games played", since q1 is always the largest threshold count.
+function gamesPlayedAt(topicGames, topic, diff){
+  return (topicGames?.[topic]?.[diff]?.q1) || 0;
+}
 
 // ─── ON LOAD: check if returning from Stripe ────────────────
 window.addEventListener('DOMContentLoaded', () => {
@@ -710,10 +804,11 @@ async function loadChildren() {
     const prog = await apiGet('/progress/' + encodeURIComponent(k.username));
     return { ...k, emoji: em[i % em.length],
       level: prog?.playerLevel || 1, stars: prog?.totalStars || 0,
-      games: prog?.gamesPlayed || 0, streak: prog?.streak || 0 };
+      games: prog?.gamesPlayed || 0, streak: prog?.streak || 0, raw: prog || {} };
   }));
+  kidsCache = withStats;
   list.innerHTML = withStats.map(k => `
-    <div class="kid-card">
+    <div class="kid-card" onclick="openActivity('${k.username}')">
       <div class="kid-card-top">
         <div class="kid-info">
           <div class="kid-avatar">${k.emoji}</div>
@@ -722,7 +817,7 @@ async function loadChildren() {
             <div class="kid-meta">@${k.username} &nbsp;·&nbsp; Grade ${k.grade||'—'}</div>
           </div>
         </div>
-        <button class="btn-del" onclick="askDelete('${k.username}','${k.name||k.username}')">Remove</button>
+        <button class="btn-del" onclick="event.stopPropagation();askDelete('${k.username}','${k.name||k.username}')">Remove</button>
       </div>
       <div class="kid-stats-grid">
         <div class="kid-stat"><span class="kid-stat-val">⚡ ${k.level}</span><span class="kid-stat-lbl">Level</span></div>
@@ -731,6 +826,62 @@ async function loadChildren() {
         <div class="kid-stat"><span class="kid-stat-val">🔥 ${k.streak}</span><span class="kid-stat-lbl">Streak</span></div>
       </div>
     </div>`).join('');
+}
+
+function openActivity(username) {
+  const k = kidsCache.find(x => x.username === username);
+  if (!k) return;
+  const prog = k.raw || {};
+  document.getElementById('activity-avatar').textContent = k.emoji;
+  document.getElementById('activity-name').textContent = k.name || k.username;
+  document.getElementById('activity-meta').textContent = `@${k.username} · Grade ${k.grade||'—'}`;
+  document.getElementById('activity-level').textContent = '⚡ ' + k.level;
+  document.getElementById('activity-stars').textContent = '⭐ ' + k.stars;
+  document.getElementById('activity-games').textContent = '🎮 ' + k.games;
+  document.getElementById('activity-streak').textContent = '🔥 ' + k.streak;
+
+  const container = document.getElementById('subjects-container');
+  container.innerHTML = SUBJECTS.map((subj, si) => {
+    const topicGames = prog[subj.key] || {};
+    const chapterEntries = Object.entries(subj.chapters).map(([chKey, chName]) => {
+      const easy   = gamesPlayedAt(topicGames, chKey, 'easy');
+      const medium = gamesPlayedAt(topicGames, chKey, 'medium');
+      const hard   = gamesPlayedAt(topicGames, chKey, 'hard');
+      return { chKey, chName, easy, medium, hard, total: easy+medium+hard };
+    });
+    const playedChapters = chapterEntries.filter(c => c.total > 0);
+    const subjectTotal = chapterEntries.reduce((s,c) => s + c.total, 0);
+
+    const chaptersHTML = playedChapters.length ? playedChapters.map(c => `
+      <div class="chapter-row">
+        <div class="chapter-name">${c.chName}</div>
+        <div class="diff-pills">
+          <div class="diff-pill easy"><span class="dp-n">${c.easy}</span>Easy</div>
+          <div class="diff-pill medium"><span class="dp-n">${c.medium}</span>Medium</div>
+          <div class="diff-pill hard"><span class="dp-n">${c.hard}</span>Hard</div>
+        </div>
+      </div>`).join('') : `<div class="subject-empty">No ${subj.label} questions answered yet</div>`;
+
+    return `
+      <div class="subject-card" id="subj-${si}">
+        <div class="subject-head" onclick="toggleSubject(${si})">
+          <span class="subject-icon">${subj.icon}</span>
+          <span class="subject-name">${subj.label}</span>
+          <span class="subject-count">${subjectTotal} question${subjectTotal!==1?'s':''}</span>
+          <span class="subject-caret">▶</span>
+        </div>
+        <div class="subject-chapters">${chaptersHTML}</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('activity-view').classList.add('open');
+}
+
+function toggleSubject(i) {
+  document.getElementById('subj-'+i).classList.toggle('open');
+}
+function closeActivity() {
+  document.getElementById('activity-view').classList.remove('open');
 }
 
 function askDelete(username, display) {

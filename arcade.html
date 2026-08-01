@@ -304,7 +304,7 @@
    XP INTEGRATION LAYER — wired to MathQuest's real storage
    -------------------------------------------------------------------------
    Reads/writes the same "mq_progress_<username>" blob that math.html /
-   english.html / science.html already save to localStorage.
+   english.html  already save to localStorage.
 
    IMPORTANT: this uses a NEW field, `arcadeXP`, as the spendable wallet —
    NOT `playerXP`. That's deliberate: `playerXP` resets every level-up
@@ -360,7 +360,7 @@
   }
 
 /* ========================= GATE CONFIG ========================= */
-  const XP_PER_BLOCK = 1000;        // XP threshold to unlock launch
+  const XP_PER_BLOCK = 0;
   const SECONDS_PER_BLOCK = 300;    // 5 minutes per 1000 XP
   const SEC_PER_XP = SECONDS_PER_BLOCK / XP_PER_BLOCK; // 0.3 sec per XP point
 

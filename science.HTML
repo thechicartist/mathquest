@@ -353,7 +353,7 @@ const SCI_UNLOCK_CHAIN = {
 };
 
 // ── PERSISTENCE (now backed by the database instead of localStorage) ──
-const API_BASE = 'https://your-worker.your-subdomain.workers.dev'; // ← same Worker URL as math.html / english.html
+const API_BASE = 'https://mathquest-api.energy-gaurav.workers.dev';
 
 async function fetchServerProgress(){
   try{
@@ -366,10 +366,9 @@ async function fetchServerProgress(){
 async function save(){
   const raw=localStorage.getItem('mq_progress_'+currentUser.username);
   const localExisting=raw?JSON.parse(raw):{};
-  // pull latest server state first so we don't clobber math.html's fields
   const serverExisting=await fetchServerProgress();
   const existing={...localExisting,...(serverExisting||{})};
-  const API_BASE = 'https://dash.cloudflare.com/531d690943a0dc4d7b54c9c533cbcec9/workers/services/edit/mathquest-api/production'; // ← same Worker URL as math.html / english.html
+  const data={...existing,totalStars,playerXP,playerLevel,streak,sciGamesPlayed:gamesPlayed,sciTopicGames:topicGames};
   localStorage.setItem('mq_progress_'+currentUser.username,JSON.stringify(data));
   try{
     await fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`, {

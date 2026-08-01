@@ -187,7 +187,6 @@
     <div class="logo">Math<span>Quest</span> 🚀</div>
      <a href="math.html" class="switch-btn">🚀 Math</a>
     <a href="english.html" class="switch-btn">📖 English</a>
-    <a href="science.html" class="switch-btn">🔬 Science</a>
     <a href="arcade.html" class="switch-btn">🎮 Arcade</a>
   </div>
   <div class="header-right">
@@ -203,7 +202,7 @@
 
 <div class="clouds" id="clouds"></div>
 <div class="mascot" id="mascot" onclick="showTip()">🐣</div>
-<div class="speech-bubble" id="speech-bubble">Pick a topic and let's go! 🎯</div>
+<div class="speech-bubble" id="speech-bubble">Pick a topic and let's go! 🎯</div> 
 <div class="unlock-toast" id="unlock-toast">🔓 Topic Unlocked!</div>
 
 <div class="container">
@@ -374,18 +373,27 @@ const GRADE_HIDDEN = {1:['wordprob','measurement'],2:['wordprob','measurement'],
 
 function isGradeNative(t){ return (GRADE_NATIVE[grade]||[]).includes(t); }
 function countQualifying(prereq, difficulty, minScore){ return (topicGames[prereq]?.[difficulty]?.[`q${minScore}`]) || 0; }
-function isTopicUnlocked(t){ if(isGradeNative(t)) return true; const options=UNLOCK_CHAIN[t]; if(!options) return true; return options.some(o=>countQualifying(o.prereq,o.difficulty,o.minScore)>=o.needed); }
+function isTopicUnlocked(t){
+  if(isGradeNative(t)) return true;
+  const options=UNLOCK_CHAIN[t];
+  if(!options) return true;
+  const filteredOptions = (grade >= 4) ? options.filter(o => o.prereq !== 'addsubt') : options;
+  if(filteredOptions.length === 0) return true;
+  return filteredOptions.some(o=>countQualifying(o.prereq,o.difficulty,o.minScore)>=o.needed);
+}
 function getLockInfo(t){
   if(isTopicUnlocked(t)) return null;
   const options=UNLOCK_CHAIN[t]; if(!options) return null;
+  const filteredOptions = (grade >= 4) ? options.filter(o => o.prereq !== 'addsubt') : options;
+  if(filteredOptions.length === 0) return null;
   let best=null,bestPct=-1;
-  for(const o of options){ const played=countQualifying(o.prereq,o.difficulty,o.minScore); const pct=played/o.needed; if(pct>bestPct){bestPct=pct;best={...o,played};} }
+  for(const o of filteredOptions){ const played=countQualifying(o.prereq,o.difficulty,o.minScore); const pct=played/o.needed; if(pct>bestPct){bestPct=pct;best={...o,played};} }
   const remaining=best.needed-best.played; const diffLabel=best.difficulty.charAt(0).toUpperCase()+best.difficulty.slice(1);
   return {prereqKey:best.prereq,prereqName:TOPIC_NAMES[best.prereq],difficulty:best.difficulty,diffLabel,minScore:best.minScore,played:best.played,needed:best.needed,remaining};
 }
 
 // ── PERSISTENCE (localStorage shared with english.html) ──
-const API_BASE = 'https://dash.cloudflare.com/531d690943a0dc4d7b54c9c533cbcec9/workers/services/edit/mathquest-api/production';
+const API_BASE = 'https://mathquest-api.energy-gaurav.workers.dev';
 
 async function fetchServerProgress(){
   try{

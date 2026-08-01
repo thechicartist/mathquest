@@ -185,7 +185,6 @@
     <div class="logo">Word<span>Quest</span> 📖</div>
     <a href="math.html" class="switch-btn">🚀 Math</a>
     <a href="english.html" class="switch-btn">📖 English</a>
-    <a href="science.html" class="switch-btn">🔬 Science</a>
     <a href="arcade.html" class="switch-btn">🎮 Arcade</a>
   </div>
   <div class="header-right">
@@ -375,7 +374,7 @@ function getLockInfo(t){
 }
 
 // ── PERSISTENCE (now backed by the database instead of localStorage) ──
-const API_BASE = 'https://mathquest-api.YOUR-SUBDOMAIN.workers.dev'; // ← put your deployed Worker URL here
+const API_BASE = 'https://dash.cloudflare.com/531d690943a0dc4d7b54c9c533cbcec9/workers/services/edit/mathquest-api/production'; // ← put your deployed Worker URL here
 
 async function fetchServerProgress(){
   try{
