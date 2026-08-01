@@ -8,7 +8,7 @@ body {
 }
 
 /* Top nav buttons */
-.edu-btn {
+.edu-btn {  
   position:fixed; top:16px; right:16px;
   background:linear-gradient(135deg,#202882,#0926e2);
   color:white; border:none; border-radius:50px;
@@ -80,7 +80,7 @@ body {
 
 /* Mobile responsive fixes */
 @media (max-width: 600px) {
-  body { padding-top:170px; }
+  body { padding-top:190px; }
 
   .student-btn, .parent-btn, .edu-btn {
     position:fixed;
@@ -91,11 +91,19 @@ body {
     text-align:center;
     padding:10px 16px;
     font-size:0.9rem;
+    box-sizing:border-box;
   }
 
   .student-btn { top:12px; }
   .parent-btn  { top:60px; }
   .edu-btn     { top:108px; }
 
-  .login-card { padding:28px 22px; }
+  .login-card { padding:28px 22px; max-width:100%; }
+}
+
+@media (max-width: 360px) {
+  body { padding-top:210px; }
+  .student-btn { top:12px; }
+  .parent-btn  { top:58px; }
+  .edu-btn     { top:104px; }
 }

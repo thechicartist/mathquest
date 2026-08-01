@@ -110,7 +110,22 @@ export default {
     if (method === 'POST' && path.startsWith('/progress/')) {
       const u = decodeURIComponent(path.slice(10));
       const body = await request.json();
-      await env.MATHQUEST_DB.put('progress:' + u, JSON.stringify(body));
+
+      // Merge with existing record instead of overwriting it,
+      // so history accumulates across every question/session.
+      const existingRaw = await env.MATHQUEST_DB.get('progress:' + u);
+      const existing = existingRaw ? JSON.parse(existingRaw) : { recentGames: [] };
+
+      const merged = { ...existing, ...body };
+
+      // If this POST includes a single new activity entry, append it
+      // to the running history instead of dropping the old ones.
+      if (body.newActivity) {
+        merged.recentGames = [body.newActivity, ...(existing.recentGames || [])].slice(0, 50);
+        delete merged.newActivity;
+      }
+
+      await env.MATHQUEST_DB.put('progress:' + u, JSON.stringify(merged));
       return json({ ok: true });
     }
 
