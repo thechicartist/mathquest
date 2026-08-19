@@ -206,7 +206,7 @@
   .touch-btn{
     flex:1; padding:16px; text-align:center; font-family:'Orbitron'; font-size:1.2rem;
     background: var(--bg-panel-2); border:1px solid rgba(255,255,255,0.1); border-radius:12px;
-    color:var(--text); user-select:none; -webkit-user-select:none;
+    color:var(--text); user-select:none; -webkit-user-select:none; touch-action:none;
   }
   .touch-btn:active{ background: var(--nebula); }
 
@@ -218,7 +218,9 @@
     margin: 10px 0;
   }
 
-  @media (min-width: 700px){
+  /* iPads can be wide but still use touch. Hide controls only for a real
+     mouse/trackpad, not based on viewport width. */
+  @media (hover:hover) and (pointer:fine){
     .touch-controls.hide-desktop{ display:none; }
   }
 </style>
@@ -516,7 +518,9 @@
     pickerScreen.style.display = 'none';
     endScreen.style.display = 'none';
     gameScreen.style.display = 'block';
-    touchControls.style.display = g.usesTouch === false ? 'none' : '';
+    touchControls.style.display = '';
+    btnLeft.textContent = gameId === 'runner' ? 'JUMP' : '◀';
+    btnRight.textContent = gameId === 'runner' ? 'JUMP' : '▶';
     fitCanvas(); // container was hidden (width 0) until now, so size it after it's visible
     lastTs = performance.now();
     raf = requestAnimationFrame(loop);
@@ -590,6 +594,7 @@
 
   // controls
   window.addEventListener('keydown', e => {
+    if(gameScreen.style.display==='block' && ['ArrowLeft','ArrowRight','ArrowUp',' ','a','d','w'].includes(e.key))e.preventDefault();
     if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
     if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
     if (e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') keys.up = true;
@@ -600,12 +605,14 @@
     if (e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') keys.up = false;
   });
   function bindTouch(el, dir){
-    const set = v => e => { e.preventDefault(); keys[dir] = v; };
-    el.addEventListener('touchstart', set(true));
-    el.addEventListener('touchend', set(false));
-    el.addEventListener('mousedown', set(true));
-    el.addEventListener('mouseup', set(false));
-    el.addEventListener('mouseleave', set(false));
+    const set = v => e => { e.preventDefault(); if(currentGameId==='runner')keys.up=v;else keys[dir]=v; };
+    el.addEventListener('pointerdown', set(true));
+    el.addEventListener('pointerup', set(false));
+    el.addEventListener('pointercancel', set(false));
+    el.addEventListener('pointerleave', set(false));
+    el.addEventListener('touchstart', set(true),{passive:false});
+    el.addEventListener('touchend', set(false),{passive:false});
+    el.addEventListener('touchcancel', set(false),{passive:false});
   }
   bindTouch(btnLeft, 'left');
   bindTouch(btnRight, 'right');
@@ -926,9 +933,7 @@
     runner: RunnerGame
   };
 
-  // Nebula Runner uses tap/left-click or the ◀▶ left button as "jump" too, for touch devices
-  btnLeft.addEventListener('touchstart', () => { if (currentGameId === 'runner') keys.up = true; });
-  btnLeft.addEventListener('touchend', () => { if (currentGameId === 'runner') keys.up = false; });
+  // Nebula Runner accepts a tap anywhere on the playfield as a jump as well.
   canvas.addEventListener('touchstart', (e) => { if (currentGameId === 'runner'){ e.preventDefault(); keys.up = true; } });
   canvas.addEventListener('touchend', (e) => { if (currentGameId === 'runner'){ e.preventDefault(); keys.up = false; } });
   canvas.addEventListener('click', () => { if (currentGameId === 'runner') { keys.up = true; setTimeout(() => keys.up = false, 80); } });
