@@ -57,6 +57,7 @@
   .topics-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); gap:16px; margin-bottom:24px; }
   .topic-card { background:white; border-radius:20px; padding:24px 16px; text-align:center; cursor:pointer; transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 6px 20px var(--shadow); border:3px solid transparent; position:relative; overflow:hidden; }
   .topic-card:hover:not(.locked) { transform:translateY(-6px) scale(1.02); }
+  .topic-card:focus-visible, button:focus-visible, a:focus-visible { outline:4px solid #7C4DFF; outline-offset:3px; }
   .topic-card.selected { transform:translateY(-8px) scale(1.04); }
   .topic-card.locked { cursor:not-allowed; }
   .topic-card.locked .topic-icon,.topic-card.locked .topic-name,.topic-card.locked .topic-desc { opacity:0.3; }
@@ -211,6 +212,10 @@
   @media(max-width:400px){
     .logo{font-size:1.1rem}
   }
+
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;scroll-behavior:auto!important;}
+  }
 </style>
 </head>
 <body>
@@ -259,43 +264,43 @@
     <div class="hero-sub">Choose a topic and start earning stars!</div>
     <div class="section-title" style="margin-bottom:14px;">🗺️ Choose Your Topic</div>
     <div class="topics-grid">
-      <div class="topic-card t-counting"  id="tc-counting"  onclick="handleTopicClick('counting')">
+      <div class="topic-card t-counting"  id="tc-counting"  role="button" tabindex="0" onclick="handleTopicClick('counting')">
         <span class="topic-icon">🍎</span><div class="topic-name">Counting</div><div class="topic-desc">Numbers &amp; sequences</div>
         <div class="lock-overlay" id="lock-counting"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-counting"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-counting" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-counting"></div></div>
       </div>
-      <div class="topic-card t-addsubt"   id="tc-addsubt"   onclick="handleTopicClick('addsubt')">
+      <div class="topic-card t-addsubt"   id="tc-addsubt"   role="button" tabindex="0" onclick="handleTopicClick('addsubt')">
         <span class="topic-icon">➕</span><div class="topic-name">Add &amp; Subtract</div><div class="topic-desc">Plus and minus</div>
         <div class="lock-overlay" id="lock-addsubt"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-addsubt"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-addsubt" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-addsubt"></div></div>
       </div>
-      <div class="topic-card t-multiply"  id="tc-multiply"  onclick="handleTopicClick('multiply')">
+      <div class="topic-card t-multiply"  id="tc-multiply"  role="button" tabindex="0" onclick="handleTopicClick('multiply')">
         <span class="topic-icon">✖️</span><div class="topic-name">Multiplication</div><div class="topic-desc">Times tables &amp; more</div>
         <div class="lock-overlay" id="lock-multiply"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-multiply"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-multiply" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-multiply"></div></div>
       </div>
-      <div class="topic-card t-measurement" id="tc-measurement" onclick="handleTopicClick('measurement')">
+      <div class="topic-card t-measurement" id="tc-measurement" role="button" tabindex="0" onclick="handleTopicClick('measurement')">
         <span class="topic-icon">📏</span><div class="topic-name">Measurement</div><div class="topic-desc">Units &amp; conversions</div>
         <div class="lock-overlay" id="lock-measurement"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-measurement"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-measurement" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-measurement"></div></div>
       </div>
-      <div class="topic-card t-geometry"  id="tc-geometry"  onclick="handleTopicClick('geometry')">
+      <div class="topic-card t-geometry"  id="tc-geometry"  role="button" tabindex="0" onclick="handleTopicClick('geometry')">
         <span class="topic-icon">📐</span><div class="topic-name">Geometry</div><div class="topic-desc">Shapes &amp; angles</div>
         <div class="lock-overlay" id="lock-geometry"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-geometry"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-geometry" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-geometry"></div></div>
       </div>
-      <div class="topic-card t-wordprob" id="tc-wordprob" onclick="handleTopicClick('wordprob')">
+      <div class="topic-card t-wordprob" id="tc-wordprob" role="button" tabindex="0" onclick="handleTopicClick('wordprob')">
         <span class="topic-icon">📝</span><div class="topic-name">Word Problems</div><div class="topic-desc">Real-world math</div>
         <div class="lock-overlay" id="lock-wordprob"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-wordprob"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-wordprob" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-wordprob"></div></div>
       </div>
-      <div class="topic-card t-fractions" id="tc-fractions" onclick="handleTopicClick('fractions')">
+      <div class="topic-card t-fractions" id="tc-fractions" role="button" tabindex="0" onclick="handleTopicClick('fractions')">
         <span class="topic-icon">🍕</span><div class="topic-name">Fractions</div><div class="topic-desc">Add, subtract &amp; compare</div>
         <div class="lock-overlay" id="lock-fractions"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-fractions"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-fractions" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-fractions"></div></div>
       </div>
-      <div class="topic-card t-decimals"  id="tc-decimals"  onclick="handleTopicClick('decimals')">
+      <div class="topic-card t-decimals"  id="tc-decimals"  role="button" tabindex="0" onclick="handleTopicClick('decimals')">
         <span class="topic-icon">🔢</span><div class="topic-name">Decimals</div><div class="topic-desc">Decimal operations</div>
         <div class="lock-overlay" id="lock-decimals"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-decimals"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-decimals" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-decimals"></div></div>
       </div>
-      <div class="topic-card t-percent"   id="tc-percent"   onclick="handleTopicClick('percent')">
+      <div class="topic-card t-percent"   id="tc-percent"   role="button" tabindex="0" onclick="handleTopicClick('percent')">
         <span class="topic-icon">💯</span><div class="topic-name">Percentages</div><div class="topic-desc">% of numbers</div>
         <div class="lock-overlay" id="lock-percent"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-percent"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-percent" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-percent"></div></div>
       </div>
-      <div class="topic-card t-algebra"   id="tc-algebra"   onclick="handleTopicClick('algebra')">
+      <div class="topic-card t-algebra"   id="tc-algebra"   role="button" tabindex="0" onclick="handleTopicClick('algebra')">
         <span class="topic-icon">🔍</span><div class="topic-name">Algebra</div><div class="topic-desc">Find the unknown</div>
         <div class="lock-overlay" id="lock-algebra"><div class="lock-icon">🔒</div><div class="lock-games-text" id="lock-text-algebra"></div><div class="lock-progress-wrap"><div class="lock-progress-fill" id="lock-prog-algebra" style="width:0%"></div></div><div class="lock-progress-label" id="lock-label-algebra"></div></div>
       </div>
@@ -351,10 +356,10 @@
 </div>
 
 <!-- QUEST MODAL -->
-<div class="quest-overlay" id="quest-overlay" onclick="closeQuestsIfBg(event)">
-  <div class="quest-panel">
+<div class="quest-overlay" id="quest-overlay" role="dialog" aria-modal="true" aria-labelledby="quest-title" onclick="closeQuestsIfBg(event)">
+  <div class="quest-panel" tabindex="-1">
     <div class="quest-header">
-      <div class="quest-header-title">📜 Daily Quests</div>
+      <div class="quest-header-title" id="quest-title">📜 Daily Quests</div>
       <button class="quest-close" onclick="closeQuests()">✕</button>
     </div>
     <div class="quest-list" id="quest-list"></div>
@@ -363,7 +368,8 @@
 
 <script>
 // ── SESSION ──
-const currentUser = JSON.parse(sessionStorage.getItem('mq_user'));
+function parseJSON(value, fallback={}){try{return value?JSON.parse(value):fallback;}catch{return fallback;}}
+const currentUser = parseJSON(sessionStorage.getItem('mq_user'), null);
 if(!currentUser) location.href='index.html';
 function doLogout(){ if(!confirm('Switch user? Your progress is saved!')) return; sessionStorage.removeItem('mq_user'); location.href='index.html'; }
 
@@ -438,32 +444,36 @@ async function fetchServerProgress(){
   return null;
 }
 
-async function save(){
-  const raw=localStorage.getItem('mq_progress_'+currentUser.username);
-  const localExisting=raw?JSON.parse(raw):{};
-  const serverExisting=await fetchServerProgress();
-  const existing={...localExisting,...(serverExisting||{})};
-  const data={...existing,totalStars,playerXP,playerLevel,streak,gamesPlayed,topicGames};
-  localStorage.setItem('mq_progress_'+currentUser.username, JSON.stringify(data));
-  try{
-    await fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(data)
-    });
-  }catch(e){ console.error('Failed to save progress to server:', e); }
+let saveQueue=Promise.resolve();
+function progressStorageKey(){return 'mq_progress_'+currentUser.username;}
+function progressSnapshot(reset=false){
+  const existing=reset?{}:parseJSON(localStorage.getItem(progressStorageKey()),{});
+  // Include both subject areas explicitly so a reset cannot restore stale English data.
+  return {...existing,totalStars,playerXP,playerLevel,streak,gamesPlayed,topicGames,engTopicGames,engGamesPlayed,arcadeXP};
+}
+function save(reset=false){
+  const data=progressSnapshot(reset);
+  localStorage.setItem(progressStorageKey(), JSON.stringify(data));
+  // Queue writes so an older request can never finish after—and overwrite—a newer one.
+  saveQueue=saveQueue.catch(()=>{}).then(async()=>{
+    try{
+      await fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    }catch(e){ console.error('Failed to save progress to server:', e); }
+  });
+  return saveQueue;
 }
 
 async function load(){
-  const raw=localStorage.getItem('mq_progress_'+currentUser.username);
-  if(raw){const d=JSON.parse(raw);totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.gamesPlayed||0;topicGames=d.topicGames||{};engTopicGames=d.engTopicGames||{};engGamesPlayed=d.engGamesPlayed||0;}
+  const raw=localStorage.getItem(progressStorageKey());
+  if(raw){const d=parseJSON(raw);totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.gamesPlayed||0;topicGames=d.topicGames||{};engTopicGames=d.engTopicGames||{};engGamesPlayed=d.engGamesPlayed||0;arcadeXP=d.arcadeXP||0;}
   try{
     const res=await fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`);
     if(res.ok){
       const d=await res.json();
       if(d && Object.keys(d).length){
         totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.gamesPlayed||0;topicGames=d.topicGames||{};engTopicGames=d.engTopicGames||{};engGamesPlayed=d.engGamesPlayed||0;
-        localStorage.setItem('mq_progress_'+currentUser.username, JSON.stringify(d));
+        arcadeXP=d.arcadeXP||0;
+        localStorage.setItem(progressStorageKey(), JSON.stringify(d));
       }
     }
   }catch(e){ console.error('Failed to load progress from server:', e); }
@@ -512,14 +522,19 @@ function goHome(){ clearInterval(timerInterval); showScreen('screen-home'); upda
 
 // ── QUESTION GENERATORS ──
 function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
-function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
+function shuffle(arr){const copy=[...arr];for(let i=copy.length-1;i>0;i--){const j=rnd(0,i);[copy[i],copy[j]]=[copy[j],copy[i]];}return copy;}
 function gcd(a,b){return b===0?a:gcd(b,a%b);}
 function lcm(a,b){return a*b/gcd(a,b);}
+function fracEq(f1,f2){
+  const [n1,d1]=f1.split('/').map(Number);
+  const [n2,d2]=f2.split('/').map(Number);
+  return n1*d2===n2*d1;
+}
 function makeOpts(ans,spread=5,count=4){const opts=new Set([String(ans)]);let t=0;while(opts.size<count&&t++<100){const w=typeof ans==='number'?ans+rnd(-spread,spread):ans;if(typeof ans==='number'&&w!==ans&&w>=0)opts.add(String(w));}return shuffle([...opts]).slice(0,count);}
-function genCounting(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const type=['next','missing','biggest'][rnd(0,diff==='easy'?1:2)];let text,ans,opts;if(type==='next'){const step=diff==='easy'?1:diff==='medium'?rnd(2,5):rnd(5,10);const start=rnd(1,diff==='easy'?15:50);const seq=[start,start+step,start+2*step,start+3*step];ans=start+4*step;text=`What comes next? ${seq.join(', ')}, ___`;opts=makeOpts(ans,step*2);}else if(type==='missing'){const step=diff==='easy'?1:rnd(2,5);const start=rnd(1,40);const pos=rnd(1,3);const seq=[start,start+step,start+2*step,start+3*step];ans=seq[pos];seq[pos]='___';text=`Fill the blank: ${seq.join(', ')}`;opts=makeOpts(ans,step*2);}else{const nums=shuffle([rnd(10,50),rnd(10,50),rnd(10,50),rnd(10,50)]);ans=Math.max(...nums);text='Which is the BIGGEST?';opts=nums.map(String);}qs.push({text,answer:String(ans),options:shuffle(opts),hint:'Count carefully!'});}return qs;}
+function genCounting(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const type=['next','missing','biggest'][rnd(0,diff==='easy'?1:2)];let text,ans,opts;if(type==='next'){const step=diff==='easy'?1:diff==='medium'?rnd(2,5):rnd(5,10);const start=rnd(1,diff==='easy'?15:50);const seq=[start,start+step,start+2*step,start+3*step];ans=start+4*step;text=`What comes next? ${seq.join(', ')}, ___`;opts=makeOpts(ans,step*2);}else if(type==='missing'){const step=diff==='easy'?1:rnd(2,5);const start=rnd(1,40);const pos=rnd(1,3);const seq=[start,start+step,start+2*step,start+3*step];ans=seq[pos];seq[pos]='___';text=`Fill the blank: ${seq.join(', ')}`;opts=makeOpts(ans,step*2);}else{const values=new Set();while(values.size<4)values.add(rnd(10,50));const nums=shuffle([...values]);ans=Math.max(...nums);text='Which is the BIGGEST?';opts=nums.map(String);}qs.push({text,answer:String(ans),options:shuffle(opts),hint:'Count carefully!'});}return qs;}
 function genAddSubt(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const op=rnd(0,1)===0?'add':'sub';let a,b;if(diff==='easy'){a=rnd(1,10);b=rnd(1,10);}else if(diff==='medium'){a=rnd(10,50);b=rnd(5,30);}else{a=rnd(50,200);b=rnd(20,100);}if(op==='sub'&&b>a){let t=a;a=b;b=t;}const ans=op==='add'?a+b:a-b;qs.push({text:`${a} ${op==='add'?'+':'-'} ${b} = ?`,answer:String(ans),options:shuffle(makeOpts(ans,8)),hint:op==='add'?'Count on!':'Count backwards!'});}return qs;}
 function genMultiply(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){let a,b;if(diff==='easy'){a=rnd(2,10);b=rnd(2,10);}else if(diff==='medium'){a=rnd(7,20);b=rnd(7,15);}else{a=rnd(12,50);b=rnd(12,30);}const ans=a*b;qs.push({text:`${a} × ${b} = ?`,answer:String(ans),options:shuffle(makeOpts(ans,ans*0.2+5)),hint:'Use your times tables!'});}return qs;}
-function genFractions(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const type=['add','sub','compare','simplify'][rnd(0,3)];let text,displayHTML=null,ans,opts,hint;if(type==='add'||type==='sub'){const maxD=diff==='easy'?6:12;const d1=rnd(2,maxD),d2=rnd(2,maxD);const n1=rnd(1,d1-1),n2=rnd(1,d2-1);const L=lcm(d1,d2);const resN=type==='add'?n1*(L/d1)+n2*(L/d2):n1*(L/d1)-n2*(L/d2);if(resN<=0){i--;continue;}const g=gcd(resN,L);ans=`${resN/g}/${L/g}`;text=type==='add'?'Add:':'Subtract:';displayHTML=`<div class="fraction-display"><span class="frac"><span class="frac-num">${n1}</span><span class="frac-den">${d1}</span></span>${type==='add'?'+':'-'}<span class="frac"><span class="frac-num">${n2}</span><span class="frac-den">${d2}</span></span></div>`;hint='Find a common denominator!';opts=[ans];let s1=0;while(opts.length<4&&s1++<60){const wn=rnd(1,9),wd=rnd(2,12),w=`${wn}/${wd}`;if(!opts.includes(w))opts.push(w);}}else if(type==='compare'){const d=rnd(3,10),n1=rnd(1,d-1);let n2=rnd(1,d-1),s2=0;while(n2===n1&&s2++<20)n2=rnd(1,d-1);if(n2===n1){i--;continue;}ans=n1>n2?`${n1}/${d}`:`${n2}/${d}`;text='Which fraction is BIGGER?';hint='Same denominator? Compare the tops!';opts=[`${n1}/${d}`,`${n2}/${d}`];let s3=0;while(opts.length<4&&s3++<40){const wn=rnd(1,d-1),w=`${wn}/${d}`;if(!opts.includes(w))opts.push(w);}}else{const simpleD=rnd(2,6),simpleN=rnd(1,simpleD-1);if(gcd(simpleN,simpleD)!==1){i--;continue;}const k=rnd(2,diff==='easy'?3:5);const n=simpleN*k,d=simpleD*k;ans=`${simpleN}/${simpleD}`;text='Simplify:';displayHTML=`<div class="fraction-display"><span class="frac"><span class="frac-num">${n}</span><span class="frac-den">${d}</span></span></div>`;hint='Divide top and bottom by their GCD!';opts=[ans];let s4=0;while(opts.length<4&&s4++<60){const wn=rnd(1,9),wd=rnd(2,12),w=`${wn}/${wd}`;if(!opts.includes(w)&&w!==ans)opts.push(w);}}opts=shuffle(opts).slice(0,4);if(!opts.includes(ans))opts[rnd(0,3)]=ans;qs.push({text,displayHTML,answer:ans,options:shuffle(opts),hint});}return qs;}
+function genFractions(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const type=['add','sub','compare','simplify'][rnd(0,3)];let text,displayHTML=null,ans,opts,hint;if(type==='add'||type==='sub'){const maxD=diff==='easy'?6:12;const d1=rnd(2,maxD),d2=rnd(2,maxD);const n1=rnd(1,d1-1),n2=rnd(1,d2-1);const L=lcm(d1,d2);const resN=type==='add'?n1*(L/d1)+n2*(L/d2):n1*(L/d1)-n2*(L/d2);if(resN<=0){i--;continue;}const g=gcd(resN,L);ans=`${resN/g}/${L/g}`;text=type==='add'?'Add:':'Subtract:';displayHTML=`<div class="fraction-display"><span class="frac"><span class="frac-num">${n1}</span><span class="frac-den">${d1}</span></span>${type==='add'?'+':'-'}<span class="frac"><span class="frac-num">${n2}</span><span class="frac-den">${d2}</span></span></div>`;hint='Find a common denominator!';opts=[ans];let s1=0;while(opts.length<4&&s1++<60){const wn=rnd(1,9),wd=rnd(2,12),w=`${wn}/${wd}`;if(!opts.includes(w)&&!opts.some(o=>fracEq(o,w)))opts.push(w);}}else if(type==='compare'){const d=rnd(3,10),n1=rnd(1,d-1);let n2=rnd(1,d-1),s2=0;while(n2===n1&&s2++<20)n2=rnd(1,d-1);if(n2===n1){i--;continue;}const answerNumerator=Math.max(n1,n2);ans=`${answerNumerator}/${d}`;text='Which fraction is BIGGER?';hint='Compare the fractions carefully!';opts=[ans];let s3=0;while(opts.length<4&&s3++<300){const wd=rnd(2,60),wn=rnd(1,wd-1),w=`${wn}/${wd}`;if(wn*d<answerNumerator*wd&&!opts.some(o=>fracEq(o,w)))opts.push(w);}if(opts.length<4){i--;continue;}}else{const simpleD=rnd(2,6),simpleN=rnd(1,simpleD-1);if(gcd(simpleN,simpleD)!==1){i--;continue;}const k=rnd(2,diff==='easy'?3:5);const n=simpleN*k,d=simpleD*k;ans=`${simpleN}/${simpleD}`;text='Simplify:';displayHTML=`<div class="fraction-display"><span class="frac"><span class="frac-num">${n}</span><span class="frac-den">${d}</span></span></div>`;hint='Divide top and bottom by their GCD!';opts=[ans];let s4=0;while(opts.length<4&&s4++<60){const wn=rnd(1,9),wd=rnd(2,12),w=`${wn}/${wd}`;if(!opts.includes(w)&&!opts.some(o=>fracEq(o,w)))opts.push(w);}}opts=shuffle(opts).slice(0,4);if(!opts.includes(ans))opts[rnd(0,3)]=ans;qs.push({text,displayHTML,answer:ans,options:shuffle(opts),hint});}return qs;}
 function genDecimals(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const type=['add','sub'][rnd(0,1)];let a,b;if(diff==='easy'){a=+(rnd(10,99)/10).toFixed(1);b=+(rnd(10,99)/10).toFixed(1);}else{a=+(rnd(100,999)/100).toFixed(2);b=+(rnd(100,999)/100).toFixed(2);}if(type==='sub'&&b>a){let t=a;a=b;b=t;}const ans=+(type==='add'?a+b:a-b).toFixed(2);const opts=new Set([String(ans)]);let safe=0;while(opts.size<4&&safe++<60){const w=+(ans+(rnd(-5,5)*0.1)).toFixed(2);if(w>0&&w!==ans)opts.add(String(w));}qs.push({text:`${a} ${type==='add'?'+':'-'} ${b} = ?`,answer:String(ans),options:shuffle([...opts]),hint:'Line up the decimal points!'});}return qs;}
 function genPercent(diff){const qs=[];const pcts=diff==='easy'?[10,20,25,50]:diff==='medium'?[15,30,40,75]:[12,17,33,66];for(let i=0;i<TOTAL_QS;i++){const p=pcts[rnd(0,pcts.length-1)];const n=Math.round(rnd(20,200)/5)*5;const ans=+(p/100*n).toFixed(1);const opts=new Set([String(ans)]);let safe=0;while(opts.size<4&&safe++<60){const w=+(ans*(1+rnd(-3,3)*0.1)).toFixed(1);if(w>0&&w!==ans)opts.add(String(w));}qs.push({text:`What is ${p}% of ${n}?`,answer:String(ans),options:shuffle([...opts]),hint:`${p}% = ${p}/100`});}return qs;}
 function genAlgebra(diff){const qs=[];for(let i=0;i<TOTAL_QS;i++){const x=rnd(diff==='easy'?1:2,diff==='easy'?10:30);const a=rnd(2,diff==='easy'?5:15);const b=rnd(0,diff==='easy'?10:20);const result=a*x+b;const text=rnd(0,1)===0?`${a}x + ${b} = ${result}, find x`:`${a}x = ${result-b}, find x`;qs.push({text,answer:String(x),options:shuffle(makeOpts(x,6)),hint:'Do the same to both sides!'});}return qs;}
@@ -540,7 +555,7 @@ function genWordProb(diff){
     const hard=[
       ()=>{const r=rnd(3,9),d=rnd(2,7);return{text:`A car travels ${r*d} km in ${d} hours. What is its speed (km/h)?`,ans:r};},
       ()=>{const pct=rnd(2,9)*10,tot=rnd(2,9)*10;return{text:`${pct}% of students passed. There are ${tot} students. How many passed?`,ans:Math.round(pct/100*tot)};},
-      ()=>{const a=rnd(3,12),b=rnd(3,12),tot=a+b+rnd(5,20);return{text:`A has ${a}, B has ${b}, together they have ${tot}. How many does C have?`,ans:tot-a-b};},
+      ()=>{const a=rnd(3,12),b=rnd(3,12),tot=a+b+rnd(5,20);return{text:`A has ${a}, B has ${b}, and A, B, and C have ${tot} in total. How many does C have?`,ans:tot-a-b};},
     ];
     const pool=diff==='easy'?easy:diff==='medium'?med:hard;
     const t=pool[rnd(0,pool.length-1)]();
@@ -572,7 +587,12 @@ function genMeasurement(diff){
   }
   return qs;
 }
-function buildQuestions(){const gen={counting:genCounting,addsubt:genAddSubt,multiply:genMultiply,fractions:genFractions,decimals:genDecimals,percent:genPercent,algebra:genAlgebra,geometry:genGeometry,wordprob:genWordProb,measurement:genMeasurement};return gen[topic](difficulty);}
+function assertQuestionIntegrity(q){
+  const answer=String(q.answer);
+  const matches=q.options.filter(option=>String(option)===answer).length;
+  if(q.options.length!==4||new Set(q.options.map(String)).size!==4||matches!==1)throw new Error('Invalid question options generated');
+}
+function buildQuestions(){const gen={counting:genCounting,addsubt:genAddSubt,multiply:genMultiply,fractions:genFractions,decimals:genDecimals,percent:genPercent,algebra:genAlgebra,geometry:genGeometry,wordprob:genWordProb,measurement:genMeasurement};const qs=gen[topic](difficulty);qs.forEach(assertQuestionIntegrity);return qs;}
 
 // ── GAME FLOW ──
 function startGame(){
@@ -630,7 +650,7 @@ function showUnlockToast(topics){const label=topics.length===1?TOPIC_NAMES[topic
 function retryGame(){currentQ=0;score=0;startGame();}
 
 // ── XP ──
-function addXP(amount){const old=playerLevel;playerXP+=amount;arcadeXP=(arcadeXP||0)+amount;const needed=playerLevel*100;if(playerXP>=needed){playerXP-=needed;playerLevel++;setTimeout(()=>showLevelUp(old,playerLevel),600);}updatePlayerUI();}
+function addXP(amount){const old=playerLevel;playerXP+=amount;arcadeXP=(arcadeXP||0)+amount;while(playerXP>=playerLevel*100){playerXP-=playerLevel*100;playerLevel++;}if(playerLevel>old)setTimeout(()=>showLevelUp(old,playerLevel),600);updatePlayerUI();}
 function showLevelUp(oldLvl,newLvl){const av=getAvatar(newLvl),oldAv=getAvatar(oldLvl);const changed=av.emoji!==oldAv.emoji;const popup=document.createElement('div');popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center';popup.innerHTML=`<div style="background:white;border-radius:28px;padding:40px 32px;text-align:center;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);border:4px solid #FFD54F"><div style="font-size:4rem;margin-bottom:8px">${av.emoji}</div><div style="font-family:'Fredoka One',cursive;font-size:2rem;color:#1A237E;margin-bottom:6px">LEVEL UP! 🎉</div><div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#FF7043;margin-bottom:8px">Level ${newLvl} reached!</div>${changed?`<div style="font-size:1rem;font-weight:700;color:#5C6BC0;margin:12px 0">✨ New avatar: <strong>${av.title}</strong> ${av.emoji}</div>`:''}<button onclick="this.parentElement.parentElement.remove()" style="background:linear-gradient(135deg,#FF7043,#FF5722);color:white;border:none;border-radius:16px;padding:14px 32px;font-family:'Fredoka One',cursive;font-size:1.2rem;cursor:pointer">Awesome! 🚀</button></div>`;document.body.appendChild(popup);launchConfetti();}
 
 // ── TIMER ──
@@ -649,10 +669,10 @@ function makeClouds(){const c=document.getElementById('clouds');for(let i=0;i<5;
 // ── QUESTS ──
 const QUEST_DEFS=[{id:'first_game',icon:'🎮',name:'First Steps',desc:'Complete your first game',type:'games',target:1,xp:50},{id:'games2',icon:'🕹️',name:'Double Trouble',desc:'Complete 2 games',type:'games',target:2,xp:80},{id:'streak3',icon:'🔥',name:'On Fire',desc:'Get a 3-answer streak',type:'streak',target:3,xp:75},{id:'streak5',icon:'💥',name:'Unstoppable',desc:'Get a 5-answer streak',type:'streak',target:5,xp:150},{id:'perfect1',icon:'⭐',name:'Perfect Round',desc:'Get 10/10 in a game',type:'perfect',target:1,xp:120},{id:'perfect5',icon:'🌟',name:'Perfectionist',desc:'Get 10/10 five times',type:'perfect',target:5,xp:400},{id:'stars10',icon:'✨',name:'Star Collector',desc:'Earn 10 stars total',type:'stars',target:10,xp:100},{id:'stars30',icon:'🌠',name:'Star Hoarder',desc:'Earn 30 stars total',type:'stars',target:30,xp:250},{id:'level5',icon:'🦁',name:'Level Up!',desc:'Reach Level 5',type:'level',target:5,xp:200},{id:'level10',icon:'🧙',name:'Wizard Status',desc:'Reach Level 10',type:'level',target:10,xp:500},{id:'correct50',icon:'✅',name:'Answer Machine',desc:'Answer 50 correctly',type:'correct',target:50,xp:150},{id:'correct200',icon:'🧠',name:'Math Brain',desc:'Answer 200 correctly',type:'correct',target:200,xp:500},{id:'topics3',icon:'🗺️',name:'Explorer',desc:'Play 3 different topics',type:'topics',target:3,xp:80},{id:'topics6',icon:'🌍',name:'World Traveller',desc:'Play all 6+ topics',type:'topics',target:6,xp:200}];
 let questProgress={},perfectCount=0,totalCorrect=0,topicsPlayed=new Set(),dailyQuestIds=[],dailyQuestDate='';
-function todayStr(){return new Date().toISOString().slice(0,10);}
+function todayStr(){const now=new Date();return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;}
 function pickDailyQuests(){const unclaimed=QUEST_DEFS.filter(d=>!(questProgress[d.id]?.claimed));const pool=unclaimed.length>=3?unclaimed:QUEST_DEFS;dailyQuestIds=[...pool].sort(()=>Math.random()-0.5).slice(0,3).map(d=>d.id);dailyQuestDate=todayStr();}
 function saveQuests(){localStorage.setItem('mq_quests_'+currentUser.username,JSON.stringify({questProgress,perfectCount,totalCorrect,topicsPlayed:[...topicsPlayed],dailyQuestIds,dailyQuestDate}));}
-function loadQuests(){const raw=localStorage.getItem('mq_quests_'+currentUser.username);if(raw){const d=JSON.parse(raw);questProgress=d.questProgress||{};perfectCount=d.perfectCount||0;totalCorrect=d.totalCorrect||0;topicsPlayed=new Set(d.topicsPlayed||[]);dailyQuestIds=d.dailyQuestIds||[];dailyQuestDate=d.dailyQuestDate||'';}if(dailyQuestDate!==todayStr()||!dailyQuestIds.length){pickDailyQuests();saveQuests();}}
+function loadQuests(){const raw=localStorage.getItem('mq_quests_'+currentUser.username);if(raw){const d=parseJSON(raw);questProgress=d.questProgress||{};perfectCount=d.perfectCount||0;totalCorrect=d.totalCorrect||0;topicsPlayed=new Set(d.topicsPlayed||[]);dailyQuestIds=d.dailyQuestIds||[];dailyQuestDate=d.dailyQuestDate||'';}if(dailyQuestDate!==todayStr()||!dailyQuestIds.length){pickDailyQuests();saveQuests();}}
 function getQuestProgress(def){const p=questProgress[def.id]||{progress:0,claimed:false};if(def.type==='games')p.progress=gamesPlayed;if(def.type==='stars')p.progress=totalStars;if(def.type==='level')p.progress=playerLevel;if(def.type==='correct')p.progress=totalCorrect;if(def.type==='topics')p.progress=topicsPlayed.size;if(def.type==='streak')p.progress=questProgress[def.id]?.progress||0;if(def.type==='perfect')p.progress=perfectCount;return p;}
 function isClaimable(def){const p=getQuestProgress(def);return !p.claimed&&p.progress>=def.target;}
 function anyClaimable(){return dailyQuestIds.some(id=>{const def=QUEST_DEFS.find(d=>d.id===id);return def&&isClaimable(def);});}
@@ -670,16 +690,21 @@ function renderQuestList(){
     list.appendChild(card);
   });
 }
-function openQuests(){renderQuestList();document.getElementById('quest-overlay').classList.add('open');}
+function openQuests(){renderQuestList();document.getElementById('quest-overlay').classList.add('open');document.querySelector('.quest-panel').focus();}
 function closeQuests(){document.getElementById('quest-overlay').classList.remove('open');}
 function closeQuestsIfBg(e){if(e.target===document.getElementById('quest-overlay'))closeQuests();}
 function updateQuestTrackers(gameScore,gameTopic){topicsPlayed.add(gameTopic);totalCorrect+=gameScore;if(gameScore===TOTAL_QS)perfectCount++;QUEST_DEFS.filter(d=>d.type==='streak').forEach(def=>{if(!questProgress[def.id])questProgress[def.id]={progress:0,claimed:false};if(maxStreakThisGame>=def.target)questProgress[def.id].progress=Math.max(questProgress[def.id].progress,maxStreakThisGame);});saveQuests();updateQuestNotif();}
 
 // ── RESET ──
-function confirmReset(){if(!confirm(`Reset ALL progress for ${currentUser.username}?`))return;totalStars=0;playerXP=0;playerLevel=1;streak=0;gamesPlayed=0;topicGames={};engTopicGames={};engGamesPlayed=0;questProgress={};perfectCount=0;totalCorrect=0;topicsPlayed=new Set();pickDailyQuests();save();saveQuests();updatePlayerUI();updateQuestNotif();}
+function confirmReset(){if(!confirm(`Reset ALL progress for ${currentUser.username}?`))return;totalStars=0;playerXP=0;playerLevel=1;streak=0;gamesPlayed=0;topicGames={};engTopicGames={};engGamesPlayed=0;arcadeXP=0;questProgress={};perfectCount=0;totalCorrect=0;topicsPlayed=new Set();pickDailyQuests();save(true);saveQuests();updatePlayerUI();updateQuestNotif();}
 
 // ── INIT ──
 makeClouds();
+function showTip(){const bubble=document.getElementById('speech-bubble');bubble.style.display='block';clearTimeout(showTip.timeout);showTip.timeout=setTimeout(()=>bubble.style.display='none',3500);}
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape')closeQuests();
+  if((event.key==='Enter'||event.key===' ')&&event.target.classList.contains('topic-card')){event.preventDefault();event.target.click();}
+});
 (async function init(){
   await load();
   loadQuests();

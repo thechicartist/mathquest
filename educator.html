@@ -172,12 +172,15 @@
   <div class="auth-sub">Manage your classes on CoreQuest</div>
   <div class="auth-tabs">
     <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
-    <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+    <!-- <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button> -->
   </div>
   <div id="form-login">
     <div class="field"><label>Username</label><input type="text" id="login-user" placeholder="Your username" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="field"><label>Password</label><input type="password" id="login-pass" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <button class="auth-btn" onclick="doLogin()">🔓 Log In</button>
+      <div style="margin-top:20px;padding-top:16px;border-top:2px solid #F5F5F5;text-align:center;font-size:0.82rem;color:#B0BEC5;font-weight:600">
+     Accounts are created by institutes.
+  </div>
     <div class="auth-err" id="login-err"></div>
   </div>
   <div id="form-signup" style="display:none">

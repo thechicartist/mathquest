@@ -245,16 +245,17 @@
         </svg>
         <div class="gauge-center">
           <div class="gauge-xp" id="gateXpValue">0</div>
-          <div class="gauge-label">XP available</div>
+          <div class="gauge-label">Stars available</div>
         </div>
       </div>
     </div>
 
     <div id="lockedMsg" class="locked-msg" style="display:none;">
-      You need at least 1000 XP to launch. Keep solving problems to refuel!
+      You need at least 2 stars to launch. Keep solving problems to refuel!
     </div>
 
-    <div class="rate-note">Rate: <b>1000 XP = 5 minutes</b> of flight time.<br>Your full balance converts to playtime and is spent when you launch.</div>
+    <div class="rate-note">Rate: <b>2 stars = 1 minute</b> of flight time.<br>Your full balance converts to playtime and is spent when you launch.</div>
+    <div class="rate-note" id="totalPlayedNote">Total time played: <b id="totalPlayedValue">0:00</b></div>
 
     <button class="primary" id="launchBtn">Choose a game (— min —s)</button>
   </div>
@@ -271,8 +272,12 @@
   <!-- GAME SCREEN -->
   <div id="gameScreen" style="width:100%; max-width:640px;">
     <div class="hud">
-      <span id="hudTime">05:00</span>
+      <span id="hudElapsed">0:00 played</span>
       <div class="fuel-bar-wrap"><div class="fuel-bar" id="fuelBar"></div></div>
+      <span id="hudStarsLeft">0 ⭐ left</span>
+    </div>
+    <div class="hud" style="margin-top:-4px;">
+      <span id="hudTime">05:00</span>
       <span id="hudScore">0 ✦</span>
     </div>
     <div id="canvasWrap">
@@ -339,7 +344,8 @@
     const raw = localStorage.getItem('mq_progress_' + currentUser.username);
     return raw ? JSON.parse(raw) : {
       totalStars: 0, playerXP: 0, playerLevel: 1, streak: 0, gamesPlayed: 0,
-      topicGames: {}, engTopicGames: {}, engGamesPlayed: 0, arcadeXP: 0
+      topicGames: {}, engTopicGames: {}, engGamesPlayed: 0, arcadeXP: 0,
+      arcadeSecondsPlayed: 0
     };
   }
 
@@ -349,20 +355,32 @@
 
   async function getStudentXP() {
     const data = loadProgress();
-    return data.arcadeXP || 0;
+    return data.totalStars || 0;
   }
 
   async function spendStudentXP(amount) {
     const data = loadProgress();
-    data.arcadeXP = Math.max(0, (data.arcadeXP || 0) - amount);
+    data.totalStars = Math.max(0, (data.totalStars || 0) - amount);
     saveProgress(data); // preserves every other field (stars, level, quests, etc.)
-    return data.arcadeXP;
+    return data.totalStars;
+  }
+
+  async function logArcadeSeconds(seconds) {
+    const data = loadProgress();
+    data.arcadeSecondsPlayed = (data.arcadeSecondsPlayed || 0) + seconds;
+    saveProgress(data);
+    return data.arcadeSecondsPlayed;
+  }
+
+  async function getArcadeSecondsPlayed() {
+    const data = loadProgress();
+    return data.arcadeSecondsPlayed || 0;
   }
 
 /* ========================= GATE CONFIG ========================= */
-  const XP_PER_BLOCK = 0;
-  const SECONDS_PER_BLOCK = 300;    // 5 minutes per 1000 XP
-  const SEC_PER_XP = SECONDS_PER_BLOCK / XP_PER_BLOCK; // 0.3 sec per XP point
+  const XP_PER_BLOCK = 2;
+  const SECONDS_PER_BLOCK = 60;     // 1 minute per 2 stars
+  const SEC_PER_XP = SECONDS_PER_BLOCK / XP_PER_BLOCK; // 30 sec per star
 
   const gateScreen = document.getElementById('gateScreen');
   const pickerScreen = document.getElementById('pickerScreen');
@@ -387,13 +405,15 @@
   async function refreshGate(){
     const xp = await getStudentXP();
     gateXpValue.textContent = xp;
-    const pct = Math.min(1, xp / (XP_PER_BLOCK * 5)); // gauge maxes visually at 5000xp
+    const totalPlayed = await getArcadeSecondsPlayed();
+    document.getElementById('totalPlayedValue').textContent = formatMinSec(totalPlayed);
+    const pct = Math.min(1, xp / 50); // gauge maxes visually at 50 stars
     gateGaugeFill.setAttribute('stroke-dashoffset', GAUGE_CIRC * (1 - pct));
 
     if (xp < XP_PER_BLOCK){
       lockedMsg.style.display = 'block';
       launchBtn.disabled = true;
-      launchBtn.textContent = 'Need 1000 XP to launch';
+      launchBtn.textContent = 'Need 2 stars to launch';
     } else {
       lockedMsg.style.display = 'none';
       launchBtn.disabled = false;
@@ -456,8 +476,6 @@
 
   confirmLaunchBtn.addEventListener('click', async () => {
     if (!selectedGame) return;
-    const xp = await getStudentXP();
-    await spendStudentXP(xp); // spend the FULL balance up front — this is the "consumed" cost of the session
     pickerScreen.style.display = 'none';
     startGame(queuedPlaySeconds, selectedGame);
   });
@@ -481,6 +499,9 @@
   let raf = null;
   let totalPlaySeconds = 0;
   let remainingMs = 0;
+  let elapsedMs = 0;
+  let sessionStartStars = 0;
+  let lastStarsDeducted = 0;
   let lastTs = 0;
   let score = 0;
   let keys = { left:false, right:false, up:false };
@@ -489,10 +510,13 @@
   let gameDraw = null;   // per-game draw() fn
   let gameReset = null;  // per-game reset() fn
 
-  function startGame(playSeconds, gameId){
+  async function startGame(playSeconds, gameId){
     currentGameId = gameId;
     totalPlaySeconds = playSeconds;
     remainingMs = playSeconds * 1000;
+    elapsedMs = 0;
+    lastStarsDeducted = 0;
+    sessionStartStars = await getStudentXP();
     score = 0;
     keys = { left:false, right:false, up:false };
 
@@ -518,12 +542,15 @@
     endScreen.style.display = 'block';
     document.getElementById('endTitle').textContent = reason === 'empty' ? 'FUEL EMPTY' : 'SESSION ENDED';
     document.getElementById('finalScore').textContent = score;
+    const secondsPlayed = Math.max(0, totalPlaySeconds - Math.max(0, remainingMs / 1000));
+    logArcadeSeconds(Math.round(secondsPlayed));
   }
 
   function loop(ts){
     const dt = ts - lastTs;
     lastTs = ts;
     remainingMs -= dt;
+    elapsedMs += dt;
 
     if (remainingMs <= 0){
       endGame('empty');
@@ -537,6 +564,19 @@
     hudTime.textContent = formatMinSec(remainingMs/1000);
     hudScore.textContent = score + ' ✦';
     fuelBar.style.width = Math.max(0, (remainingMs / (totalPlaySeconds*1000)) * 100) + '%';
+
+    const elapsedSec = elapsedMs / 1000;
+    document.getElementById('hudElapsed').textContent = formatMinSec(elapsedSec) + ' played';
+
+    const starsSpentSoFar = Math.floor(elapsedSec / SEC_PER_XP);
+    const starsLeft = Math.max(0, sessionStartStars - starsSpentSoFar);
+    document.getElementById('hudStarsLeft').textContent = starsLeft + ' ⭐ left';
+
+    if (starsSpentSoFar > lastStarsDeducted){
+      const toDeduct = starsSpentSoFar - lastStarsDeducted;
+      lastStarsDeducted = starsSpentSoFar;
+      spendStudentXP(toDeduct);
+    }
 
     raf = requestAnimationFrame(loop);
   }

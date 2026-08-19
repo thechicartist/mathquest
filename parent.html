@@ -28,6 +28,9 @@
     width:fit-content; margin:0 auto 24px; display:block; text-align:center;
   }
 
+  /* Auth tabs (Sign Up / Log In) */
+  #auth-tabs.tabs { margin-bottom:24px; }
+
   /* Step indicator */
   .steps { display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:28px; }
   .step-dot {
@@ -131,7 +134,7 @@
   .creds-key { font-size:0.82rem; color:#90A4AE; font-weight:800; }
   .creds-val { font-size:0.92rem; color:#1A237E; font-weight:800; }
 
-  /* Tabs (dashboard) */
+  /* Tabs (dashboard + auth) */
   .tabs { display:flex; gap:8px; margin-bottom:22px; }
   .tab {
     flex:1; padding:11px; border-radius:14px; border:3px solid #E0E0E0;
@@ -289,10 +292,16 @@
   <div class="logo">Parent<span>Hub</span></div>
   <div class="badge">👨‍👩‍👧 Parent Portal</div>
 
+  <!-- Sign Up / Log In tabs — Log In is active by default -->
+  <div class="tabs" id="auth-tabs">
+    <button class="tab active" id="tab-login" onclick="showLogin()">🔑 Log In</button>
+    <button class="tab" id="tab-signup" onclick="showSignup()">📝 Sign Up</button>
+  </div>
+
   <!-- ═══════════════════════════════════════
        SIGNUP FLOW  (3 steps)
   ════════════════════════════════════════ -->
-  <div id="signup-flow">
+  <div id="signup-flow" style="display:none">
 
     <!-- Step indicator -->
     <div class="steps-wrap">
@@ -349,9 +358,6 @@
 
       <button class="btn-primary" onclick="goToPayment()">Continue to Payment →</button>
       <div class="msg err" id="err1"></div>
-
-      <div class="or-divider"><span>already have an account?</span></div>
-      <button class="btn-ghost" onclick="showLogin()">Sign in instead</button>
     </div>
 
     <!-- Step 2 — Payment (Stripe Checkout redirect) -->
@@ -401,7 +407,7 @@
   <!-- ═══════════════════════════════════════
        LOGIN GATE  (existing parents)
   ════════════════════════════════════════ -->
-  <div id="login-gate" style="display:none">
+  <div id="login-gate">
     <div class="panel-title">Welcome back!</div>
     <div class="panel-sub">Sign in to manage your children's accounts</div>
     <div class="field">
@@ -414,8 +420,6 @@
     </div>
     <button class="btn-primary" onclick="gateLogin()">🔑 Sign In</button>
     <div class="msg err" id="gate-err"></div>
-    <div class="or-divider"><span>new parent?</span></div>
-    <button class="btn-ghost" onclick="showSignup()">Create an account — $4.99 USD</button>
   </div>
 
   <!-- ═══════════════════════════════════════
@@ -529,8 +533,8 @@ const SUBJECTS = [
     chapters:{counting:'Counting',addsubt:'Add & Subtract',multiply:'Multiplication',fractions:'Fractions',decimals:'Decimals',percent:'Percentages',algebra:'Algebra',geometry:'Geometry',wordprob:'Word Problems',measurement:'Measurement'} },
   { key:'engTopicGames', label:'English', icon:'📖',
     chapters:{vocab:'Vocabulary',spelling:'Spelling',grammar:'Grammar',punctuation:'Punctuation',reading:'Comprehension',synonyms:'Synonyms',antonyms:'Antonyms',figurative:'Figurative Language',prefixes:'Prefixes & Suffixes',sentences:'Sentences'} },
-  { key:'sciTopicGames', label:'Science', icon:'🔬',
-    chapters:{biology:'Biology',chemistry:'Chemistry',physics:'Physics',earth:'Earth Science',space:'Space',humanbody:'Human Body'} },
+//  { key:'sciTopicGames', label:'Science', icon:'🔬',
+//     chapters:{biology:'Biology',chemistry:'Chemistry',physics:'Physics',earth:'Earth Science',space:'Space',humanbody:'Human Body'} },
 ];
 
 // topicGames[topic][difficulty].q1 = count of games played at that
@@ -570,9 +574,17 @@ window.addEventListener('DOMContentLoaded', () => {
       showSignup();
     }
     history.replaceState({}, '', window.location.pathname);
+  } else {
+    // Normal page load — Log In shows by default
+    showLogin();
   }
-  // Otherwise: normal page load, signup flow shows by default
 });
+
+// ─── AUTH TABS ─────────────────────────────────────────────
+function setAuthTab(which) {
+  document.getElementById('tab-signup').classList.toggle('active', which === 'signup');
+  document.getElementById('tab-login').classList.toggle('active', which === 'login');
+}
 
 // ─── STEP NAVIGATION ──────────────────────────────────────
 function goToStep(n) {
@@ -584,6 +596,9 @@ function goToStep(n) {
     if (i < 3) document.getElementById('line'+i).classList.toggle('done', i < n);
     document.getElementById('lbl'+i).classList.toggle('active', i === n);
   });
+  // Auth tabs only make sense while picking account details (step 1)
+  const tabs = document.getElementById('auth-tabs');
+  if (tabs) tabs.style.display = (n === 1) ? '' : 'none';
 }
 
 // ─── STEP 1 → 2 ───────────────────────────────────────────
@@ -693,12 +708,17 @@ function showLogin() {
   document.getElementById('login-gate').style.display  = '';
   document.getElementById('dashboard').style.display   = 'none';
   document.querySelector('.card').style.maxWidth = '460px';
+  const tabs = document.getElementById('auth-tabs');
+  if (tabs) tabs.style.display = '';
+  setAuthTab('login');
 }
 function showSignup() {
   document.getElementById('signup-flow').style.display = '';
   document.getElementById('login-gate').style.display  = 'none';
   document.getElementById('dashboard').style.display   = 'none';
   document.querySelector('.card').style.maxWidth = '460px';
+  setAuthTab('signup');
+  goToStep(1); // also handles showing auth-tabs
 }
 function showDashboard() {
   document.getElementById('signup-flow').style.display = 'none';
@@ -707,6 +727,8 @@ function showDashboard() {
   document.getElementById('dash-greeting').textContent =
     'Hi, ' + (currentParent.fname || currentParent.name || currentParent.username) + '!';
   document.querySelector('.card').style.maxWidth = '720px';
+  const tabs = document.getElementById('auth-tabs');
+  if (tabs) tabs.style.display = 'none';
 }
 
 // ─── LOGIN GATE ───────────────────────────────────────────
@@ -727,7 +749,7 @@ function signOut() {
   currentParent = null;
   document.getElementById('g-user').value = '';
   document.getElementById('g-pass').value = '';
-  showLogin();
+  showSignup();
 }
 
 // ─── DASHBOARD TABS ──────────────────────────────────────
