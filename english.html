@@ -217,6 +217,7 @@
     <button class="close-btn" onclick="toggleMenu()">X</button>
     <a href="math.html" class="switch-btn">🚀 Math</a>
     <a href="english.html" class="switch-btn">📖 English</a>
+    <a href="science.html" class="switch-btn">🔬 Science</a>
     <a href="arcade.html" class="switch-btn">🎮 Arcade</a>
   </div>
   <div class="header-right">
@@ -359,8 +360,9 @@
 
 <script>
 // ── SESSION ──
-const currentUser = JSON.parse(sessionStorage.getItem('mq_user')) || {username:'Player',grade:1,avatar:'🦉'};
-if(!currentUser) { sessionStorage.setItem('mq_user', JSON.stringify({username:'Player',grade:1,avatar:'🦉'})); location.reload(); }
+function parseJSON(value, fallback=null){try{return value?JSON.parse(value):fallback;}catch{return fallback;}}
+const currentUser = parseJSON(sessionStorage.getItem('mq_user'));
+if(!currentUser) location.href='index.html';
 function doLogout(){ if(!confirm('Switch user? Your progress is saved!')) return; sessionStorage.removeItem('mq_user'); location.href='index.html'; }
 
 // ── AVATARS ──
@@ -377,6 +379,7 @@ let totalStars=0, streak=0, playerXP=0, playerLevel=1, arcadeXP=0, gamesPlayed=0
 let segStates=[], maxStreakThisGame=0;
 let topicGames={};
 let mathTopicGames={}, mathGamesPlayed=0;
+const studentGrade=Math.max(1,Math.min(9,Number(currentUser?.grade)||1));
 
 const TOPIC_NAMES={vocab:'Vocabulary',spelling:'Spelling',grammar:'Grammar',punctuation:'Punctuation',reading:'Comprehension',synonyms:'Synonyms',antonyms:'Antonyms',figurative:'Figurative Language',prefixes:'Prefixes & Suffixes',sentences:'Sentences'};
 const ALL_TOPICS=['vocab','spelling','grammar','punctuation','reading','synonyms','antonyms','figurative','prefixes','sentences'];
@@ -416,25 +419,25 @@ async function fetchServerProgress(){
   return null;
 }
 
-async function save(){
+let saveQueue=Promise.resolve();
+function save(){
   const raw=localStorage.getItem('mq_progress_'+currentUser.username);
-  const localExisting=raw?JSON.parse(raw):{};
-  const serverExisting=await fetchServerProgress();
-  const existing={...localExisting,...(serverExisting||{})};
+  const existing=parseJSON(raw,{});
   const data={...existing,totalStars,playerXP,playerLevel,streak,engGamesPlayed:gamesPlayed,engTopicGames:topicGames};
   localStorage.setItem('mq_progress_'+currentUser.username, JSON.stringify(data));
-  try{
+  saveQueue=saveQueue.catch(()=>{}).then(async()=>{try{
     await fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(data)
     });
-  }catch(e){ console.error('Failed to save progress to server:', e); }
+  }catch(e){ console.error('Failed to save progress to server:', e); }});
+  return saveQueue;
 }
 
 async function load(){
   const raw=localStorage.getItem('mq_progress_'+currentUser.username);
-  if(raw){const d=JSON.parse(raw);totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.engGamesPlayed||0;topicGames=d.engTopicGames||{};}
+  if(raw){const d=parseJSON(raw,{});totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.engGamesPlayed||0;topicGames=d.engTopicGames||{};}
   const d=await fetchServerProgress();
   if(d && Object.keys(d).length){
     totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.engGamesPlayed||0;topicGames=d.engTopicGames||{};
@@ -484,6 +487,11 @@ function goHome(){ clearInterval(timerInterval); showScreen('screen-home'); upda
 // ─────────────────────────────────────────────
 function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
 function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
+function questionDifficulty(){
+  if(studentGrade<=3) return difficulty==='hard'?'medium':'easy';
+  if(studentGrade>=7) return difficulty==='easy'?'medium':'hard';
+  return difficulty;
+}
 
 // ── VOCABULARY ──
 const VOCAB_EASY=[
@@ -566,7 +574,7 @@ const SPELLING_HARD=[
   {correct:'Mediterranean',wrong:['Mediteranean','Meditrranean','Mediterrenean']},
   {correct:'exhilarating',wrong:['exhilerating','exhilaratting','exhilerrating']},
   {correct:'conscientious',wrong:['conscientous','conscentious','concientious']},
-  {correct:'paraphernalia',wrong:['parafernalia','paraphernallia','paraphernalia']},
+  {correct:'paraphernalia',wrong:['parafernalia','paraphernallia','paraphenalia']},
   {correct:'supercilious',wrong:['supercilous','supercillius','supercillious']},
   {correct:'bureaucracy',wrong:['beurocracy','bureacracy','burocracy']},
   {correct:'idiosyncratic',wrong:['idiosyncrattic','idiosyncretic','idiosincratic']},
@@ -901,7 +909,7 @@ function genSentences(diff){
 
 function buildQuestions(){
   const gen={vocab:genVocab,spelling:genSpelling,grammar:genGrammar,punctuation:genPunctuation,reading:genReading,synonyms:genSynonyms,antonyms:genAntonyms,figurative:genFigurative,prefixes:genPrefixes,sentences:genSentences};
-  return gen[topic](difficulty);
+  return gen[topic](questionDifficulty());
 }
 
 function startGame(){

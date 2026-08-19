@@ -198,7 +198,7 @@
     border-radius:16px; overflow:hidden; border:1px solid rgba(139,92,246,0.35);
     box-shadow: 0 20px 60px rgba(0,0,0,0.5);
   }
-  canvas{ display:block; width:100%; background: radial-gradient(ellipse at 50% 0%, #16204a, #05070f 80%); touch-action:none; }
+  canvas{ display:block; width:100%; background:#05070f; touch-action:none; }
 
   .touch-controls{
     display:flex; justify-content:space-between; max-width:640px; margin:14px auto 0 auto; gap:12px;
@@ -311,46 +311,31 @@
    Reads/writes the same "mq_progress_<username>" blob that math.html /
    english.html  already save to localStorage.
 
-   IMPORTANT: this uses a NEW field, `arcadeXP`, as the spendable wallet —
-   NOT `playerXP`. That's deliberate: `playerXP` resets every level-up
-   (it's progress toward the next level, capped under playerLevel*100), so
-   a Level 1 student could never reach 1000 even after weeks of practice.
-   `arcadeXP` accumulates every time addXP() runs and only goes down when
-   spent here, so it behaves like a real currency while leaving your
-   leveling bar completely untouched.
-
-   This means addXP() in math.html / english.html / science.html needs ONE
-   extra line so the wallet actually fills up:
-
-     function addXP(amount){
-       const old=playerLevel;
-       playerXP+=amount;
-       arcadeXP=(arcadeXP||0)+amount;   // <-- add this line
-       const needed=playerLevel*100;
-       ...
-     }
-
-   And add `arcadeXP` to the two spots that build/read the save blob:
-     save():  const data={totalStars,playerXP,playerLevel,streak,gamesPlayed,topicGames,engTopicGames,engGamesPlayed,arcadeXP};
-     load():  arcadeXP = d.arcadeXP || 0;
+   Arcade fuel is deliberately paid with earned stars. `playerXP` remains
+   level progress, while `arcadeXP` is retained only for legacy profiles.
    ========================================================================= */
 
-  const currentUser = JSON.parse(sessionStorage.getItem('mq_user'));
+  function parseJSON(value, fallback=null) { try { return value ? JSON.parse(value) : fallback; } catch { return fallback; } }
+  const currentUser = parseJSON(sessionStorage.getItem('mq_user'));
   if (!currentUser) {
     location.href = 'index.html'; // same guard math.html/english.html use
   }
 
+  const API_BASE = 'https://mathquest-api.energy-gaurav.workers.dev';
   function loadProgress() {
     const raw = localStorage.getItem('mq_progress_' + currentUser.username);
-    return raw ? JSON.parse(raw) : {
+    return raw ? parseJSON(raw) : {
       totalStars: 0, playerXP: 0, playerLevel: 1, streak: 0, gamesPlayed: 0,
       topicGames: {}, engTopicGames: {}, engGamesPlayed: 0, arcadeXP: 0,
       arcadeSecondsPlayed: 0
     };
   }
 
-  function saveProgress(data) {
+  function saveProgress(data, changedFields) {
     localStorage.setItem('mq_progress_' + currentUser.username, JSON.stringify(data));
+    fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(changedFields)
+    }).catch(() => {});
   }
 
   async function getStudentXP() {
@@ -361,14 +346,14 @@
   async function spendStudentXP(amount) {
     const data = loadProgress();
     data.totalStars = Math.max(0, (data.totalStars || 0) - amount);
-    saveProgress(data); // preserves every other field (stars, level, quests, etc.)
+    saveProgress(data, {totalStars:data.totalStars});
     return data.totalStars;
   }
 
   async function logArcadeSeconds(seconds) {
     const data = loadProgress();
     data.arcadeSecondsPlayed = (data.arcadeSecondsPlayed || 0) + seconds;
-    saveProgress(data);
+    saveProgress(data, {arcadeSecondsPlayed:data.arcadeSecondsPlayed});
     return data.arcadeSecondsPlayed;
   }
 
@@ -517,6 +502,7 @@
     elapsedMs = 0;
     lastStarsDeducted = 0;
     sessionStartStars = await getStudentXP();
+    if (sessionStartStars < XP_PER_BLOCK) { gateScreen.style.display = 'block'; await refreshGate(); return; }
     score = 0;
     keys = { left:false, right:false, up:false };
 
@@ -582,6 +568,25 @@
   }
 
   function dist(x1,y1,x2,y2){ return Math.hypot(x1-x2, y1-y2); }
+
+  function drawSpaceBackground(accent='#8B5CF6', drift=1){
+    const w=canvas.width,h=canvas.height,t=elapsedMs/1000;
+    const sky=ctx.createLinearGradient(0,0,0,h);
+    sky.addColorStop(0,'#111b45');sky.addColorStop(.52,'#0b1030');sky.addColorStop(1,'#040611');
+    ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+    const glow=ctx.createRadialGradient(w*.72,h*.15,5,w*.72,h*.15,w*.58);
+    glow.addColorStop(0,accent+'42');glow.addColorStop(1,'transparent');ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);
+    for(let i=0;i<54;i++){const x=(i*97+43)%w,y=(i*53+t*(12+(i%5)*8)*drift)%(h+16)-8,r=i%9===0?1.8:.7;ctx.fillStyle=i%9===0?'#FDE68A':'rgba(255,255,255,.58)';ctx.fillRect(x,y,r,r);}
+  }
+  function drawHitFlash(amount){if(amount<=0)return;ctx.fillStyle=`rgba(251,113,133,${amount/18})`;ctx.fillRect(0,0,canvas.width,canvas.height);}
+  function drawShip(ship,colour='#EC4899'){
+    ctx.save();ctx.translate(ship.x,ship.y);const flame=ctx.createLinearGradient(0,ship.h/2,0,ship.h/2+18);flame.addColorStop(0,'#FDE68A');flame.addColorStop(1,'rgba(251,146,60,0)');ctx.fillStyle=flame;ctx.beginPath();ctx.moveTo(-7,ship.h/2-2);ctx.lineTo(0,ship.h/2+18);ctx.lineTo(7,ship.h/2-2);ctx.closePath();ctx.fill();
+    const body=ctx.createLinearGradient(-ship.w/2,0,ship.w/2,0);body.addColorStop(0,'#C4B5FD');body.addColorStop(.52,colour);body.addColorStop(1,'#7C3AED');ctx.fillStyle=body;ctx.shadowColor=colour;ctx.shadowBlur=18;ctx.beginPath();ctx.moveTo(0,-ship.h/2-7);ctx.lineTo(ship.w/2,ship.h/2);ctx.lineTo(0,ship.h/2-5);ctx.lineTo(-ship.w/2,ship.h/2);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#BAE6FD';ctx.beginPath();ctx.ellipse(0,-1,6,7,0,0,Math.PI*2);ctx.fill();ctx.restore();
+  }
+  function drawAsteroid(a){
+    ctx.save();ctx.translate(a.x,a.y);ctx.rotate(a.y*.018);const rock=ctx.createRadialGradient(-a.r*.32,-a.r*.35,2,0,0,a.r);rock.addColorStop(0,'#C4B5FD');rock.addColorStop(.42,'#7C3AED');rock.addColorStop(1,'#312E81');ctx.fillStyle=rock;ctx.shadowColor='#8B5CF6';ctx.shadowBlur=9;ctx.beginPath();for(let i=0;i<9;i++){const angle=i*Math.PI*2/9,r=a.r*(.77+(i%3)*.1);ctx.lineTo(Math.cos(angle)*r,Math.sin(angle)*r);}ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='rgba(49,46,129,.5)';ctx.beginPath();ctx.arc(-a.r*.25,a.r*.16,a.r*.18,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(a.r*.25,-a.r*.16,a.r*.12,0,Math.PI*2);ctx.fill();ctx.restore();
+  }
+  function drawBomb(b){ctx.save();ctx.translate(b.x,b.y);ctx.fillStyle='#FB7185';ctx.shadowColor='#FB7185';ctx.shadowBlur=14;ctx.beginPath();ctx.arc(0,0,b.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#FDE68A';ctx.beginPath();ctx.arc(-3,-3,3,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#CBD5E1';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(4,-b.r+2);ctx.quadraticCurveTo(10,-b.r-7,15,-b.r-2);ctx.stroke();ctx.restore();}
 
   // controls
   window.addEventListener('keydown', e => {
@@ -677,31 +682,9 @@
     },
     draw(){
       const st = dodgeState;
-      if (st.flash > 0){
-        ctx.fillStyle = `rgba(248,113,113,${st.flash/24})`;
-        ctx.fillRect(0,0,canvas.width, canvas.height);
-      }
-      ctx.fillStyle = '#FBBF24';
-      st.stardust.forEach(s => {
-        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-        ctx.shadowColor = '#FBBF24'; ctx.shadowBlur = 10; ctx.fill();
-      });
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = '#5B4636'; ctx.strokeStyle = '#8B5CF6';
-      st.asteroids.forEach(a => {
-        ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, Math.PI*2); ctx.fill();
-        ctx.lineWidth = 1.5; ctx.stroke();
-      });
-      ctx.save();
-      ctx.translate(st.ship.x, st.ship.y);
-      ctx.fillStyle = '#EC4899';
-      ctx.beginPath();
-      ctx.moveTo(0, -st.ship.h/2);
-      ctx.lineTo(st.ship.w/2, st.ship.h/2);
-      ctx.lineTo(-st.ship.w/2, st.ship.h/2);
-      ctx.closePath();
-      ctx.shadowColor = '#EC4899'; ctx.shadowBlur = 12; ctx.fill();
-      ctx.restore(); ctx.shadowBlur = 0;
+      drawSpaceBackground('#8B5CF6',1.1);
+      ctx.fillStyle='#FBBF24';st.stardust.forEach(s=>drawStar(s.x,s.y,s.r));
+      st.asteroids.forEach(drawAsteroid);drawShip(st.ship);drawHitFlash(st.flash);
     }
   };
 
@@ -762,26 +745,17 @@
     },
     draw(){
       const st = catchState;
-      if (st.flash > 0){
-        ctx.fillStyle = `rgba(248,113,113,${st.flash/24})`;
-        ctx.fillRect(0,0,canvas.width, canvas.height);
-      }
+      drawSpaceBackground('#0EA5E9',.8);
       ctx.fillStyle = '#FBBF24';
       st.stars.forEach(s => {
         drawStar(s.x, s.y, s.r);
       });
-      ctx.fillStyle = '#F87171';
-      st.bombs.forEach(b => {
-        ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
-        ctx.shadowColor = '#F87171'; ctx.shadowBlur = 10; ctx.fill();
-      });
-      ctx.shadowBlur = 0;
+      st.bombs.forEach(drawBomb);
       const basketY = canvas.height - 30;
-      ctx.fillStyle = '#8B5CF6';
+      const basket=ctx.createLinearGradient(0,basketY-12,0,basketY+12);basket.addColorStop(0,'#C4B5FD');basket.addColorStop(1,'#6D28D9');ctx.fillStyle=basket;
       ctx.beginPath();
       ctx.roundRect(st.basket.x - st.basket.w/2, basketY - st.basket.h/2, st.basket.w, st.basket.h, 8);
-      ctx.shadowColor = '#8B5CF6'; ctx.shadowBlur = 12; ctx.fill();
-      ctx.shadowBlur = 0;
+      ctx.shadowColor='#8B5CF6';ctx.shadowBlur=16;ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#FDE68A';ctx.fillRect(st.basket.x-20,basketY-2,40,3);drawHitFlash(st.flash);
     }
   };
   function drawStar(cx, cy, r){
@@ -846,28 +820,15 @@
     },
     draw(){
       const st = slalomState;
-      if (st.flash > 0){
-        ctx.fillStyle = `rgba(248,113,113,${st.flash/24})`;
-        ctx.fillRect(0,0,canvas.width, canvas.height);
-      }
-      ctx.fillStyle = '#5B4636';
+      drawSpaceBackground('#EC4899',1.35);
       st.gates.forEach(g => {
         const leftW = g.gapX - g.gapW/2;
         const rightX = g.gapX + g.gapW/2;
         const rightW = canvas.width - rightX;
-        ctx.fillRect(0, g.y-9, leftW, 18);
-        ctx.fillRect(rightX, g.y-9, rightW, 18);
+        const comet=ctx.createLinearGradient(0,g.y-9,0,g.y+9);comet.addColorStop(0,'#FDE68A');comet.addColorStop(.5,'#F97316');comet.addColorStop(1,'#BE123C');ctx.fillStyle=comet;ctx.shadowColor='#F97316';ctx.shadowBlur=12;
+        ctx.fillRect(0,g.y-9,leftW,18);ctx.fillRect(rightX,g.y-9,rightW,18);ctx.shadowBlur=0;
       });
-      ctx.save();
-      ctx.translate(st.ship.x, st.ship.y);
-      ctx.fillStyle = '#EC4899';
-      ctx.beginPath();
-      ctx.moveTo(0, -st.ship.h/2);
-      ctx.lineTo(st.ship.w/2, st.ship.h/2);
-      ctx.lineTo(-st.ship.w/2, st.ship.h/2);
-      ctx.closePath();
-      ctx.shadowColor = '#EC4899'; ctx.shadowBlur = 12; ctx.fill();
-      ctx.restore(); ctx.shadowBlur = 0;
+      drawShip(st.ship,'#F43F5E');drawHitFlash(st.flash);
     }
   };
 
@@ -938,11 +899,8 @@
     },
     draw(){
       const st = runnerState;
-      if (st.flash > 0){
-        ctx.fillStyle = `rgba(248,113,113,${st.flash/24})`;
-        ctx.fillRect(0,0,canvas.width, canvas.height);
-      }
-      ctx.strokeStyle = 'rgba(139,92,246,0.4)';
+      drawSpaceBackground('#22D3EE',1.7);
+      ctx.strokeStyle = 'rgba(34,211,238,0.7)';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(0, st.groundY);
@@ -952,18 +910,12 @@
       ctx.fillStyle = '#FBBF24';
       st.orbs.forEach(o => { drawStar(o.x, o.y, o.r); });
 
-      ctx.fillStyle = '#5B4636'; ctx.strokeStyle = '#8B5CF6';
+      ctx.fillStyle = '#4C1D95'; ctx.strokeStyle = '#C4B5FD';
       st.obstacles.forEach(o => {
-        ctx.fillRect(o.x - o.w/2, o.y - o.h, o.w, o.h);
+        ctx.shadowColor='#8B5CF6';ctx.shadowBlur=10;ctx.fillRect(o.x - o.w/2, o.y - o.h, o.w, o.h);ctx.shadowBlur=0;
         ctx.strokeRect(o.x - o.w/2, o.y - o.h, o.w, o.h);
       });
-
-      ctx.fillStyle = '#EC4899';
-      ctx.shadowColor = '#EC4899'; ctx.shadowBlur = 12;
-      ctx.beginPath();
-      ctx.roundRect(st.player.x - st.player.w/2, st.player.y - st.player.h/2, st.player.w, st.player.h, 6);
-      ctx.fill();
-      ctx.shadowBlur = 0;
+      drawShip({x:st.player.x,y:st.player.y,w:st.player.w,h:st.player.h},'#06B6D4');drawHitFlash(st.flash);
     }
   };
 
@@ -979,6 +931,7 @@
   btnLeft.addEventListener('touchend', () => { if (currentGameId === 'runner') keys.up = false; });
   canvas.addEventListener('touchstart', (e) => { if (currentGameId === 'runner'){ e.preventDefault(); keys.up = true; } });
   canvas.addEventListener('touchend', (e) => { if (currentGameId === 'runner'){ e.preventDefault(); keys.up = false; } });
+  canvas.addEventListener('click', () => { if (currentGameId === 'runner') { keys.up = true; setTimeout(() => keys.up = false, 80); } });
 
   refreshGate();
 </script>

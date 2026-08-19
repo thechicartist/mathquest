@@ -177,10 +177,16 @@
   .quest-claim-btn:hover { transform:scale(1.05); }
   .quest-done-badge { flex-shrink:0; color:#00897B; font-size:1.5rem; }
 
+  @media(max-width:780px){
+    header{padding:14px 16px;flex-wrap:wrap;gap:12px;}
+    .logo-group,.header-right{width:100%;justify-content:center;flex-wrap:wrap;gap:8px;}
+    .switch-btn,.quest-btn,.star-counter,.streak-badge{font-size:.85rem;padding:7px 12px;}
+  }
   @media(max-width:500px){
     .hero-title{font-size:2rem} .answers-grid{grid-template-columns:1fr}
     .question-text{font-size:1.5rem} .topics-grid{grid-template-columns:1fr 1fr}
     .logo{font-size:1.4rem}
+    .header-right > button{width:100%;}
   }
 </style>
 </head>
@@ -323,7 +329,8 @@
 
 <script>
 // ── SESSION ──
-const currentUser = JSON.parse(sessionStorage.getItem('mq_user'));
+function parseJSON(value, fallback=null){try{return value?JSON.parse(value):fallback;}catch{return fallback;}}
+const currentUser = parseJSON(sessionStorage.getItem('mq_user'));
 if(!currentUser) location.href='index.html';
 function doLogout(){ if(!confirm('Switch user? Your progress is saved!')) return; sessionStorage.removeItem('mq_user'); location.href='index.html'; }
 
@@ -340,6 +347,7 @@ let timerInterval, timeLeft=20;
 let totalStars=0, streak=0, playerXP=0, playerLevel=1, arcadeXP=0, gamesPlayed=0;
 let segStates=[], maxStreakThisGame=0;
 let topicGames={};
+const studentGrade=Math.max(1,Math.min(9,Number(currentUser?.grade)||1));
 
 const SCI_TOPICS = ['biology','chemistry','physics','earth','space','humanbody'];
 const SCI_TOPIC_NAMES = {biology:'🌿 Biology',chemistry:'⚗️ Chemistry',physics:'⚡ Physics',earth:'🌍 Earth Science',space:'🚀 Space',humanbody:'🫀 Human Body'};
@@ -363,25 +371,25 @@ async function fetchServerProgress(){
   return null;
 }
 
-async function save(){
+let saveQueue=Promise.resolve();
+function save(){
   const raw=localStorage.getItem('mq_progress_'+currentUser.username);
-  const localExisting=raw?JSON.parse(raw):{};
-  const serverExisting=await fetchServerProgress();
-  const existing={...localExisting,...(serverExisting||{})};
+  const existing=parseJSON(raw,{});
   const data={...existing,totalStars,playerXP,playerLevel,streak,sciGamesPlayed:gamesPlayed,sciTopicGames:topicGames};
   localStorage.setItem('mq_progress_'+currentUser.username,JSON.stringify(data));
-  try{
+  saveQueue=saveQueue.catch(()=>{}).then(async()=>{try{
     await fetch(`${API_BASE}/progress/${encodeURIComponent(currentUser.username)}`, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(data)
     });
-  }catch(e){ console.error('Failed to save progress to server:', e); }
+  }catch(e){ console.error('Failed to save progress to server:', e); }});
+  return saveQueue;
 }
 
 async function load(){
   const raw=localStorage.getItem('mq_progress_'+currentUser.username);
-  if(raw){const d=JSON.parse(raw);totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.sciGamesPlayed||0;topicGames=d.sciTopicGames||{};}
+  if(raw){const d=parseJSON(raw,{});totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.sciGamesPlayed||0;topicGames=d.sciTopicGames||{};}
   const d=await fetchServerProgress();
   if(d && Object.keys(d).length){
     totalStars=d.totalStars||0;playerXP=d.playerXP||0;playerLevel=d.playerLevel||1;streak=d.streak||0;gamesPlayed=d.sciGamesPlayed||0;topicGames=d.sciTopicGames||{};
@@ -438,6 +446,11 @@ function updatePlayerUI(){
   renderTopicCards();
 }
 function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function questionDifficulty(){
+  if(studentGrade<=3) return difficulty==='hard'?'medium':'easy';
+  if(studentGrade>=7) return difficulty==='easy'?'medium':'hard';
+  return difficulty;
+}
 
 // ── FALLBACK QUESTION BANKS ──
 const BANKS = {
@@ -658,32 +671,32 @@ humanbody:{
 
 // ── AI GENERATION ──
 const SCI_TOPIC_PROMPTS = {
-  biology: (diff) => `Generate exactly 10 biology multiple-choice questions for ${diff} level school students.
+  biology: (diff) => `Generate exactly 10 biology multiple-choice questions for Grade ${studentGrade} students at ${diff} difficulty.
 Return ONLY a valid JSON array, no markdown. Each object:
 {"q": "Question text", "a": "Correct answer", "w": ["wrong1","wrong2","wrong3"]}
 Focus on: ${diff==='easy'?'basic life processes, plant/animal classification, ecosystems':diff==='medium'?'cells, genetics basics, body systems, ecology':'DNA, evolution, biochemistry, advanced physiology'}
 Wrong answers must be plausible. Return JSON only.`,
-  chemistry: (diff) => `Generate exactly 10 chemistry multiple-choice questions for ${diff} level school students.
+  chemistry: (diff) => `Generate exactly 10 chemistry multiple-choice questions for Grade ${studentGrade} students at ${diff} difficulty.
 Return ONLY a valid JSON array, no markdown. Each object:
 {"q": "Question text", "a": "Correct answer", "w": ["wrong1","wrong2","wrong3"]}
 Focus on: ${diff==='easy'?'states of matter, elements vs compounds, acids and bases, common symbols':diff==='medium'?'atomic structure, bonding, reactions, periodic table trends':'thermodynamics, equilibrium, organic chemistry, electrochemistry'}
 Wrong answers must be plausible. Return JSON only.`,
-  physics: (diff) => `Generate exactly 10 physics multiple-choice questions for ${diff} level school students.
+  physics: (diff) => `Generate exactly 10 physics multiple-choice questions for Grade ${studentGrade} students at ${diff} difficulty.
 Return ONLY a valid JSON array, no markdown. Each object:
 {"q": "Question text", "a": "Correct answer", "w": ["wrong1","wrong2","wrong3"]}
 Focus on: ${diff==='easy'?'forces, motion, energy, light, sound, electricity basics':diff==='medium'?'Newton\'s laws, circuits, waves, pressure, work and power':'quantum physics, relativity, electromagnetism, thermodynamics'}
 Wrong answers must be plausible. Return JSON only.`,
-  earth: (diff) => `Generate exactly 10 earth science multiple-choice questions for ${diff} level school students.
+  earth: (diff) => `Generate exactly 10 earth science multiple-choice questions for Grade ${studentGrade} students at ${diff} difficulty.
 Return ONLY a valid JSON array, no markdown. Each object:
 {"q": "Question text", "a": "Correct answer", "w": ["wrong1","wrong2","wrong3"]}
 Focus on: ${diff==='easy'?'rock types, water cycle, seasons, weather, fossils':diff==='medium'?'plate tectonics, rock cycle, climate, erosion, volcanoes':'geological time, seismology, atmospheric science, ocean systems'}
 Wrong answers must be plausible. Return JSON only.`,
-  space: (diff) => `Generate exactly 10 space science multiple-choice questions for ${diff} level school students.
+  space: (diff) => `Generate exactly 10 space science multiple-choice questions for Grade ${studentGrade} students at ${diff} difficulty.
 Return ONLY a valid JSON array, no markdown. Each object:
 {"q": "Question text", "a": "Correct answer", "w": ["wrong1","wrong2","wrong3"]}
 Focus on: ${diff==='easy'?'solar system, planets, Moon, stars, day and night':diff==='medium'?'star life cycles, black holes, galaxies, Big Bang, space exploration':'cosmology, dark matter, pulsars, exoplanets, relativistic effects'}
 Wrong answers must be plausible. Return JSON only.`,
-  humanbody: (diff) => `Generate exactly 10 human body multiple-choice questions for ${diff} level school students.
+  humanbody: (diff) => `Generate exactly 10 human body multiple-choice questions for Grade ${studentGrade} students at ${diff} difficulty.
 Return ONLY a valid JSON array, no markdown. Each object:
 {"q": "Question text", "a": "Correct answer", "w": ["wrong1","wrong2","wrong3"]}
 Focus on: ${diff==='easy'?'major organs and their functions, skeleton, blood, senses':diff==='medium'?'body systems, digestion, circulation, immunity, nervous system':'biochemistry, hormones, neural mechanisms, genetics and disease'}
@@ -697,30 +710,40 @@ async function buildQuestionsAI(){
   const promptFn=SCI_TOPIC_PROMPTS[sciTopic];
   if(!promptFn) return buildQuestionsFallback();
   try{
-    const response=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:3000,system:"You are an expert science teacher. Return ONLY valid JSON arrays with no markdown, no backticks, no preamble. Just the raw JSON array.",messages:[{role:"user",content:promptFn(difficulty)}]})});
+    const response=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:3000,system:"You are an expert science teacher. Return ONLY valid JSON arrays with no markdown, no backticks, no preamble. Just the raw JSON array.",messages:[{role:"user",content:promptFn(questionDifficulty())}]})});
     if(!response.ok) throw new Error('API '+response.status);
     const data=await response.json();
     const text=(data.content||[]).map(i=>i.text||'').join('');
     const clean=text.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
     const bank=JSON.parse(clean);
     if(!Array.isArray(bank)||bank.length<5) throw new Error('Invalid');
-    return convertAIBank(bank);
+    const questions=convertAIBank(bank);
+    if(questions.length!==TOTAL_QS) throw new Error('Invalid question set');
+    return questions;
   }catch(err){ console.error('AI failed, using fallback:',err); return buildQuestionsFallback(); }
 }
 function convertAIBank(bank){
-  return shuffle([...bank]).slice(0,TOTAL_QS).map(q=>({
+  return shuffle([...bank]).map(q=>({
     text:q.q||q.question||'',
     answer:q.a||q.answer||'',
     options:shuffle([q.a||q.answer,...(q.w||q.wrong||[])].slice(0,4)),
     hint:'Think carefully!'
-  }));
+  })).filter(isValidQuestion).slice(0,TOTAL_QS);
 }
 function buildQuestionsFallback(){
   const bank=BANKS[sciTopic]||{};
-  const pool=shuffle([...(bank[difficulty]||[]),...(bank.easy||[]),...(bank.medium||[]),...(bank.hard||[])]);
-  return pool.slice(0,TOTAL_QS).map(q=>({
+  const pool=bank[questionDifficulty()]||[];
+  if(!pool.length) return [];
+  const questions=[];
+  while(questions.length<TOTAL_QS)questions.push(...shuffle(pool));
+  return questions.slice(0,TOTAL_QS).map(q=>({
     text:q.q,answer:q.a,options:shuffle([q.a,...q.w]),hint:'Think carefully!'
   }));
+}
+function isValidQuestion(q){
+  const answer=String(q.answer||'');
+  const options=(q.options||[]).map(String);
+  return Boolean(q.text&&answer)&&options.length===4&&new Set(options).size===4&&options.filter(o=>o===answer).length===1;
 }
 
 // ── GAME FLOW ──

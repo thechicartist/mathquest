@@ -227,6 +227,7 @@
     <button class="close-btn" onclick="toggleMenu()">X</button>
     <a href="math.html" class="switch-btn">🚀 Math</a>
     <a href="english.html" class="switch-btn">📖 English</a>
+    <a href="science.html" class="switch-btn">🔬 Science</a>
     <a href="arcade.html" class="switch-btn">🎮 Arcade</a>
   </div>
   <div class="header-right">
@@ -393,8 +394,7 @@ const UNLOCK_CHAIN = {
   addsubt   : [{ prereq:'counting',  needed:4,  difficulty:'easy',   minScore:6  },
                { prereq:'multiply',  needed:4,  difficulty:'easy',   minScore:6  },
                { prereq:'fractions', needed:4,  difficulty:'easy',   minScore:6  }],
-  multiply  : [{ prereq:'addsubt',   needed:5,  difficulty:'easy',   minScore:6  },
-               { prereq:'fractions', needed:5,  difficulty:'easy',   minScore:6  }],
+  multiply  : [{ prereq:'addsubt',   needed:5,  difficulty:'easy',   minScore:6  },],
   geometry  : [{ prereq:'addsubt',   needed:6,  difficulty:'easy',   minScore:7  },
                { prereq:'multiply',  needed:6,  difficulty:'easy',   minScore:7  },
                { prereq:'fractions', needed:6,  difficulty:'easy',   minScore:7  }],
@@ -525,6 +525,13 @@ function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
 function shuffle(arr){const copy=[...arr];for(let i=copy.length-1;i>0;i--){const j=rnd(0,i);[copy[i],copy[j]]=[copy[j],copy[i]];}return copy;}
 function gcd(a,b){return b===0?a:gcd(b,a%b);}
 function lcm(a,b){return a*b/gcd(a,b);}
+// Difficulty is relative to the learner's enrolled grade. The selected
+// button still controls rewards and unlocking; this chooses suitable content.
+function questionDifficulty(){
+  if(grade<=3) return difficulty==='hard'?'medium':'easy';
+  if(grade>=7) return difficulty==='easy'?'medium':'hard';
+  return difficulty;
+}
 function fracEq(f1,f2){
   const [n1,d1]=f1.split('/').map(Number);
   const [n2,d2]=f2.split('/').map(Number);
@@ -592,7 +599,7 @@ function assertQuestionIntegrity(q){
   const matches=q.options.filter(option=>String(option)===answer).length;
   if(q.options.length!==4||new Set(q.options.map(String)).size!==4||matches!==1)throw new Error('Invalid question options generated');
 }
-function buildQuestions(){const gen={counting:genCounting,addsubt:genAddSubt,multiply:genMultiply,fractions:genFractions,decimals:genDecimals,percent:genPercent,algebra:genAlgebra,geometry:genGeometry,wordprob:genWordProb,measurement:genMeasurement};const qs=gen[topic](difficulty);qs.forEach(assertQuestionIntegrity);return qs;}
+function buildQuestions(){const gen={counting:genCounting,addsubt:genAddSubt,multiply:genMultiply,fractions:genFractions,decimals:genDecimals,percent:genPercent,algebra:genAlgebra,geometry:genGeometry,wordprob:genWordProb,measurement:genMeasurement};const qs=gen[topic](questionDifficulty());qs.forEach(assertQuestionIntegrity);return qs;}
 
 // ── GAME FLOW ──
 function startGame(){
