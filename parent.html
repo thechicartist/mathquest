@@ -420,7 +420,6 @@
     </div>
     <button class="btn-primary" onclick="gateLogin()">🔑 Sign In</button>
     <div class="msg err" id="gate-err"></div>
-  </div>
 
   <!-- ═══════════════════════════════════════
        DASHBOARD
@@ -493,6 +492,32 @@
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeDelModal()">Cancel</button>
       <button class="btn-confirm-del" onclick="confirmDelete()">Remove</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change kid password modal -->
+<div class="modal-overlay" id="kidpw-modal">
+  <div class="modal">
+    <div style="font-size:2.2rem;margin-bottom:8px">🔑</div>
+    <h3 id="kidpw-title">Change Password</h3>
+    <p style="margin-bottom:14px">Set a new password for <span id="kidpw-name" style="font-weight:800"></span>.</p>
+    <div class="field" style="text-align:left">
+      <label>New password for child</label>
+      <input type="password" id="kidpw-new" placeholder="At least 4 characters">
+    </div>
+    <div class="field" style="text-align:left">
+      <label>Confirm new password</label>
+      <input type="password" id="kidpw-new2" placeholder="Repeat password">
+    </div>
+    <div class="field" style="text-align:left">
+      <label>Your password (to confirm it's you)</label>
+      <input type="password" id="kidpw-parentpass" placeholder="Your account password" onkeydown="if(event.key==='Enter')confirmResetKidPassword()">
+    </div>
+    <div class="msg err" id="kidpw-err"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeKidPwModal()">Cancel</button>
+      <button class="btn-confirm-del" style="background:#43A047" onclick="confirmResetKidPassword()">Save New Password</button>
     </div>
   </div>
 </div>
@@ -703,6 +728,12 @@ function goToDashboard() {
 }
 
 // ─── VIEW SWITCHING ───────────────────────────────────────
+function hideForgotPanels() {
+  document.getElementById('forgot-step1').style.display = 'none';
+
+  document.getElementById('forgot-step2').style.display = 'none';
+  document.getElementById('forgot-step3').style.display = 'none';
+}
 function showLogin() {
   document.getElementById('signup-flow').style.display = 'none';
   document.getElementById('login-gate').style.display  = '';
@@ -729,6 +760,111 @@ function showDashboard() {
   document.querySelector('.card').style.maxWidth = '720px';
   const tabs = document.getElementById('auth-tabs');
   if (tabs) tabs.style.display = 'none';
+}
+
+// ─── FORGOT PASSWORD FLOW ─────────────────────────────────
+let fpEmail = ''; // email currently in the reset flow
+let fpResetToken = '';
+
+function showForgotStep1() {
+  document.getElementById('signup-flow').style.display = 'none';
+  document.getElementById('login-gate').style.display  = 'none';
+  document.getElementById('dashboard').style.display   = 'none';  
+  document.getElementById('forgot-step1').style.display = '';
+  document.getElementById('fp-email').value = '';
+  document.getElementById('fp1-err').textContent = '';
+  const tabs = document.getElementById('auth-tabs');
+  if (tabs) tabs.style.display = 'none';
+}
+
+async function requestOtp(isResend) {
+  const email = document.getElementById('fp-email')?.value.trim() || fpEmail;
+  const err = document.getElementById(isResend ? 'fp2-err' : 'fp1-err');
+  if (!email || !/\S+@\S+\.\S+/.test(email)) {
+    return setErr(document.getElementById('fp1-err'), 'Enter a valid email address.');
+  }
+  fpEmail = email;
+  err.className = 'msg ok'; err.textContent = 'Sending code… ⏳';
+
+  const btn = document.getElementById(isResend ? null : 'fp-send-btn');
+  if (btn) btn.disabled = true;
+
+  try {
+    const res = await apiPost('/parent-forgot-password', { email });
+    if (!res || res.error) {
+      if (btn) btn.disabled = false;
+      return setErr(err, res?.error || 'Something went wrong. Please try again.');
+    }
+    err.textContent = '';
+    // Move to step 2 (or just confirm resend)
+    document.getElementById('forgot-step1').style.display = 'none';
+    document.getElementById('forgot-step2').style.display = '';
+    document.getElementById('fp-sent-email').textContent = email;
+    document.getElementById('fp-otp').value = '';
+    document.getElementById('fp2-err').className = 'msg ok';
+    document.getElementById('fp2-err').textContent = isResend ? 'A new code has been sent!' : '';
+  } catch (e) {
+    if (btn) btn.disabled = false;
+    setErr(err, 'Something went wrong. Please try again.');
+  }
+  if (btn) btn.disabled = false;
+}
+
+async function verifyOtp() {
+  const code = document.getElementById('fp-otp').value.trim();
+  const err = document.getElementById('fp2-err');
+  if (!code || code.length !== 6) return setErr(err, 'Enter the 6-digit code.');
+  err.className = 'msg ok'; err.textContent = 'Verifying… ⏳';
+
+  try {
+    const res = await apiPost('/parent-verify-otp', { email: fpEmail, code });
+    if (!res || res.error) return setErr(err, res?.error || 'Incorrect code. Try again.');
+    fpResetToken = res.resetToken;
+    err.textContent = '';
+    document.getElementById('forgot-step2').style.display = 'none';
+    document.getElementById('forgot-step3').style.display = '';
+    document.getElementById('fp-newpass').value = '';
+    document.getElementById('fp-newpass2').value = '';
+    document.getElementById('fp3-err').textContent = '';
+  } catch (e) {
+    setErr(err, 'Something went wrong. Please try again.');
+  }
+}
+
+function checkPwForgot() {
+  const pw = document.getElementById('fp-newpass').value;
+  const hint = document.getElementById('pw-hint-forgot');
+  let s = 0;
+  if (pw.length >= 6) s++;
+  if (pw.length >= 10) s++;
+  if (/[A-Z]/.test(pw) && /[0-9]/.test(pw)) s++;
+  const labels = ['Weak', 'Okay', 'Strong'];
+  const colors = ['#EF5350', '#FFA726', '#66BB6A'];
+  if (hint) { hint.textContent = pw ? labels[s-1] || 'Too short' : 'Enter a password'; hint.style.color = pw && s ? colors[s-1] : '#90A4AE'; }
+}
+
+async function submitNewPassword() {
+  const pass = document.getElementById('fp-newpass').value;
+  const pass2 = document.getElementById('fp-newpass2').value;
+  const err = document.getElementById('fp3-err');
+  if (!pass || !pass2) return setErr(err, 'Please fill in both fields!');
+  if (pass.length < 6) return setErr(err, 'Password must be at least 6 characters.');
+  if (pass !== pass2) return setErr(err, "Passwords don't match!");
+
+  err.className = 'msg ok'; err.textContent = 'Saving… ⏳';
+  try {
+    const res = await apiPost('/parent-reset-password', {
+      resetToken: fpResetToken,
+      newPassword: btoa(pass), // match existing storage scheme (base64), consistent with signup/login
+    });
+    if (!res || res.error) return setErr(err, res?.error || 'Something went wrong. Please try again.');
+    fpEmail = ''; fpResetToken = '';
+    showLogin();
+    document.getElementById('gate-err').className = 'msg ok';
+    document.getElementById('gate-err').textContent = 'Password reset! Please sign in with your new password.';
+  } catch (e) {
+    setErr(err, 'Something went wrong. Please try again.');
+  }
 }
 
 // ─── LOGIN GATE ───────────────────────────────────────────
@@ -839,7 +975,10 @@ async function loadChildren() {
             <div class="kid-meta">@${k.username} &nbsp;·&nbsp; Grade ${k.grade||'—'}</div>
           </div>
         </div>
-        <button class="btn-del" onclick="event.stopPropagation();askDelete('${k.username}','${k.name||k.username}')">Remove</button>
+        <div style="display:flex;gap:6px">
+          <button class="btn-del" style="background:#FFF3E0;color:#EF6C00;border-color:#FFE0B2" onclick="event.stopPropagation();askResetKidPassword('${k.username}','${k.name||k.username}')">Change Password</button>
+          <button class="btn-del" onclick="event.stopPropagation();askDelete('${k.username}','${k.name||k.username}')">Remove</button>
+        </div>
       </div>
       <div class="kid-stats-grid">
         <div class="kid-stat"><span class="kid-stat-val">⚡ ${k.level}</span><span class="kid-stat-lbl">Level</span></div>
@@ -923,6 +1062,46 @@ async function confirmDelete() {
   loadChildren();
 }
 
+// ─── CHANGE KID PASSWORD ──────────────────────────────────
+let kidPwTarget = null;
+function askResetKidPassword(username, display) {
+  kidPwTarget = username;
+  document.getElementById('kidpw-name').textContent = display;
+  document.getElementById('kidpw-new').value = '';
+  document.getElementById('kidpw-new2').value = '';
+  document.getElementById('kidpw-parentpass').value = '';
+  document.getElementById('kidpw-err').textContent = '';
+  document.getElementById('kidpw-modal').classList.add('open');
+}
+function closeKidPwModal() {
+  document.getElementById('kidpw-modal').classList.remove('open');
+  kidPwTarget = null;
+}
+async function confirmResetKidPassword() {
+  if (!kidPwTarget) return;
+  const newPass  = document.getElementById('kidpw-new').value;
+  const newPass2 = document.getElementById('kidpw-new2').value;
+  const parentPw = document.getElementById('kidpw-parentpass').value;
+  const err = document.getElementById('kidpw-err');
+
+  if (!newPass || !newPass2 || !parentPw) return setErr(err, 'Please fill in all fields!');
+  if (newPass.length < 4) return setErr(err, 'Password must be at least 4 characters.');
+  if (newPass !== newPass2) return setErr(err, "Passwords don't match!");
+
+  err.className = 'msg ok'; err.textContent = 'Saving… ⏳';
+  const res = await apiPost('/student-reset-password', {
+    studentUsername: kidPwTarget,
+    parentUsername: currentParent.username,
+    parentPassword: btoa(parentPw),
+    newPassword: btoa(newPass),
+  });
+  if (!res || res.error) return setErr(err, res?.error || 'Something went wrong.');
+
+  closeKidPwModal();
+  const msg = document.getElementById('kids-msg');
+  setMsg(msg, `✅ Password updated for ${kidPwTarget}.`, false, '#43A047');
+}
+
 // ─── HELPERS ──────────────────────────────────────────────
 function setErr(el, txt) { el.className='msg err'; el.textContent=txt; }
 function setMsg(el, txt, isErr, color) {
@@ -953,4 +1132,4 @@ if (typeof apiGet === 'undefined') {
 </script>
   <link rel="stylesheet" href="css/style.css">
 </body>
-</html>
+</html> 
