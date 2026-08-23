@@ -256,6 +256,50 @@ export default {
       return json({ ok: true });
     }
 
+    // ── PARENT FORGOT PASSWORD (security question) ──
+    if (method === 'POST' && path === '/parent-forgot-password') {
+      const body = await request.json();
+      const identifier = (body.username || body.email || '').trim();
+      if (!identifier) return json({ error: 'Enter your username or email.' }, 400);
+
+      const list = await env.MATHQUEST_DB.list({ prefix: 'parent:' });
+      let match = null;
+      for (const key of list.keys) {
+        const raw = await env.MATHQUEST_DB.get(key.name);
+        if (!raw) continue;
+        const p = JSON.parse(raw);
+        if (p.username?.toLowerCase() === identifier.toLowerCase() ||
+            p.email?.toLowerCase() === identifier.toLowerCase()) {
+          match = p;
+          break;
+        }
+      }
+      if (!match) return json({ error: 'No account found with that username or email.' }, 404);
+      if (!match.securityQuestion) return json({ error: 'No security question is set up for this account.' }, 400);
+
+      return json({ username: match.username, securityQuestion: match.securityQuestion });
+    }
+
+    if (method === 'POST' && path === '/parent-reset-password') {
+      const body = await request.json();
+      const { username, securityAnswer, newPassword } = body;
+      if (!username || !securityAnswer || !newPassword) {
+        return json({ error: 'Missing required fields.' }, 400);
+      }
+      const raw = await env.MATHQUEST_DB.get('parent:' + username);
+      if (!raw) return json({ error: 'Account not found.' }, 404);
+      const parent = JSON.parse(raw);
+
+      const normalize = s => (s || '').trim().toLowerCase();
+      if (normalize(parent.securityAnswer) !== normalize(securityAnswer)) {
+        return json({ error: 'That answer doesn’t match. Try again.' }, 401);
+      }
+
+      parent.password = newPassword;
+      await env.MATHQUEST_DB.put('parent:' + username, JSON.stringify(parent));
+      return json({ ok: true });
+    }
+
     // ── STRIPE CHECKOUT ──
     if (method === 'POST' && path === '/create-checkout-session') {
       const body = await request.json();
@@ -268,7 +312,7 @@ export default {
         body: new URLSearchParams({
           'mode': 'payment',
           'line_items[0][price_data][currency]': 'usd',
-          'line_items[0][price_data][product_data][name]': 'MathQuest Parent Account',
+          'line_items[0][price_data][product_data][name]': 'ScribbleSum Parent Account',
           'line_items[0][price_data][unit_amount]': '499',
           'line_items[0][quantity]': '1',
           'customer_email': body.email,

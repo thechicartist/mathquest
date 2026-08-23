@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CoreQuest — Login</title>
+<title>ScribbleSum — Login</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="corequest-icon.svg">
 <link rel="stylesheet" href="css/style.css">
@@ -15,7 +15,7 @@
 <button class="edu-btn" onclick="location.href='educator.html'">🎓 Educators</button>
 
 <div class="login-card">
-  <img src="corequest-logo.svg" alt="CoreQuest logo" width="350">
+  <img src="scribblesum-logo.svg" alt="ScribbleSum logo" width="350">
   <div class="login-subtitle">Your math adventure awaits!</div>
 
   <div class="login-field">
@@ -42,7 +42,7 @@ async function doLogin(){
   if(!u||!p){ err.textContent='Please fill in both fields!'; return; }
   err.style.color='#43A047'; err.textContent='Checking... ⏳';
   const userData = await apiGet('/user/'+encodeURIComponent(u));
-  if(!userData || userData.error){ err.style.color='#E53935'; err.textContent='Username not found. Ask your educator!'; return; }
+  if(!userData || userData.error){ err.style.color='#E53935'; err.textContent='Username not found. Ask your educator or parent!'; return; }
   if(userData.password !== btoa(p)){ err.style.color='#E53935'; err.textContent='Wrong password. Try again!'; return; }
   // Save session and go to game
   sessionStorage.setItem('mq_user', JSON.stringify({username:u, ...userData}));
