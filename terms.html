@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScribbleSum — Terms &amp; Conditions</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="corequest-icon.svg">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  :root{
+    --ink:#2D2A26;
+    --paper:#FFFBF2;
+    --paper-line:#EFE6D0;
+    --student:#4FA8E0;
+    --parent:#A66DD4;
+    --educator:#2FBF9E;
+    --accent:#FF8A3D;
+    --shadow: 0 6px 0 rgba(45,42,38,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Nunito', sans-serif;
+    color:var(--ink);
+    background:
+      linear-gradient(var(--paper-line) 1px, transparent 1px) 0 38px/100% 40px,
+      var(--paper);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  h1,h2,.brand{font-family:'Fredoka One', cursive; font-weight:400;}
+  main{ flex:1 0 auto; width:100%; }
+
+  .role-nav{
+    display:flex; justify-content:center; gap:12px;
+    flex-wrap:wrap;
+    padding:22px 16px 8px;
+  }
+  .role-nav a{
+    text-decoration:none;
+    font-family:'Nunito',sans-serif;
+    font-weight:800;
+    font-size:0.92rem;
+    color:#fff;
+    padding:10px 18px;
+    border-radius:999px;
+    box-shadow:var(--shadow);
+    transition:transform .15s ease;
+  }
+  .role-nav a:hover{ transform:translateY(-2px); }
+  .role-nav a.student{ background:var(--student); }
+  .role-nav a.parent{ background:var(--parent); }
+  .role-nav a.educator{ background:var(--educator); }
+  .role-nav a.back{ background:var(--ink); }
+
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:20px 20px 0;
+  }
+
+  .header-block{
+    text-align:center;
+    margin:18px auto 8px;
+  }
+  .doodle-title{
+    position:relative;
+    display:inline-block;
+    font-size:2.4rem;
+    color:var(--ink);
+    margin:0;
+  }
+  .doodle-title svg{
+    position:absolute;
+    left:0; bottom:-14px;
+    width:100%; height:16px;
+  }
+  .updated{
+    text-align:center;
+    font-weight:700;
+    color:#8A8478;
+    font-size:0.9rem;
+    margin:22px 0 30px;
+  }
+
+  .page{
+    background:#fff;
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:8px 32px 20px;
+    border:1px solid var(--paper-line);
+  }
+
+  .page section{
+    padding:22px 0;
+    border-bottom:1px dashed var(--paper-line);
+  }
+  .page section:last-child{ border-bottom:none; }
+
+  .page h2{
+    font-size:1.15rem;
+    color:var(--ink);
+    margin:0 0 10px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:30px; height:30px;
+    border-radius:50%;
+    background:var(--accent);
+    color:#fff;
+    font-family:'Fredoka One',cursive;
+    font-size:0.9rem;
+    flex-shrink:0;
+  }
+  .page p, .page li{
+    font-weight:600;
+    line-height:1.65;
+    color:#4A463F;
+    font-size:0.98rem;
+  }
+  .page ul{ margin:10px 0 0; padding-left:22px; }
+  .page li{ margin-bottom:6px; }
+  .placeholder{
+    background:#FFF1B8;
+    padding:1px 6px;
+    border-radius:5px;
+    color:#7A5A00;
+    font-weight:800;
+  }
+
+  .footer-note{
+    text-align:center;
+    margin-top:36px;
+    font-size:0.85rem;
+    color:#8A8478;
+    font-weight:700;
+  }
+  .footer-note a{ color:var(--educator); text-decoration:none; }
+  .footer-note a:hover{ text-decoration:underline; }
+
+  @media (prefers-reduced-motion: reduce){
+    .role-nav a{ transition:none; }
+  }
+
+  /* Site footer — flexes and wraps at any width, respects notch/home-bar insets */
+  .site-footer{
+    flex-shrink:0;
+    margin-top:50px;
+    background:var(--ink);
+    color:#EDE7DA;
+    padding:26px 16px calc(20px + env(safe-area-inset-bottom));
+  }
+  .footer-inner{
+    max-width:760px;
+    margin:0 auto;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px 24px;
+  }
+  .footer-brand{
+    font-family:'Fredoka One', cursive;
+    font-size:1.05rem;
+    color:#fff;
+    white-space:nowrap;
+  }
+  .footer-links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 20px;
+    justify-content:center;
+  }
+  .footer-links a{
+    color:#EDE7DA;
+    text-decoration:none;
+    font-weight:700;
+    font-size:0.9rem;
+    white-space:nowrap;
+  }
+  .footer-links a:hover{ color:var(--accent); text-decoration:underline; }
+  .footer-copy{
+    font-size:0.8rem;
+    color:#B7AF9D;
+    font-weight:600;
+    text-align:center;
+    width:100%;
+    order:3;
+  }
+  @media (min-width:560px){
+    .footer-copy{ width:auto; order:0; text-align:left; }
+  }
+  @media (max-width:559px){
+    .footer-inner{ justify-content:center; text-align:center; }
+  }
+</style>
+</head>
+<body>
+
+<main>
+<nav class="role-nav">
+  <a class="student" href="index.html">👦 Student</a>
+  <a class="parent" href="parent.html">👨‍👩‍👧‍👦 Parents</a>
+  <a class="educator" href="educator.html">🎓 Educators</a>
+  <a class="back" href="index.html">← Back to login</a>
+</nav>
+
+<div class="wrap">
+  <div class="header-block">
+    <h1 class="doodle-title">
+      Terms &amp; Conditions
+      <svg viewBox="0 0 300 16" preserveAspectRatio="none"><path d="M2 8 Q40 2 80 8 T160 8 T240 8 T298 8" stroke="#FF8A3D" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+    </h1>
+  </div>
+  <p class="updated">Last updated: <span class="placeholder">[Month Day, Year]</span></p>
+
+  <div class="page">
+
+    <section>
+      <h2><span class="num">1</span>Agreement to Terms</h2>
+      <p>These Terms &amp; Conditions ("Terms") govern access to and use of ScribbleSum (the "Service"), provided by <span class="placeholder">ScribbleSum</span> ("we," "us," "our"). By creating an account, logging in, or otherwise using the Service, you agree to be bound by these Terms. If you do not agree, please do not use the Service.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">2</span>Who Can Use ScribbleSum</h2>
+      <p>ScribbleSum is designed for use by children under adult supervision. Student accounts may only be created and managed by a parent, legal guardian, or educator acting on behalf of a school. By creating a student account, the creating adult confirms that they are the parent, guardian, or an authorized educator of the student, and consents to the student's use of the Service in accordance with these Terms and our Privacy Policy.</p>
+      <p>Parent and educator accounts may only be created by individuals who are at least <span class="placeholder">18</span> years old and legally able to enter into this agreement.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">3</span>Accounts &amp; Account Security</h2>
+      <ul>
+        <li>Parents and educators are responsible for maintaining the confidentiality of login credentials for accounts they create, including student accounts.</li>
+        <li>You are responsible for all activity that occurs under your account and any student accounts linked to it.</li>
+        <li>Notify us promptly via our <a href="https://docs.google.com/forms/d/e/1FAIpQLScMfZEoUwNTG7IMQwNQ-2kPQI55CNcOrOu_kVzozkvgfpZPWg/viewform" target="_blank" rel="noopener" style="color:var(--educator); font-weight:800;">contact form</a> if you suspect unauthorized use of an account.</li>
+        <li>We may suspend or terminate accounts that violate these Terms or are used in a way that risks the safety of other users.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2><span class="num">4</span>Subscriptions &amp; Payment</h2>
+      <p>ScribbleSum may offer both free and paid subscription plans. Paid plans, pricing, and billing cycles are described at the time of purchase. Unless stated otherwise:</p>
+      <ul>
+        <li>Subscriptions renew automatically at the end of each billing period unless cancelled beforehand.</li>
+        <li>You can cancel a subscription at any time through your account settings; cancellation takes effect at the end of the current billing period.</li>
+        <li>Fees are non-refundable except where required by law or as otherwise stated in our refund policy.</li>
+        <li>We may change subscription pricing with advance notice; continued use after a price change constitutes acceptance of the new pricing.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2><span class="num">5</span>Acceptable Use</h2>
+      <p>When using ScribbleSum, you agree not to:</p>
+      <ul>
+        <li>Use the Service for any unlawful purpose or in violation of these Terms.</li>
+        <li>Attempt to gain unauthorized access to another user's account or to our systems.</li>
+        <li>Copy, modify, reverse-engineer, or resell any part of the Service without our written permission.</li>
+        <li>Upload or transmit any content that is harmful, abusive, or inappropriate for a children's learning environment.</li>
+        <li>Interfere with or disrupt the Service, including through automated scripts, bots, or excessive requests.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2><span class="num">6</span>Content &amp; Intellectual Property</h2>
+      <p>All content provided through ScribbleSum — including activities, illustrations, text, software, and the ScribbleSum name and logo — is owned by <span class="placeholder">ScribbleSum</span> or its licensors and is protected by copyright and other intellectual property laws. You may not reproduce, distribute, or create derivative works from this content without our prior written consent.</p>
+      <p>Any work a student completes within the Service (such as saved answers or progress data) remains associated with that student's account and is used solely to support their learning experience, as described in our Privacy Policy.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">7</span>Privacy &amp; Children's Data</h2>
+      <p>Our collection and use of personal information, including information relating to children, is described in our Privacy Policy. We take reasonable steps to comply with applicable children's privacy laws, and student data is used only to operate and improve the Service — not for third-party advertising.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">8</span>Disclaimers</h2>
+      <p>ScribbleSum is provided on an "as is" and "as available" basis. We do not guarantee that the Service will be uninterrupted, error-free, or that it will meet every educational outcome. ScribbleSum is a supplemental learning tool and is not a substitute for formal instruction.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">9</span>Limitation of Liability</h2>
+      <p>To the fullest extent permitted by law, <span class="placeholder">ScribbleSum</span> will not be liable for any indirect, incidental, or consequential damages arising from your use of, or inability to use, the Service. Our total liability for any claim relating to the Service will not exceed the amount you paid us, if any, in the <span class="placeholder">12 months</span> preceding the claim.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">10</span>Changes to These Terms</h2>
+      <p>We may update these Terms from time to time. If we make material changes, we will notify parents and educators through the Service or by email. Continued use of the Service after changes take effect constitutes acceptance of the revised Terms.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">11</span>Termination</h2>
+      <p>We may suspend or terminate access to the Service, in whole or in part, at any time if these Terms are violated or if required to protect the safety or integrity of the Service. You may stop using the Service and request account deletion at any time by contacting us.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">13</span>Contact Us</h2>
+      <p>Questions about these Terms can be submitted through our <a href="https://docs.google.com/forms/d/e/1FAIpQLScMfZEoUwNTG7IMQwNQ-2kPQI55CNcOrOu_kVzozkvgfpZPWg/viewform" target="_blank" rel="noopener" style="color:var(--educator); font-weight:800;">contact form</a>.</p>
+    </section>
+
+  </div>
+
+  <div class="footer-note">
+    Have a question first? Check our <a href="faq.html">FAQ</a> · <a href="index.html">Back to login</a>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="footer-brand">✏️ ScribbleSum</span>
+    <nav class="footer-links">
+      <a href="faq.html">FAQ</a>
+      <a href="terms.html">Terms &amp; Conditions</a>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLScMfZEoUwNTG7IMQwNQ-2kPQI55CNcOrOu_kVzozkvgfpZPWg/viewform" target="_blank" rel="noopener">Contact</a>
+    </nav>
+    <span class="footer-copy">© 2026 ScribbleSum. All rights reserved.</span>
+  </div>
+</footer>
+
+</body>
+</html>

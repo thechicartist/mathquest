@@ -8,6 +8,25 @@
 <link rel="icon" type="image/svg+xml" href="corequest-icon.svg">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
+
+  .site-footer{
+    position:fixed; left:0; bottom:0; width:100%; box-sizing:border-box;
+    background:#2D2A26; color:#EDE7DA;
+    padding:14px 16px calc(10px + env(safe-area-inset-bottom));
+    font-family:'Nunito',sans-serif; z-index:10;
+  }
+  .footer-inner{
+    max-width:760px; margin:0 auto; display:flex; flex-wrap:wrap;
+    align-items:center; justify-content:space-between; gap:8px 20px;
+  }
+  .footer-brand{ font-family:'Fredoka One',cursive; font-size:0.95rem; color:#fff; white-space:nowrap; }
+  .footer-links{ display:flex; flex-wrap:wrap; gap:8px 16px; justify-content:center; }
+  .footer-links a{ color:#EDE7DA; text-decoration:none; font-weight:700; font-size:0.82rem; white-space:nowrap; }
+  .footer-links a:hover{ color:#FF8A3D; text-decoration:underline; }
+  .footer-copy{ font-size:0.72rem; color:#B7AF9D; font-weight:600; text-align:center; width:100%; order:3; }
+  @media (min-width:560px){ .footer-copy{ width:auto; order:0; text-align:left; } }
+  @media (max-width:559px){ .footer-inner{ justify-content:center; text-align:center; } }
+  body{ padding-bottom:70px !important; }
   body {
     font-family:'Nunito',sans-serif;
     background:linear-gradient(180deg,#E8F5E9 0%,#F1F8E9 40%,#E3F2FD 100%);
@@ -1132,5 +1151,17 @@ if (typeof apiGet === 'undefined') {
 }
 </script>
   <link rel="stylesheet" href="css/style.css">
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-brand">✏️ ScribbleSum</span>
+      <nav class="footer-links">
+        <a href="faq.html">FAQ</a>
+        <a href="terms.html">Terms &amp; Conditions</a>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLScMfZEoUwNTG7IMQwNQ-2kPQI55CNcOrOu_kVzozkvgfpZPWg/viewform" target="_blank" rel="noopener">Contact</a>
+      </nav>
+      <span class="footer-copy">© 2026 ScribbleSum. All rights reserved.</span>
+    </div>
+  </footer>
 </body>
-</html> 
+</html>

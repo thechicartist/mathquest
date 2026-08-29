@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScribbleSum — FAQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="corequest-icon.svg">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  :root{
+    --ink:#2D2A26;
+    --paper:#FFFBF2;
+    --paper-line:#EFE6D0;
+    --student:#4FA8E0;
+    --parent:#A66DD4;
+    --educator:#2FBF9E;
+    --accent:#FF8A3D;
+    --note-1:#FFF1B8;
+    --note-2:#D9F2E6;
+    --note-3:#E3EEFF;
+    --note-4:#FBE3F0;
+    --shadow: 0 6px 0 rgba(45,42,38,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Nunito', sans-serif;
+    color:var(--ink);
+    background:
+      linear-gradient(var(--paper-line) 1px, transparent 1px) 0 38px/100% 40px,
+      var(--paper);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  h1,h2,.brand{font-family:'Fredoka One', cursive; font-weight:400;}
+  main{ flex:1 0 auto; width:100%; }
+
+  /* Top nav — mirrors index.html role buttons */
+  .role-nav{
+    display:flex; justify-content:center; gap:12px;
+    flex-wrap:wrap;
+    padding:22px 16px 8px;
+  }
+  .role-nav a{
+    text-decoration:none;
+    font-family:'Nunito',sans-serif;
+    font-weight:800;
+    font-size:0.92rem;
+    color:#fff;
+    padding:10px 18px;
+    border-radius:999px;
+    box-shadow:var(--shadow);
+    transition:transform .15s ease;
+  }
+  .role-nav a:hover{ transform:translateY(-2px); }
+  .role-nav a.student{ background:var(--student); }
+  .role-nav a.parent{ background:var(--parent); }
+  .role-nav a.educator{ background:var(--educator); }
+  .role-nav a.back{ background:var(--ink); }
+
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:20px 20px 0;
+  }
+
+  .header-block{
+    text-align:center;
+    margin:18px auto 34px;
+  }
+  .doodle-title{
+    position:relative;
+    display:inline-block;
+    font-size:2.6rem;
+    color:var(--ink);
+    margin:0;
+  }
+  .doodle-title svg{
+    position:absolute;
+    left:0; bottom:-14px;
+    width:100%; height:16px;
+  }
+  .header-block p{
+    margin-top:20px;
+    font-size:1.05rem;
+    color:#5B564E;
+    font-weight:700;
+  }
+
+  /* Sticky-note style accordion */
+  .faq-item{
+    border-radius:16px;
+    margin-bottom:14px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    transform:rotate(var(--tilt,0deg));
+  }
+  .faq-item:nth-child(4n+1){ background:var(--note-1); --tilt:-0.4deg; }
+  .faq-item:nth-child(4n+2){ background:var(--note-3); --tilt:0.4deg; }
+  .faq-item:nth-child(4n+3){ background:var(--note-2); --tilt:-0.3deg; }
+  .faq-item:nth-child(4n){ background:var(--note-4); --tilt:0.35deg; }
+
+  .faq-q{
+    width:100%;
+    text-align:left;
+    background:none;
+    border:none;
+    cursor:pointer;
+    padding:18px 52px 18px 20px;
+    font-family:'Nunito', sans-serif;
+    font-weight:800;
+    font-size:1.02rem;
+    color:var(--ink);
+    position:relative;
+  }
+  .faq-q::after{
+    content:"✎";
+    position:absolute;
+    right:18px; top:50%;
+    transform:translateY(-50%) rotate(0deg);
+    font-size:1.2rem;
+    transition:transform .25s ease;
+    color:var(--accent);
+  }
+  .faq-item.open .faq-q::after{ transform:translateY(-50%) rotate(90deg); }
+
+  .faq-a{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .3s ease, padding .3s ease;
+    padding:0 20px;
+    font-weight:600;
+    line-height:1.55;
+    color:#4A463F;
+  }
+  .faq-item.open .faq-a{
+    max-height:400px;
+    padding:0 20px 20px;
+  }
+
+  .category-label{
+    font-family:'Fredoka One',cursive;
+    color:var(--accent);
+    font-size:1.1rem;
+    margin:34px 0 14px;
+  }
+
+  .footer-note{
+    text-align:center;
+    margin-top:50px;
+    font-size:0.85rem;
+    color:#8A8478;
+    font-weight:700;
+  }
+  .footer-note a{ color:var(--educator); text-decoration:none; }
+  .footer-note a:hover{ text-decoration:underline; }
+
+  @media (prefers-reduced-motion: reduce){
+    .role-nav a, .faq-q::after, .faq-a{ transition:none; }
+  }
+
+  /* Site footer — flexes and wraps at any width, respects notch/home-bar insets */
+  .site-footer{
+    flex-shrink:0;
+    margin-top:50px;
+    background:var(--ink);
+    color:#EDE7DA;
+    padding:26px 16px calc(20px + env(safe-area-inset-bottom));
+  }
+  .footer-inner{
+    max-width:760px;
+    margin:0 auto;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px 24px;
+  }
+  .footer-brand{
+    font-family:'Fredoka One', cursive;
+    font-size:1.05rem;
+    color:#fff;
+    white-space:nowrap;
+  }
+  .footer-links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 20px;
+    justify-content:center;
+  }
+  .footer-links a{
+    color:#EDE7DA;
+    text-decoration:none;
+    font-weight:700;
+    font-size:0.9rem;
+    white-space:nowrap;
+  }
+  .footer-links a:hover{ color:var(--accent); text-decoration:underline; }
+  .footer-copy{
+    font-size:0.8rem;
+    color:#B7AF9D;
+    font-weight:600;
+    text-align:center;
+    width:100%;
+    order:3;
+  }
+  @media (min-width:560px){
+    .footer-copy{ width:auto; order:0; text-align:left; }
+  }
+  @media (max-width:559px){
+    .footer-inner{ justify-content:center; text-align:center; }
+  }
+</style>
+</head>
+<body>
+
+<main>
+<nav class="role-nav">
+  <a class="student" href="index.html">👦 Student</a>
+  <a class="parent" href="parent.html">👨‍👩‍👧‍👦 Parents</a>
+  <a class="educator" href="educator.html">🎓 Educators</a>
+  <a class="back" href="index.html">← Back to login</a>
+</nav>
+
+<div class="wrap">
+  <div class="header-block">
+    <h1 class="doodle-title">
+      Frequently Asked Questions
+      <svg viewBox="0 0 300 16" preserveAspectRatio="none"><path d="M2 8 Q40 2 80 8 T160 8 T240 8 T298 8" stroke="#FF8A3D" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+    </h1>
+    <p>Everything about ScribbleSum, answered in plain language.</p>
+  </div>
+
+  <div class="category-label">🚀 Getting Started</div>
+
+  <div class="faq-item">
+    <button class="faq-q">How do I get a ScribbleSum account?</button>
+    <div class="faq-a">Accounts are set up by a parent or educator — students can't sign up on their own. If you're a student, ask the adult who set up your account for your username and password. If you're a parent or educator, use the Parents or Educators button above to create and manage accounts.</div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q">I forgot my username or password. What do I do?</button>
+    <div class="faq-a">Ask your parent or educator — they can look up your username or reset your password from their dashboard. For safety, students can't reset their own passwords.</div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q">Why can't I log in even though I typed my password correctly?</button>
+    <div class="faq-a">Double-check for extra spaces and that Caps Lock isn't on — passwords are case-sensitive. If it still doesn't work, your parent or educator may need to confirm your account is active or reset your password.</div>
+  </div>
+
+  <div class="category-label">🧮 Using ScribbleSum</div>
+
+  <div class="faq-item">
+    <button class="faq-q">What age or grade level is ScribbleSum designed for?</button>
+    <div class="faq-a">ScribbleSum is built for elementary and early middle school learners practicing core math skills. Activities adjust in difficulty as a student progresses, so it can flex across a range of levels.</div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q">Does my progress get saved automatically?</button>
+    <div class="faq-a">Yes. Progress, scores, and completed activities save automatically as a student works, and are visible to the parent or educator connected to that account.</div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q">Can I use ScribbleSum on a tablet or phone?</button>
+    <div class="faq-a">ScribbleSum works in a web browser on most tablets, laptops, and desktop computers. For the smoothest experience, we recommend a recent version of Chrome, Safari, or Edge.</div>
+  </div>
+
+  <div class="category-label">👨‍👩‍👧 For Parents</div>
+
+  <div class="faq-item">
+    <button class="faq-q">How do I create an account for my child?</button>
+    <div class="faq-a">Select the Parents button above and follow the steps to create your family account and add a student profile. You'll set your child's username and password during setup.</div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q">Can I see how my child is doing?</button>
+    <div class="faq-a">Yes. Your parent dashboard shows completed activities, accuracy, time spent, and areas where your child may need more practice.</div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q">Is ScribbleSum free, or is there a subscription?</button>
+    <div class="faq-a">ScribbleSum offers a free tier with core activities, plus optional paid plans that unlock additional content and reporting features. Pricing details are shown when you create a parent account.</div>
+  </div>
+
+  <div class="category-label">🎓 For Educators</div>
+
+  <div class="faq-item">
+    <button class="faq-q">Can I add my whole class at once?</button>
+    <div class="faq-a">Yes. The Educators dashboard supports bulk-adding students via a class roster, or you can add students individually.</div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q">Can I assign specific activities to my students?</button>
+    <div class="faq-a">Yes. Educators can assign targeted activities or skill sets to individual students or the whole class, and track completion from the dashboard.</div>
+  </div>
+
+  <div class="category-label">🔒 Privacy &amp; Safety</div>
+
+  <div class="faq-item">
+    <button class="faq-q">Is my child's information kept private?</button>
+    <div class="faq-a">Yes. Student accounts are created and managed by a parent or educator, and student data is used only to support learning and progress tracking. See our Privacy Policy for full details.</div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q">Can students chat with each other or with strangers?</button>
+    <div class="faq-a">No. ScribbleSum does not include open chat, messaging, or social features between students, keeping the experience focused on learning.</div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q">I still need help — how do I contact support?</button>
+    <div class="faq-a">Fill out our <a href="https://docs.google.com/forms/d/e/1FAIpQLScMfZEoUwNTG7IMQwNQ-2kPQI55CNcOrOu_kVzozkvgfpZPWg/viewform" target="_blank" rel="noopener" style="color:var(--educator); font-weight:800;">contact form</a> and we'll get back to you as soon as we can.</div>
+  </div>
+
+  <div class="footer-note">
+    Looking for our <a href="terms.html">Terms &amp; Conditions</a>? · <a href="index.html">Back to login</a>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="footer-brand">✏️ ScribbleSum</span>
+    <nav class="footer-links">
+      <a href="faq.html">FAQ</a>
+      <a href="terms.html">Terms &amp; Conditions</a>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLScMfZEoUwNTG7IMQwNQ-2kPQI55CNcOrOu_kVzozkvgfpZPWg/viewform" target="_blank" rel="noopener">Contact</a>
+    </nav>
+    <span class="footer-copy">© 2026 ScribbleSum. All rights reserved.</span>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.faq-q').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    btn.parentElement.classList.toggle('open');
+  });
+});
+</script>
+
+</body>
+</html>
