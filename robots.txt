@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Prevent search engines from indexing administrative or app control routes
+Disallow: /admin/
+Disallow: /educator/
+Disallow: /api/
+
+# Link search crawlers directly to your site index map
+Sitemap: https://scribblesum.com/sitemap.xml
