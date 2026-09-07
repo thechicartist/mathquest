@@ -15,7 +15,7 @@
     background:#2D2A26; color:#EDE7DA;
     padding:14px 16px calc(10px + env(safe-area-inset-bottom));
     font-family:'Nunito',sans-serif; z-index:10;
-  }
+  }login
   .footer-inner{
     max-width:760px; margin:0 auto; display:flex; flex-wrap:wrap;
     align-items:center; justify-content:space-between; gap:8px 20px;
@@ -321,7 +321,7 @@
   </div>
 
   <!-- ═══════════════════════════════════════
-       SIGNUP FLOW  (3 steps)
+       SIGNUP FLOW  (2 steps)
   ════════════════════════════════════════ -->
   <div id="signup-flow" style="display:none">
 
@@ -331,13 +331,10 @@
         <div class="step-dot active" id="dot1">1</div>
         <div class="step-line" id="line1"></div>
         <div class="step-dot" id="dot2">2</div>
-        <div class="step-line" id="line2"></div>
-        <div class="step-dot" id="dot3">3</div>
       </div>
       <div class="steps-labels">
         <span class="step-label active" id="lbl1">Account</span>
-        <span class="step-label" id="lbl2">Payment</span>
-        <span class="step-label" id="lbl3">Done!</span>
+        <span class="step-label" id="lbl2">Done!</span>
       </div>
     </div>
 
@@ -378,12 +375,12 @@
         <input type="password" id="s-pass2" placeholder="Repeat password">
       </div>
 
-      <button class="btn-primary" onclick="goToPayment()">Continue to Payment →</button>
+      <button class="btn-primary" onclick="nextStep()">next →</button>
       <div class="msg err" id="err1"></div>
     </div>
 
     <!-- Step 2 — Payment (Stripe Checkout redirect) -->
-    <div class="panel" id="step2">
+    <div class="panel" id="step1">
       <div class="price-box">
         <div class="price-amount struck"><span class="price-currency">$</span>4.99</div>
         <div class="price-free">Free for now</div>

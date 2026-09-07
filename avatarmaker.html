@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avatar Studio</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root{
+    --navy: #1F2B5E;
+    --navy-deep: #141C42;
+    --teal: #2FC3C9;
+    --teal-deep: #1D9AA0;
+    --purple: #6A4FD6;
+    --purple-deep: #4F37AE;
+    --gold: #FFC93C;
+    --gold-deep: #E8A800;
+    --coral: #FF6B7A;
+    --coral-deep: #E24C5C;
+    --grass: #4ECB71;
+    --grass-deep: #35A957;
+    --panel: #F4F7FF;
+    --card: #FFFFFF;
+    --ink: #1F2B5E;
+    --ink-soft: #5B6494;
+  }
+
+  *{ box-sizing: border-box; }
+  html, body{ margin:0; padding:0; height:100%; font-family:'Nunito', sans-serif; color: var(--ink); }
+  h1,h2,h3,button,.game-font{ font-family:'Baloo 2', sans-serif; }
+
+  #app{
+    min-height:100%;
+    padding: 18px 16px 50px;
+    background:
+      radial-gradient(circle at 15% 0%, #8FE3E6 0%, transparent 45%),
+      radial-gradient(circle at 100% 10%, #B9A6FF 0%, transparent 40%),
+      linear-gradient(180deg, #4FD2D6 0%, #3FA9E8 45%, #6A7FE8 100%);
+    position:relative;
+    overflow:hidden;
+  }
+  #app::before, #app::after{
+    content:""; position:absolute; border-radius:50%;
+    background: rgba(255,255,255,0.35); filter: blur(1px);
+  }
+  #app::before{ width:120px; height:70px; top:60px; left:-30px; }
+  #app::after{ width:160px; height:90px; top:220px; right:-50px; }
+
+  .wrap{ max-width: 1040px; margin: 0 auto; position:relative; z-index:1; }
+
+  /* ---- HUD header ---- */
+  .hud{
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    flex-wrap:wrap; margin-bottom:18px;
+  }
+  .sign{
+    background: linear-gradient(180deg, var(--purple), var(--purple-deep));
+    border: 5px solid var(--navy-deep);
+    border-radius: 18px;
+    padding: 12px 26px;
+    box-shadow: 0 6px 0 var(--navy-deep), 0 10px 18px rgba(20,28,66,0.35);
+    display:flex; align-items:center; gap:12px;
+  }
+  .sign .icon{ font-size:30px; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.2)); }
+  .sign h1{
+    margin:0; font-size:24px; color:#fff; letter-spacing:0.5px;
+    text-shadow: 0 2px 0 var(--navy-deep), 0 3px 6px rgba(0,0,0,0.25);
+  }
+
+  .coin-hud{
+    display:flex; align-items:center; gap:10px;
+    background: linear-gradient(180deg, #FFE07A, var(--gold));
+    border: 5px solid var(--gold-deep);
+    border-radius: 999px;
+    padding: 8px 20px 8px 8px;
+    box-shadow: 0 6px 0 var(--gold-deep), 0 10px 16px rgba(232,168,0,0.35);
+    cursor:pointer;
+    transition: transform .1s ease;
+  }
+  .coin-hud:active{ transform: translateY(2px); }
+  .coin-hud .coin-icon{
+    width:38px; height:38px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #FFF3C4, var(--gold) 60%, var(--gold-deep) 100%);
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.15);
+  }
+  .coin-hud .count{ font-size:22px; font-weight:800; color: var(--navy-deep); }
+  .coin-hud .label{ font-size:11px; font-weight:700; color:#8A6A00; text-transform:uppercase; letter-spacing:0.6px; }
+
+  /* ---- earn panel ---- */
+  .earn-panel{
+    background: linear-gradient(180deg, #FFFFFF, #EAF1FF);
+    border: 5px solid var(--navy-deep);
+    border-radius: 20px;
+    padding: 14px 16px;
+    box-shadow: 0 6px 0 var(--navy-deep), 0 10px 18px rgba(20,28,66,0.25);
+    margin-bottom: 16px;
+  }
+  .earn-title{
+    font-size:15px; font-weight:800; margin: 0 0 10px 2px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .earn-list{ display:flex; flex-direction:column; gap:8px; }
+  .earn-row{
+    display:flex; align-items:center; gap:10px;
+    background: var(--card); border:3px solid #DCE2F5; border-radius:12px;
+    padding: 8px 10px;
+  }
+  .earn-row .e-icon{ font-size:20px; width:26px; text-align:center; }
+  .earn-row .e-text{ flex:1; font-size:13px; font-weight:700; color: var(--ink); }
+  .earn-row .e-sub{ font-size:11px; font-weight:600; color: var(--ink-soft); display:block; }
+  .earn-row .e-btn{
+    border:none; border-radius:10px; padding:7px 14px; font-weight:800; font-size:12.5px;
+    cursor:pointer; font-family:'Baloo 2'; color:#fff;
+    background: var(--grass); box-shadow: 0 3px 0 var(--grass-deep);
+    white-space:nowrap;
+  }
+  .earn-row .e-btn:disabled{ background:#D8DCEC; color:#98A0C0; box-shadow:none; cursor:not-allowed; }
+  .earn-row .e-btn:active:not(:disabled){ transform: translateY(2px); box-shadow:none; }
+  .streak-flames{ font-size:11px; font-weight:800; color: var(--gold-deep); }
+
+  /* ---- category rail ---- */
+  .rail{
+    display:flex; gap:10px; overflow-x:auto; padding: 4px 2px 14px;
+    margin-bottom: 4px;
+  }
+  .rail-btn{
+    flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:4px;
+    width:76px; cursor:pointer;
+  }
+  .rail-btn .circle{
+    width:58px; height:58px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:26px;
+    background: linear-gradient(180deg, #FFFFFF, #E7ECFF);
+    border: 4px solid var(--navy-deep);
+    box-shadow: 0 5px 0 var(--navy-deep);
+    transition: transform .1s ease;
+  }
+  .rail-btn span.txt{
+    font-size:11.5px; font-weight:800; color:#fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  }
+  .rail-btn.active .circle{
+    background: linear-gradient(180deg, #FFE07A, var(--gold));
+    border-color: var(--gold-deep);
+    box-shadow: 0 5px 0 var(--gold-deep);
+    transform: translateY(-3px);
+  }
+  .rail-btn:active .circle{ transform: translateY(2px); box-shadow: 0 1px 0 var(--navy-deep); }
+
+  /* ---- layout ---- */
+  .layout{ display:grid; grid-template-columns: 320px 1fr; gap: 18px; align-items:start; }
+  @media (max-width: 780px){ .layout{ grid-template-columns: 1fr; } }
+
+  .stage-panel{
+    position:sticky; top:16px;
+    background: linear-gradient(180deg, #EAF1FF, #FFFFFF 70%);
+    border: 6px solid var(--navy-deep);
+    border-radius: 26px;
+    padding: 16px;
+    box-shadow: 0 8px 0 var(--navy-deep), 0 14px 24px rgba(20,28,66,0.3);
+  }
+  .stage{
+    position:relative;
+    background: radial-gradient(circle at 50% 22%, rgba(255,255,255,0.95), rgba(180,200,255,0.35) 72%);
+    border-radius: 18px;
+    padding: 10px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .stage svg{ width:100%; max-width:230px; height:auto; }
+
+  .avatar-banner{
+    margin-top:10px; text-align:center;
+    background: linear-gradient(180deg, var(--teal), var(--teal-deep));
+    border: 4px solid var(--navy-deep);
+    border-radius: 12px;
+    padding: 8px 10px;
+    box-shadow: 0 4px 0 var(--navy-deep);
+  }
+  .avatar-banner .name{ font-weight:800; color:#fff; font-size:16px; text-shadow:0 1px 0 rgba(0,0,0,0.2); }
+  .avatar-banner .sub{ font-weight:700; color:#EAFFFB; font-size:11.5px; margin-top:1px; }
+
+  .grown-up{ margin-top:14px; }
+  .grown-up summary{
+    cursor:pointer; font-weight:700; font-size:12.5px; color: var(--ink-soft); list-style:none;
+    text-align:center;
+  }
+  .grown-up summary::-webkit-details-marker{ display:none; }
+  .grown-up summary::before{ content:"⚙️  "; }
+  .grown-up .controls{ display:flex; flex-direction:column; gap:8px; margin-top:10px; align-items:center; }
+  .grown-up .note{ font-size:11px; color: var(--ink-soft); text-align:center; max-width:220px; line-height:1.4; }
+  .btn-small{
+    border:none; border-radius:10px; padding:8px 14px; font-weight:800; font-size:12.5px;
+    cursor:pointer; font-family:'Baloo 2'; color:#fff;
+    background: var(--grass); box-shadow: 0 3px 0 var(--grass-deep);
+  }
+  .btn-small.reset{ background: var(--coral); box-shadow: 0 3px 0 var(--coral-deep); }
+
+  /* ---- shelf / shop ---- */
+  .shelf-panel{
+    background: linear-gradient(180deg, #2C6E49 0%, #245A3C 100%);
+    border: 6px solid var(--navy-deep);
+    border-radius: 26px;
+    padding: 18px;
+    box-shadow: 0 8px 0 var(--navy-deep), 0 14px 24px rgba(20,28,66,0.3);
+  }
+  .shelf-title{
+    color:#fff; font-size:18px; font-weight:800; margin:0 0 12px 4px;
+    text-shadow: 0 2px 0 rgba(0,0,0,0.25);
+    display:flex; align-items:center; gap:8px;
+  }
+
+  .shop-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 14px;
+    background: repeating-linear-gradient(180deg, #8B5A2B 0 10px, #7A4C22 10px 14px);
+    border-radius: 16px;
+    padding: 16px 14px;
+  }
+
+  .item-card{
+    background: linear-gradient(180deg, #FFFFFF, #F0F2FF);
+    border: 4px solid var(--navy-deep);
+    border-radius: 16px;
+    padding: 12px 10px 10px;
+    text-align:center;
+    display:flex; flex-direction:column; align-items:center; gap:7px;
+    box-shadow: 0 5px 0 var(--navy-deep);
+    position:relative;
+  }
+  .item-card.equipped{ border-color: var(--grass-deep); box-shadow: 0 5px 0 var(--grass-deep); background: linear-gradient(180deg,#EFFFF3,#FFFFFF); }
+  .item-card.owned:not(.equipped){ border-color: var(--purple-deep); box-shadow: 0 5px 0 var(--purple-deep); }
+
+  .ribbon{
+    position:absolute; top:-9px; right:-9px;
+    background: var(--gold); color: var(--navy-deep);
+    font-size:9.5px; font-weight:800; padding:3px 7px; border-radius:8px;
+    border:2px solid var(--gold-deep);
+    transform: rotate(8deg);
+  }
+
+  .swatch{
+    width:56px; height:56px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center; font-size:26px;
+    border: 3px solid rgba(31,43,94,0.15);
+  }
+
+  .item-name{ font-weight:700; font-size:12.5px; line-height:1.2; }
+
+  .price-tag{
+    display:flex; align-items:center; gap:4px; font-weight:800; font-size:13px; color: var(--gold-deep);
+  }
+  .price-tag.free{ color: var(--grass-deep); }
+
+  .item-btn{
+    width:100%; border:none; border-radius:10px; padding:8px 6px;
+    font-weight:800; font-size:12.5px; cursor:pointer; font-family:'Baloo 2';
+    box-shadow: 0 3px 0 rgba(0,0,0,0.25);
+  }
+  .item-btn.buy{ background: var(--gold); color: var(--navy-deep); box-shadow: 0 3px 0 var(--gold-deep); }
+  .item-btn.buy:disabled{ background:#D8DCEC; color:#98A0C0; box-shadow:none; cursor:not-allowed; }
+  .item-btn.wear{ background: var(--coral); color:#fff; box-shadow: 0 3px 0 var(--coral-deep); }
+  .item-btn.equipped-btn{ background: var(--grass); color:#fff; box-shadow: 0 3px 0 var(--grass-deep); cursor:default; }
+  .item-btn:active{ transform: translateY(2px); box-shadow:none !important; }
+
+  .toast{
+    position: fixed; left:50%; bottom: 24px; transform: translateX(-50%) translateY(20px);
+    background: var(--navy-deep); color:#fff; padding: 12px 22px; border-radius: 999px;
+    font-weight:700; font-size:14px; opacity:0; pointer-events:none;
+    transition: opacity .25s ease, transform .25s ease;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+    z-index: 20; border: 2px solid var(--gold);
+    max-width: 90vw; text-align:center;
+  }
+  .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
+
+  @keyframes pop{ 0%{transform:scale(1);} 40%{transform:scale(1.14);} 100%{transform:scale(1);} }
+  .pop{ animation: pop .32s ease; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="wrap">
+    <div class="hud">
+      <div class="sign">
+        <div class="icon">🛍️</div>
+        <h1>Avatar Studio</h1>
+      </div>
+      <div class="coin-hud" id="starPill">
+        <div class="coin-icon">⭐</div>
+        <div>
+          <div class="count" id="starCount">0</div>
+          <div class="label">Coins</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="earn-panel">
+      <div class="earn-title">💰 Earn coins</div>
+      <div class="earn-list" id="earnList"></div>
+    </div>
+
+    <div class="rail" id="tabs"></div>
+
+    <div class="layout">
+      <div class="stage-panel">
+        <div class="stage">
+          <svg id="avatarSvg" viewBox="0 0 240 340" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <div class="avatar-banner">
+          <div class="name">My Avatar</div>
+          <div class="sub" id="avatarSub">Looking good!</div>
+        </div>
+
+        <details class="grown-up">
+          <summary>For grown-ups</summary>
+          <div class="controls">
+            <div class="note">Coins are earned by checking in and completing chores above — no direct top-up. You can reset progress if needed.</div>
+            <button class="btn-small reset" id="resetBtn">Reset everything</button>
+          </div>
+        </details>
+      </div>
+
+      <div class="shelf-panel">
+        <div class="shelf-title"><span id="shelfIcon">🖐️</span><span id="shelfLabel">Skin</span></div>
+        <div class="shop-grid" id="shopGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+
+  const CATALOG = {
+    skin: [
+      { id:'skin-1', name:'Peach', cost:0, color:'#F5C9A0', shade:'#D9A878', hi:'#FFE3C4' },
+      { id:'skin-2', name:'Honey', cost:5, color:'#E8B978', shade:'#C99752', hi:'#F7D6A0' },
+      { id:'skin-3', name:'Caramel', cost:5, color:'#D6A164', shade:'#B37F45', hi:'#EAC28A' },
+      { id:'skin-4', name:'Almond', cost:5, color:'#BE7F49', shade:'#9C632F', hi:'#D9A26B' },
+      { id:'skin-5', name:'Cocoa', cost:5, color:'#8A5227', shade:'#6C3C18', hi:'#A8703E' },
+      { id:'skin-6', name:'Espresso', cost:5, color:'#66401F', shade:'#4C2E14', hi:'#82582F' },
+    ],
+    hair: [
+      { id:'hair-bald', name:'Buzzed', cost:0, shape:'buzz', color:'#3A2A22' },
+      { id:'hair-short', name:'Short & Neat', cost:12, shape:'short', color:'#5B3A24' },
+      { id:'hair-curly', name:'Curly Top', cost:18, shape:'curly', color:'#7A3E1D' },
+      { id:'hair-spiky', name:'Spiky', cost:20, shape:'spiky', color:'#2E4A9E' },
+      { id:'hair-mohawk', name:'Mohawk', cost:22, shape:'mohawk', color:'#3FA65C' },
+      { id:'hair-pony', name:'Ponytail', cost:25, shape:'ponytail', color:'#E8B84B' },
+      { id:'hair-pigtails', name:'Pigtails', cost:25, shape:'pigtails', color:'#E8629C' },
+      { id:'hair-long', name:'Long & Flowy', cost:28, shape:'long', color:'#8A4FC9' },
+    ],
+    shirt: [
+      { id:'shirt-white', name:'Comfy White Tee', cost:0, fill:'#FBFBFE', pattern:'plain', stroke:'#D8DCEC' },
+      { id:'shirt-red', name:'Cherry Red', cost:8, fill:'#DB4E4E', pattern:'plain' },
+      { id:'shirt-blue', name:'Ocean Blue', cost:8, fill:'#3980CE', pattern:'plain' },
+      { id:'shirt-purple', name:'Grape Purple', cost:10, fill:'#8153BD', pattern:'plain' },
+      { id:'shirt-yellow-stripe', name:'Sunny Stripes', cost:15, fill:'#F5C452', pattern:'stripes' },
+      { id:'shirt-orange-stripe', name:'Tiger Stripes', cost:15, fill:'#F08E42', pattern:'stripes' },
+      { id:'shirt-green-star', name:'Starry Green', cost:18, fill:'#46AD7E', pattern:'stars' },
+      { id:'shirt-pink-star', name:'Starry Pink', cost:18, fill:'#F27FA3', pattern:'stars' },
+      { id:'shirt-rainbow', name:'Rainbow Blast', cost:30, fill:'rainbow', pattern:'rainbow' },
+    ],
+    pants: [
+      { id:'pants-blue', name:'Classic Jeans', cost:0, fill:'#37518C' },
+      { id:'pants-black', name:'Midnight Black', cost:10, fill:'#2E2E39' },
+      { id:'pants-red', name:'Racer Red', cost:12, fill:'#B84049' },
+      { id:'pants-green', name:'Forest Green', cost:12, fill:'#387E51' },
+      { id:'pants-purple', name:'Plum Purple', cost:12, fill:'#6E4A9C' },
+      { id:'pants-rainbow', name:'Rainbow Rush', cost:25, fill:'rainbow' },
+    ],
+    shoes: [
+      { id:'shoes-white', name:'Clean Sneakers', cost:0, fill:'#EFEFF3', stroke:'#CFCBE8' },
+      { id:'shoes-red', name:'Red Runners', cost:8, fill:'#CB4B46' },
+      { id:'shoes-blue', name:'Blue Bounce', cost:8, fill:'#3873C4' },
+      { id:'shoes-gold', name:'Gold Boots', cost:20, fill:'#D6A63F' },
+      { id:'shoes-rainbow', name:'Rainbow Kicks', cost:22, fill:'rainbow' },
+    ],
+    accessory: [
+      { id:'acc-none', name:'No Accessory', cost:0, type:'none' },
+      { id:'acc-glasses', name:'Sunglasses', cost:10, type:'glasses', color:'#26262F' },
+      { id:'acc-cap', name:'Baseball Cap', cost:15, type:'cap', color:'#CB4B46' },
+      { id:'acc-bowtie', name:'Bowtie', cost:12, type:'bowtie', color:'#37518C' },
+      { id:'acc-wizard', name:'Wizard Hat', cost:25, type:'wizard', color:'#5F45B4' },
+      { id:'acc-crown', name:'Golden Crown', cost:40, type:'crown', color:'#E6B02A' },
+    ],
+  };
+
+  const TAB_META = [
+    { key:'skin', label:'Skin', icon:'🖐️' },
+    { key:'hair', label:'Hair', icon:'💇' },
+    { key:'shirt', label:'Shirts', icon:'👕' },
+    { key:'pants', label:'Pants', icon:'👖' },
+    { key:'shoes', label:'Shoes', icon:'👟' },
+    { key:'accessory', label:'Extras', icon:'✨' },
+  ];
+
+  // ---- Earning tasks: real progression instead of a "grown-up top-up" cheat box ----
+  const CHORES = [
+    { id:'chore-room', text:'Tidy your room', icon:'🧹', reward:4 },
+    { id:'chore-teeth', text:'Brush your teeth', icon:'🪥', reward:2 },
+    { id:'chore-reading', text:'Read for 15 minutes', icon:'📖', reward:5 },
+    { id:'chore-dishes', text:'Help clear the table', icon:'🍽️', reward:3 },
+  ];
+
+  const DEFAULT_STATE = {
+    stars: 0,
+    lastCheckIn: null,   // date string 'YYYY-MM-DD'
+    streak: 0,
+    choresDoneOn: {},    // { 'YYYY-MM-DD': [choreId, ...] }
+    owned: {
+      skin: ['skin-1'], hair: ['hair-bald'], shirt: ['shirt-white'],
+      pants: ['pants-blue'], shoes: ['shoes-white'], accessory: ['acc-none'],
+    },
+    equipped: {
+      skin: 'skin-1', hair: 'hair-bald', shirt: 'shirt-white',
+      pants: 'pants-blue', shoes: 'shoes-white', accessory: 'acc-none',
+    },
+  };
+
+  let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+  let activeTab = 'skin';
+  const STORAGE_KEY = 'avatar-studio-state-v2';
+
+  function todayStr(){
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function yesterdayStr(){
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  async function loadState(){
+    try{
+      const result = await window.storage.get(STORAGE_KEY, false);
+      if (result && result.value){
+        const parsed = JSON.parse(result.value);
+        state = Object.assign(JSON.parse(JSON.stringify(DEFAULT_STATE)), parsed);
+        if (!state.choresDoneOn) state.choresDoneOn = {};
+      }
+    }catch(e){}
+    render();
+  }
+  async function saveState(){
+    try{ await window.storage.set(STORAGE_KEY, JSON.stringify(state), false); }
+    catch(e){ console.error('Could not save', e); }
+  }
+
+  function findItem(cat, id){ return CATALOG[cat].find(i => i.id === id); }
+  function isOwned(cat, id){ return state.owned[cat].includes(id); }
+  function isEquipped(cat, id){ return state.equipped[cat] === id; }
+
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(showToast._h);
+    showToast._h = setTimeout(()=> t.classList.remove('show'), 1700);
+  }
+
+  function rainbowFill(id){ return `url(#${id})`; }
+
+  // ---------------- Avatar rendering (shaded, more natural proportions) ----------------
+  function buildAvatar(){
+    const skin = findItem('skin', state.equipped.skin);
+    const hair = findItem('hair', state.equipped.hair);
+    const shirt = findItem('shirt', state.equipped.shirt);
+    const pants = findItem('pants', state.equipped.pants);
+    const shoes = findItem('shoes', state.equipped.shoes);
+    const acc = findItem('accessory', state.equipped.accessory);
+
+    const shirtFill = shirt.fill === 'rainbow' ? rainbowFill('rbShirt') : shirt.fill;
+    const pantsFill = pants.fill === 'rainbow' ? rainbowFill('rbPants') : pants.fill;
+    const shoesFill = shoes.fill === 'rainbow' ? rainbowFill('rbShoes') : shoes.fill;
+
+    let svg = '';
+    svg += `<defs>
+      <linearGradient id="rbShirt" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#E85D7A"/><stop offset="25%" stop-color="#F0B93E"/>
+        <stop offset="50%" stop-color="#3FB595"/><stop offset="75%" stop-color="#3980CE"/>
+        <stop offset="100%" stop-color="#8153BD"/>
+      </linearGradient>
+      <linearGradient id="rbPants" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#E85D7A"/><stop offset="50%" stop-color="#F0B93E"/><stop offset="100%" stop-color="#3980CE"/>
+      </linearGradient>
+      <linearGradient id="rbShoes" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#E85D7A"/><stop offset="50%" stop-color="#3FB595"/><stop offset="100%" stop-color="#8153BD"/>
+      </linearGradient>
+
+      <radialGradient id="skinGrad" cx="42%" cy="34%" r="70%">
+        <stop offset="0%" stop-color="${skin.hi || '#fff'}"/>
+        <stop offset="55%" stop-color="${skin.color}"/>
+        <stop offset="100%" stop-color="${skin.shade || skin.color}"/>
+      </radialGradient>
+      <linearGradient id="skinLimb" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="${skin.hi || skin.color}"/>
+        <stop offset="55%" stop-color="${skin.color}"/>
+        <stop offset="100%" stop-color="${skin.shade || skin.color}"/>
+      </linearGradient>
+      <linearGradient id="shirtShade" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28"/>
+        <stop offset="35%" stop-color="#ffffff" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#000000" stop-opacity="0.14"/>
+      </linearGradient>
+      <linearGradient id="pantsShade" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#000000" stop-opacity="0.16"/>
+        <stop offset="50%" stop-color="#000000" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#000000" stop-opacity="0.16"/>
+      </linearGradient>
+      <radialGradient id="hairGrad" cx="40%" cy="25%" r="80%">
+        <stop offset="0%" stop-color="${hair.color}" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="#000000" stop-opacity="0.18"/>
+      </radialGradient>
+      <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.18"/>
+      </filter>
+    </defs>`;
+
+    // ground shadow
+    svg += `<ellipse cx="120" cy="323" rx="52" ry="9" fill="#0F1638" opacity="0.16"/>`;
+
+    // back hair (behind body) for long styles
+    if (hair.shape === 'ponytail'){
+      svg += `<path d="M172 108 Q192 140 182 178 Q176 156 168 132 Z" fill="${hair.color}"/>`;
+    }
+    if (hair.shape === 'pigtails'){
+      svg += `<path d="M64 100 Q42 128 50 160 Q58 138 68 116 Z" fill="${hair.color}"/>`;
+      svg += `<path d="M176 100 Q198 128 190 160 Q182 138 172 116 Z" fill="${hair.color}"/>`;
+    }
+    if (hair.shape === 'long'){
+      svg += `<path d="M68 92 Q50 165 66 226 Q76 224 84 220 Q72 160 90 96 Z" fill="${hair.color}"/>`;
+      svg += `<path d="M172 92 Q190 165 174 226 Q164 224 156 220 Q168 160 150 96 Z" fill="${hair.color}"/>`;
+    }
+
+    // legs
+ svg += `<path d="M96 244 q-8 14 -8 34 q0 20 3 46 q1 8 9 9 h10 q7 0 7 -8 q1 -26 -1 -46 q-1 -18 -6 -30 q-7 -8 -14 -5 z" fill="${pantsFill}"/>`;
+svg += `<path d="M144 244 q8 14 8 34 q0 20 -3 46 q-1 8 -9 9 h-10 q-7 0 -7 -8 q-1 -26 1 -46 q1 -18 6 -30 q7 -8 14 -5 z" fill="${pantsFill}"/>`;
+
+    // shoes
+    svg += `<path d="M84 300 q-2 10 8 12 h20 q6 0 5 -8 l-2 -10 z" fill="${shoesFill}" stroke="${shoes.stroke||'none'}" stroke-width="1.5"/>`;
+    svg += `<path d="M156 300 q2 10 -8 12 h-20 q-6 0 -5 -8 l2 -10 z" fill="${shoesFill}" stroke="${shoes.stroke||'none'}" stroke-width="1.5"/>`;
+
+    // arms (behind torso slightly, natural taper)
+    svg += `<path d="M87 150 q-16 4 -22 22 q-6 18 -5 40 q0 16 3 30 q1 7 8 6 q6 -1 6 -8 q-2 -22 0 -38 q1 -13 6 -20 q4 -8 12 -12 z" fill="url(#skinLimb)"/>`;
+svg += `<path d="M153 150 q16 4 22 22 q6 18 5 40 q0 16 -3 30 q-1 7 -8 6 q-6 -1 -6 -8 q2 -22 0 -38 q-1 -13 -6 -20 q-4 -8 -12 -12 z" fill="url(#skinLimb)"/>`;
+
+    // torso (tapered, shirt with natural silhouette)
+ svg += `<path d="M89 144 q31 -18 62 0 q13 8 15 24 q5 26 -1 60 q-2 14 -18 15 q-27 3 -39 0 q-16 -1 -18 -15 q-6 -34 -1 -60 q2 -16 15 -24 z" fill="${shirtFill}" stroke="${shirt.stroke||'none'}" stroke-width="1.5"/>`;
+    // collar shadow
+    svg += `<path d="M104 146 q16 10 32 0 q-2 8 -16 10 q-14 -2 -16 -10 z" fill="#000" opacity="0.08"/>`;
+
+    if (shirt.pattern === 'stripes'){
+      for (let y = 162; y < 232; y += 17){
+        svg += `<path d="M88 ${y} q32 8 64 0 l0 6 q-32 8 -64 0 z" fill="#ffffff" opacity="0.5"/>`;
+      }
+    }
+    if (shirt.pattern === 'stars'){
+      const pts = [[100,168],[140,168],[100,200],[140,200],[120,222]];
+      pts.forEach(p => { svg += star(p[0], p[1], 6.5, '#ffffff', 0.7); });
+    }
+
+    // neck
+    svg += `<rect x="110" y="122" width="20" height="26" rx="8" fill="url(#skinLimb)"/>`;
+    svg += `<ellipse cx="120" cy="146" rx="12" ry="4" fill="#000" opacity="0.12"/>`;
+
+    // head (slightly egg-shaped for realism, subtle jaw)
+svg += `<path d="M120 38 q34 0 42 30 q5 17 3 32 q-2 15 -9 26 q-8 14 -17 20 q-9 7 -19 7 q-10 0 -19 -7 q-9 -6 -17 -20 q-7 -11 -9 -26 q-2 -15 3 -32 q8 -30 42 -30 z" fill="url(#skinGrad)"/>`;
+
+    // ears
+    svg += `<ellipse cx="68" cy="92" rx="8" ry="11" fill="url(#skinLimb)"/>`;
+    svg += `<ellipse cx="172" cy="92" rx="8" ry="11" fill="url(#skinLimb)"/>`;
+    svg += `<ellipse cx="69" cy="93" rx="3.5" ry="5.5" fill="#000" opacity="0.1"/>`;
+    svg += `<ellipse cx="171" cy="93" rx="3.5" ry="5.5" fill="#000" opacity="0.1"/>`;
+
+    // cheeks blush
+    svg += `<ellipse cx="86" cy="104" rx="9" ry="6" fill="#FF7A8C" opacity="0.28"/>`;
+    svg += `<ellipse cx="154" cy="104" rx="9" ry="6" fill="#FF7A8C" opacity="0.28"/>`;
+
+    // brows
+    svg += `<path d="M92 78 q10 -6 20 -1" stroke="#00000055" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+    svg += `<path d="M148 78 q-10 -6 -20 -1" stroke="#00000055" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+
+    // eyes (almond shape with highlight)
+    svg += `<path d="M96 90 q8 -7 18 0 q-8 6 -18 0 z" fill="#fff"/>`;
+    svg += `<path d="M126 90 q8 -7 18 0 q-8 6 -18 0 z" fill="#fff"/>`;
+    svg += `<circle cx="105" cy="90" r="4.6" fill="#2A2035"/>`;
+    svg += `<circle cx="135" cy="90" r="4.6" fill="#2A2035"/>`;
+    svg += `<circle cx="106.3" cy="88.5" r="1.4" fill="#fff"/>`;
+    svg += `<circle cx="136.3" cy="88.5" r="1.4" fill="#fff"/>`;
+
+    // nose (soft shadow)
+    svg += `<path d="M118 94 q2 8 0 12 q3 3 6 0" stroke="#00000030" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+
+    // mouth (gentle smile with lip shading)
+    svg += `<path d="M104 112 q16 12 32 0" stroke="#B85A5A" stroke-width="3.4" fill="none" stroke-linecap="round"/>`;
+    svg += `<path d="M108 114 q12 7 24 0" stroke="#8A3E3E" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.5"/>`;
+
+    // hair front + accessory
+    svg += hairFrontShape(hair);
+    svg += accessoryShape(acc);
+
+    return svg;
+  }
+
+  function star(cx, cy, r, fill, opacity){
+    const pts = [];
+    for (let i=0;i<10;i++){
+      const rad = i % 2 === 0 ? r : r/2.3;
+      const ang = Math.PI/2 * -1 + i * Math.PI/5;
+      pts.push(`${cx + rad*Math.cos(ang)},${cy - rad*Math.sin(ang)}`);
+    }
+    return `<polygon points="${pts.join(' ')}" fill="${fill}" opacity="${opacity}"/>`;
+  }
+
+  function hairFrontShape(hair){
+    const c = hair.color;
+    switch(hair.shape){
+      case 'buzz':
+        return `<path d="M72 74 Q120 26 168 74 Q168 54 120 42 Q72 54 72 74 Z" fill="${c}"/><path d="M72 74 Q120 26 168 74 Q168 54 120 42 Q72 54 72 74 Z" fill="url(#hairGrad)"/>`;
+      case 'short':
+        return `<path d="M68 86 Q70 26 120 24 Q170 26 172 86 Q168 46 120 40 Q72 46 68 86 Z" fill="${c}"/><path d="M68 86 Q70 26 120 24 Q170 26 172 86 Q168 46 120 40 Q72 46 68 86 Z" fill="url(#hairGrad)"/>`;
+      case 'curly':
+        return `<g fill="${c}">
+          <circle cx="82" cy="56" r="14"/><circle cx="105" cy="40" r="16"/>
+          <circle cx="135" cy="40" r="16"/><circle cx="158" cy="56" r="14"/>
+          <circle cx="120" cy="34" r="16"/>
+        </g>`;
+      case 'spiky':
+        return `<g fill="${c}">
+          <polygon points="74,78 82,32 93,76"/>
+          <polygon points="97,72 107,24 116,72"/>
+          <polygon points="124,72 133,24 143,72"/>
+          <polygon points="147,76 158,32 166,78"/>
+        </g>`;
+      case 'mohawk':
+        return `<g>
+          <path d="M72 80 Q120 60 168 80 Q168 66 120 60 Q72 66 72 80 Z" fill="${c}" opacity="0.5"/>
+          <polygon points="113,18 127,18 121,70 119,70" fill="${c}"/>
+        </g>`;
+      case 'ponytail':
+        return `<path d="M68 84 Q70 28 120 26 Q170 28 172 84 Q168 48 120 42 Q72 48 68 84 Z" fill="${c}"/>`;
+      case 'pigtails':
+        return `<path d="M68 84 Q70 30 120 28 Q170 30 172 84 Q168 50 120 44 Q72 50 68 84 Z" fill="${c}"/>`;
+      case 'long':
+        return `<path d="M68 86 Q70 26 120 24 Q170 26 172 86 Q168 46 120 40 Q72 46 68 86 Z" fill="${c}"/>`;
+      default: return '';
+    }
+  }
+
+  function accessoryShape(acc){
+    switch(acc.type){
+      case 'glasses':
+        return `<g stroke="${acc.color}" stroke-width="3.6" fill="none" opacity="0.92">
+          <circle cx="105" cy="90" r="12"/><circle cx="135" cy="90" r="12"/>
+          <line x1="117" y1="90" x2="123" y2="90"/>
+        </g>`;
+      case 'cap':
+        return `<g fill="${acc.color}">
+          <path d="M68 76 Q70 28 120 26 Q170 28 172 76 Q168 52 120 48 Q72 52 68 76 Z"/>
+          <ellipse cx="158" cy="76" rx="24" ry="8"/>
+        </g>`;
+      case 'bowtie':
+        return `<g fill="${acc.color}">
+          <polygon points="110,136 122,129 122,147"/>
+          <polygon points="130,136 118,129 118,147"/>
+          <circle cx="120" cy="137" r="3.6"/>
+        </g>`;
+      case 'wizard':
+        return `<g fill="${acc.color}">
+          <polygon points="120,-6 92,56 148,56"/>
+          <ellipse cx="120" cy="56" rx="44" ry="9"/>
+          ${star(120,14,5.5,'#F0C450',0.9)}
+        </g>`;
+      case 'crown':
+        return `<g fill="${acc.color}">
+          <polygon points="78,56 91,20 104,48 120,14 136,48 149,20 162,56"/>
+          <rect x="78" y="52" width="84" height="9" rx="3"/>
+        </g>`;
+      default: return '';
+    }
+  }
+
+  // ---------------- Earning economy ----------------
+  function checkedInToday(){ return state.lastCheckIn === todayStr(); }
+
+  function doDailyCheckIn(){
+    if (checkedInToday()) return;
+    const wasYesterday = state.lastCheckIn === yesterdayStr();
+    state.streak = wasYesterday ? state.streak + 1 : 1;
+    state.lastCheckIn = todayStr();
+    const bonus = Math.min(2 + Math.floor(state.streak / 3), 6);
+    const reward = 3 + bonus;
+    state.stars += reward;
+    document.getElementById('starPill').classList.add('pop');
+    setTimeout(()=> document.getElementById('starPill').classList.remove('pop'), 320);
+    showToast(`Daily check-in! +${reward} coins (streak: ${state.streak} day${state.streak===1?'':'s'})`);
+    saveState(); render();
+  }
+
+  function choreDoneToday(id){
+    const list = state.choresDoneOn[todayStr()] || [];
+    return list.includes(id);
+  }
+
+  function doChore(id){
+    if (choreDoneToday(id)) return;
+    const chore = CHORES.find(c => c.id === id);
+    const key = todayStr();
+    if (!state.choresDoneOn[key]) state.choresDoneOn[key] = [];
+    state.choresDoneOn[key].push(id);
+    state.stars += chore.reward;
+    document.getElementById('starPill').classList.add('pop');
+    setTimeout(()=> document.getElementById('starPill').classList.remove('pop'), 320);
+    showToast(`Nice work! +${chore.reward} coins for "${chore.text}"`);
+    saveState(); render();
+  }
+
+  function renderEarnList(){
+    const list = document.getElementById('earnList');
+    list.innerHTML = '';
+
+    // Daily check-in row
+    const checkedIn = checkedInToday();
+    const row = document.createElement('div');
+    row.className = 'earn-row';
+    row.innerHTML = `
+      <div class="e-icon">📅</div>
+      <div class="e-text">Daily check-in
+        <span class="e-sub">${state.streak > 0 ? `<span class="streak-flames">🔥 ${state.streak}-day streak</span>` : 'Start your streak today'}</span>
+      </div>
+    `;
+    const btn = document.createElement('button');
+    btn.className = 'e-btn';
+    btn.textContent = checkedIn ? 'Done ✓' : 'Check in';
+    btn.disabled = checkedIn;
+    btn.onclick = doDailyCheckIn;
+    row.appendChild(btn);
+    list.appendChild(row);
+
+    // Chore rows
+    CHORES.forEach(chore => {
+      const done = choreDoneToday(chore.id);
+      const r = document.createElement('div');
+      r.className = 'earn-row';
+      r.innerHTML = `
+        <div class="e-icon">${chore.icon}</div>
+        <div class="e-text">${chore.text}<span class="e-sub">+${chore.reward} coins</span></div>
+      `;
+      const b = document.createElement('button');
+      b.className = 'e-btn';
+      b.textContent = done ? 'Done ✓' : 'Mark done';
+      b.disabled = done;
+      b.onclick = () => doChore(chore.id);
+      r.appendChild(b);
+      list.appendChild(r);
+    });
+  }
+
+  function render(){
+    document.getElementById('starCount').textContent = state.stars;
+    document.getElementById('avatarSvg').innerHTML = buildAvatar();
+    renderEarnList();
+    renderTabs();
+    renderShop();
+  }
+
+  function renderTabs(){
+    const tabsEl = document.getElementById('tabs');
+    tabsEl.innerHTML = '';
+    TAB_META.forEach(t => {
+      const btn = document.createElement('div');
+      btn.className = 'rail-btn' + (t.key === activeTab ? ' active' : '');
+      btn.innerHTML = `<div class="circle">${t.icon}</div><span class="txt">${t.label}</span>`;
+      btn.onclick = () => {
+        activeTab = t.key;
+        document.getElementById('shelfIcon').textContent = t.icon;
+        document.getElementById('shelfLabel').textContent = t.label;
+        renderTabs(); renderShop();
+      };
+      tabsEl.appendChild(btn);
+    });
+    document.getElementById('shelfIcon').textContent = TAB_META.find(t=>t.key===activeTab).icon;
+    document.getElementById('shelfLabel').textContent = TAB_META.find(t=>t.key===activeTab).label;
+  }
+
+  function renderShop(){
+    const grid = document.getElementById('shopGrid');
+    grid.innerHTML = '';
+    CATALOG[activeTab].forEach(item => {
+      const owned = isOwned(activeTab, item.id);
+      const equipped = isEquipped(activeTab, item.id);
+
+      const card = document.createElement('div');
+      card.className = 'item-card' + (owned ? ' owned' : '') + (equipped ? ' equipped' : '');
+
+      if (equipped){
+        const rib = document.createElement('div');
+        rib.className = 'ribbon'; rib.textContent = 'WEARING';
+        card.appendChild(rib);
+      } else if (owned){
+        const rib = document.createElement('div');
+        rib.className = 'ribbon'; rib.textContent = 'OWNED';
+        card.appendChild(rib);
+      }
+
+      const swatch = document.createElement('div');
+      swatch.className = 'swatch';
+      swatch.style.background = swatchBg(activeTab, item);
+      swatch.textContent = swatchIcon(activeTab, item);
+      card.appendChild(swatch);
+
+      const name = document.createElement('div');
+      name.className = 'item-name';
+      name.textContent = item.name;
+      card.appendChild(name);
+
+      const price = document.createElement('div');
+      price.className = 'price-tag' + (item.cost === 0 ? ' free' : '');
+      price.innerHTML = item.cost === 0 ? 'Free' : `⭐ ${item.cost}`;
+      card.appendChild(price);
+
+      const btn = document.createElement('button');
+      if (equipped){
+        btn.className = 'item-btn equipped-btn';
+        btn.textContent = 'Wearing ✓';
+        btn.disabled = true;
+      } else if (owned){
+        btn.className = 'item-btn wear';
+        btn.textContent = 'Wear this';
+        btn.onclick = () => equipItem(activeTab, item.id);
+      } else {
+        btn.className = 'item-btn buy';
+        btn.textContent = 'Buy';
+        btn.disabled = state.stars < item.cost;
+        btn.onclick = () => buyItem(activeTab, item.id);
+      }
+      card.appendChild(btn);
+
+      grid.appendChild(card);
+    });
+  }
+
+  function swatchBg(cat, item){
+    if (cat === 'skin') return item.color;
+    if (cat === 'hair') return item.color;
+    if (cat === 'shirt' || cat === 'pants' || cat === 'shoes'){
+      return item.fill === 'rainbow'
+        ? 'linear-gradient(135deg, #E85D7A, #F0B93E, #3FB595, #3980CE, #8153BD)'
+        : item.fill;
+    }
+    if (cat === 'accessory') return item.type === 'none' ? '#EEF1FF' : (item.color || '#EEF1FF');
+    return '#EEF1FF';
+  }
+
+  function swatchIcon(cat, item){
+    if (cat === 'accessory'){
+      const map = { none:'—', glasses:'🕶️', cap:'🧢', bowtie:'🎀', wizard:'🧙', crown:'👑' };
+      return map[item.type] || '';
+    }
+    if (cat === 'hair') return '💇';
+    if (cat === 'shirt') return '👕';
+    if (cat === 'pants') return '👖';
+    if (cat === 'shoes') return '👟';
+    return '';
+  }
+
+  function buyItem(cat, id){
+    const item = findItem(cat, id);
+    if (state.stars < item.cost) { showToast("Not enough coins yet — earn more above!"); return; }
+    state.stars -= item.cost;
+    state.owned[cat].push(id);
+    state.equipped[cat] = id;
+    document.getElementById('starPill').classList.add('pop');
+    setTimeout(()=> document.getElementById('starPill').classList.remove('pop'), 320);
+    showToast(`${item.name} added to your closet! ✨`);
+    saveState(); render();
+  }
+
+  function equipItem(cat, id){
+    state.equipped[cat] = id;
+    const stage = document.querySelector('.stage');
+    stage.classList.add('pop');
+    setTimeout(()=> stage.classList.remove('pop'), 320);
+    saveState(); render();
+  }
+
+  document.getElementById('resetBtn').onclick = () => {
+    if (!confirm('Reset the whole shop? This clears owned items, streak, and coins.')) return;
+    state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+    saveState(); render();
+    showToast('Shop reset!');
+  };
+
+  loadState();
+})();
+</script>
+</body>
+</html>
