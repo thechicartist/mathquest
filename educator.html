@@ -181,6 +181,66 @@
 
   /* LOADING SPINNER */
   .loader { text-align:center; padding:40px; color:rgba(255,255,255,0.7); font-weight:700; font-size:1rem; }
+
+  /* STUDENT ROW CLICKABLE */
+  #class-student-table tr.stu-row { cursor:pointer; }
+  #class-student-table tr.stu-row:hover td { background:#F0F3FF; }
+
+  /* Full-screen activity view */
+  .fullscreen-view {
+    display:none; position:fixed; inset:0; background:linear-gradient(180deg,#1E2A7A 0%,#1F6BB5 100%);
+    z-index:200; overflow-y:auto; padding:24px;
+  }
+  .fullscreen-view.open { display:block; }
+  .fs-inner { max-width:640px; margin:0 auto; padding-top:56px; padding-bottom:40px; }
+  .fs-back {
+    position:fixed; top:16px; left:16px; background:white; color:#3F51B5;
+    border:2px solid #E8EAF6; border-radius:50px; padding:10px 18px;
+    font-family:'Fredoka One',cursive; font-size:0.9rem; cursor:pointer;
+    box-shadow:0 4px 14px rgba(0,0,0,0.12); transition:all 0.2s;
+  }
+  .fs-back:hover { transform:translateY(-2px); }
+  .fs-header { display:flex; align-items:center; gap:16px; margin-bottom:24px;
+    background:white; border-radius:22px; padding:20px; border:3px solid #E8EAF6; }
+  .fs-avatar { width:64px; height:64px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,#66BB6A,#43A047); display:flex; align-items:center;
+    justify-content:center; font-size:2rem; }
+  .fs-name { font-family:'Fredoka One',cursive; font-size:1.4rem; color:#1A237E; }
+  .fs-meta { font-size:0.85rem; color:#90A4AE; font-weight:700; margin-top:2px; }
+  .fs-section-title { font-family:'Fredoka One',cursive; font-size:1.1rem; color:#ffffff;
+    margin:22px 0 12px; }
+  .kid-stats-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+  }
+  .kid-stat {
+    background:white; border-radius:12px; padding:10px 6px;
+    text-align:center; border:2px solid #E8EAF6;
+  }
+  .kid-stat-val {
+    font-family:'Fredoka One',cursive; font-size:1.3rem; color:#1A237E; line-height:1;
+  }
+  .kid-stat-lbl {
+    font-size:0.7rem; font-weight:800; color:#90A4AE; margin-top:3px;
+  }
+  .subject-card { background:white; border:2px solid #E8EAF6; border-radius:18px; margin-bottom:14px; overflow:hidden; }
+  .subject-head { display:flex; align-items:center; gap:12px; padding:16px 18px; cursor:pointer; user-select:none; }
+  .subject-icon { font-size:1.6rem; }
+  .subject-name { font-family:'Fredoka One',cursive; font-size:1.05rem; color:#1A237E; flex:1; }
+  .subject-count { font-size:0.78rem; font-weight:800; color:#90A4AE; }
+  .subject-caret { font-size:0.85rem; color:#B0BEC5; transition:transform 0.2s; }
+  .subject-card.open .subject-caret { transform:rotate(90deg); }
+  .subject-chapters { display:none; border-top:2px solid #F5F5F5; padding:6px 12px 12px; }
+  .subject-card.open .subject-chapters { display:block; }
+  .chapter-row { padding:10px 8px; border-bottom:1px solid #F8FBF8; }
+  .chapter-row:last-child { border-bottom:none; }
+  .chapter-name { font-weight:800; color:#37474F; font-size:0.88rem; margin-bottom:6px; }
+  .diff-pills { display:flex; gap:8px; }
+  .diff-pill { flex:1; border-radius:10px; padding:6px 4px; text-align:center; font-size:0.72rem; font-weight:800; border:2px solid; }
+  .diff-pill .dp-n { font-family:'Fredoka One',cursive; font-size:1rem; display:block; }
+  .diff-pill.easy { border-color:#A5D6A7; background:#E8F5E9; color:#2E7D32; }
+  .diff-pill.medium { border-color:#FFCC80; background:#FFF3E0; color:#E65100; }
+  .diff-pill.hard { border-color:#EF9A9A; background:#FFEBEE; color:#B71C1C; }
+  .subject-empty { text-align:center; color:#B0BEC5; font-weight:700; font-size:0.85rem; padding:16px; }
 </style>
 </head>
 <body>
@@ -191,15 +251,12 @@
   <div class="auth-sub">Manage your classes on ScribbleSum</div>
   <div class="auth-tabs">
     <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
-    <!-- <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button> -->
+    <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
   </div>
   <div id="form-login">
     <div class="field"><label>Username</label><input type="text" id="login-user" placeholder="Your username" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="field"><label>Password</label><input type="password" id="login-pass" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <button class="auth-btn" onclick="doLogin()">🔓 Log In</button>
-      <div style="margin-top:20px;padding-top:16px;border-top:2px solid #F5F5F5;text-align:center;font-size:0.82rem;color:#B0BEC5;font-weight:600">
-     Accounts are created by institutes.
-  </div>
     <div class="auth-err" id="login-err"></div>
   </div>
   <div id="form-signup" style="display:none">
@@ -335,6 +392,34 @@
   </div>
 </div>
 
+<!-- ══ STUDENT ACTIVITY VIEW ══ -->
+<div class="fullscreen-view" id="activity-view">
+  <button class="fs-back" onclick="closeActivity()">← Back</button>
+  <div class="fs-inner">
+    <div class="fs-header">
+      <div class="fs-avatar" id="activity-avatar">🐣</div>
+      <div>
+        <div class="fs-name" id="activity-name">Student</div>
+        <div class="fs-meta" id="activity-meta">@username</div>
+      </div>
+    </div>
+    <div class="kid-stats-grid">
+      <div class="kid-stat"><span class="kid-stat-val" id="activity-level">⚡ 1</span><span class="kid-stat-lbl">Level</span></div>
+      <div class="kid-stat"><span class="kid-stat-val" id="activity-stars">⭐ 0</span><span class="kid-stat-lbl">Stars</span></div>
+      <div class="kid-stat"><span class="kid-stat-val" id="activity-games">🎮 0</span><span class="kid-stat-lbl">Games</span></div>
+      <div class="kid-stat"><span class="kid-stat-val" id="activity-streak">🔥 0</span><span class="kid-stat-lbl">Streak</span></div>
+    </div>
+    <div class="fs-section-title">Subject Breakdown</div>
+    <div id="subject-pie-wrap" style="display:flex;justify-content:center;margin-bottom:20px">
+      <svg id="subject-pie" width="180" height="180" viewBox="0 0 180 180"></svg>
+    </div>
+    <div id="subject-pie-legend" style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:10px;font-size:0.82rem;font-weight:800"></div>
+
+    <div class="fs-section-title">Progress by Subject</div>
+    <div id="subjects-container"></div>
+  </div>
+</div>
+
 <script src="js/api.js"></script>
 
 <script>
@@ -346,6 +431,21 @@ let currentEdu = null;
 let currentClass = null; // { id, name, grade, emoji }
 
 const CLASS_EMOJIS = ['📚','🚀','🌟','🎯','🦋','🌈','🔬','🎨','🏆','🌍','🧩','⚡'];
+
+let classStudentsCache = []; // last-rendered student list with raw progress, for the activity view
+
+const SUBJECTS = [
+  { key:'topicGames',    label:'Math',    icon:'🚀',
+    chapters:{counting:'Counting',addsubt:'Add & Subtract',multiply:'Multiplication',fractions:'Fractions',decimals:'Decimals',percent:'Percentages',algebra:'Algebra',geometry:'Geometry',wordprob:'Word Problems',measurement:'Measurement'} },
+  { key:'engTopicGames', label:'English', icon:'📖',
+    chapters:{vocab:'Vocabulary',spelling:'Spelling',grammar:'Grammar',punctuation:'Punctuation',reading:'Comprehension',synonyms:'Synonyms',antonyms:'Antonyms',figurative:'Figurative Language',prefixes:'Prefixes & Suffixes',sentences:'Sentences'} },
+  { key:'sciTopicGames', label:'Science', icon:'🔬',
+    chapters:{biology:'Biology',chemistry:'Chemistry',physics:'Physics',earth:'Earth Science',space:'Space',humanbody:'Human Body'} },
+];
+
+function gamesPlayedAt(topicGames, topic, diff){
+  return (topicGames?.[topic]?.[diff]?.q1) || 0;
+}
 
 // ══════════════════════════════════════════
 //  AUTH TABS
@@ -576,9 +676,10 @@ async function renderClassStudents(){
   const students=await Promise.all(names.map(async n=>{
     const u=await apiGet('/user/'+encodeURIComponent(n));
     const d=await apiGet('/progress/'+encodeURIComponent(n));
-    return{name:n,avatar:u?.avatar||'🐣',grade:u?.grade||1,level:d?.playerLevel||1,stars:d?.totalStars||0,games:d?.gamesPlayed||0,streak:d?.streak||0};
+    return{name:n,avatar:u?.avatar||'🐣',grade:u?.grade||1,level:d?.playerLevel||1,stars:d?.totalStars||0,games:d?.gamesPlayed||0,streak:d?.streak||0,raw:d||{}};
   }));
   students.sort((a,b)=>b.stars-a.stars);
+  classStudentsCache = students;
 
   // Update hero stats
   const total=students.length;
@@ -596,7 +697,7 @@ async function renderClassStudents(){
     return;
   }
   tbody.innerHTML=students.map((s,i)=>`
-    <tr>
+    <tr class="stu-row" onclick="openActivity('${s.name}')">
       <td style="font-size:1.4rem">${s.avatar}</td>
       <td><strong>${s.name}</strong>${i===0?'<span style="font-size:0.75rem;background:#FFD54F;color:#BF360C;border-radius:50px;padding:2px 8px;margin-left:6px">🏆 Top</span>':''}</td>
       <td><span class="grade-pill">Grade ${s.grade}</span></td>
@@ -604,7 +705,7 @@ async function renderClassStudents(){
       <td>⭐ ${s.stars}</td>
       <td>${s.games}</td>
       <td>🔥 ${s.streak}</td>
-      <td><button class="del-btn" onclick="removeStudentFromClass('${s.name}')">🗑 Remove</button></td>
+      <td><button class="del-btn" onclick="event.stopPropagation();removeStudentFromClass('${s.name}')">🗑 Remove</button></td>
     </tr>`).join('');
 }
 
@@ -671,6 +772,96 @@ async function removeStudentFromClass(name){
 }
 
 // ══════════════════════════════════════════
+//  STUDENT ACTIVITY VIEW
+// ══════════════════════════════════════════
+function openActivity(name){
+  const s=classStudentsCache.find(x=>x.name===name);
+  if(!s) return;
+  const prog=s.raw||{};
+  document.getElementById('activity-avatar').textContent=s.avatar;
+  document.getElementById('activity-name').textContent=s.name;
+  document.getElementById('activity-meta').textContent=`@${s.name} · Grade ${s.grade||'—'}`;
+  document.getElementById('activity-level').textContent='⚡ '+s.level;
+  document.getElementById('activity-stars').textContent='⭐ '+s.stars;
+  document.getElementById('activity-games').textContent='🎮 '+s.games;
+  document.getElementById('activity-streak').textContent='🔥 '+s.streak;
+
+  const subjectTotals = SUBJECTS.map(subj => {
+    const topicGames = prog[subj.key] || {};
+    const total = Object.keys(subj.chapters).reduce((s, chKey) =>
+      s + gamesPlayedAt(topicGames, chKey, 'easy') + gamesPlayedAt(topicGames, chKey, 'medium') + gamesPlayedAt(topicGames, chKey, 'hard'), 0);
+    return { label: subj.label, icon: subj.icon, total };
+  });
+  renderSubjectPie(subjectTotals);
+
+  const container=document.getElementById('subjects-container');
+  container.innerHTML=SUBJECTS.map((subj,si)=>{
+    const topicGames=prog[subj.key]||{};
+    const chapterEntries=Object.entries(subj.chapters).map(([chKey,chName])=>{
+      const easy=gamesPlayedAt(topicGames,chKey,'easy');
+      const medium=gamesPlayedAt(topicGames,chKey,'medium');
+      const hard=gamesPlayedAt(topicGames,chKey,'hard');
+      return{chKey,chName,easy,medium,hard,total:easy+medium+hard};
+    });
+    const playedChapters=chapterEntries.filter(c=>c.total>0);
+    const subjectTotal=chapterEntries.reduce((s,c)=>s+c.total,0);
+
+    const chaptersHTML=playedChapters.length?playedChapters.map(c=>`
+      <div class="chapter-row">
+        <div class="chapter-name">${c.chName}</div>
+        <div class="diff-pills">
+          <div class="diff-pill easy"><span class="dp-n">${c.easy}</span>Easy</div>
+          <div class="diff-pill medium"><span class="dp-n">${c.medium}</span>Medium</div>
+          <div class="diff-pill hard"><span class="dp-n">${c.hard}</span>Hard</div>
+        </div>
+      </div>`).join(''):`<div class="subject-empty">No ${subj.label} questions answered yet</div>`;
+
+    return`
+      <div class="subject-card" id="subj-${si}">
+        <div class="subject-head" onclick="toggleSubject(${si})">
+          <span class="subject-icon">${subj.icon}</span>
+          <span class="subject-name">${subj.label}</span>
+          <span class="subject-count">${subjectTotal} question${subjectTotal!==1?'s':''}</span>
+          <span class="subject-caret">▶</span>
+        </div>
+        <div class="subject-chapters">${chaptersHTML}</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('activity-view').classList.add('open');
+}
+function toggleSubject(i){
+  document.getElementById('subj-'+i).classList.toggle('open');
+}
+function closeActivity(){
+  document.getElementById('activity-view').classList.remove('open');
+}
+
+function renderSubjectPie(data){
+  const colors=['#3F51B5','#43A047','#FF7043'];
+  const total=data.reduce((s,d)=>s+d.total,0);
+  const svg=document.getElementById('subject-pie');
+  const legend=document.getElementById('subject-pie-legend');
+  if(!total){
+    svg.innerHTML='<circle cx="90" cy="90" r="80" fill="#F0F0F0"/><text x="90" y="95" text-anchor="middle" fill="#B0BEC5" font-size="13" font-weight="700">No data yet</text>';
+    legend.innerHTML='';
+    return;
+  }
+  let angle=-90, paths='';
+  data.forEach((d,i)=>{
+    if(!d.total) return;
+    const slice=(d.total/total)*360;
+    const x1=90+80*Math.cos(angle*Math.PI/180), y1=90+80*Math.sin(angle*Math.PI/180);
+    angle+=slice;
+    const x2=90+80*Math.cos(angle*Math.PI/180), y2=90+80*Math.sin(angle*Math.PI/180);
+    const large=slice>180?1:0;
+    paths+=`<path d="M90,90 L${x1},${y1} A80,80 0 ${large} 1 ${x2},${y2} Z" fill="${colors[i%colors.length]}"/>`;
+  });
+  svg.innerHTML=paths;
+  legend.innerHTML=data.map((d,i)=>`<span style="color:${colors[i%colors.length]}">${d.icon} ${d.label}: ${d.total}</span>`).join('');
+}
+
+// ══════════════════════════════════════════
 //  CHANGE PASSWORD
 // ══════════════════════════════════════════
 async function changePassword(){
@@ -691,7 +882,7 @@ async function changePassword(){
 
 
 </script>
-
+  
 <footer class="site-footer">
   <div class="footer-inner">
     <span class="footer-brand">✏️ ScribbleSum</span>

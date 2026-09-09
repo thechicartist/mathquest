@@ -560,6 +560,12 @@
       <div class="kid-stat"><span class="kid-stat-val" id="activity-games">🎮 0</span><span class="kid-stat-lbl">Games</span></div>
       <div class="kid-stat"><span class="kid-stat-val" id="activity-streak">🔥 0</span><span class="kid-stat-lbl">Streak</span></div>
     </div>
+    <div class="fs-section-title">Subject Breakdown</div>
+    <div id="subject-pie-wrap" style="display:flex;justify-content:center;margin-bottom:20px">
+      <svg id="subject-pie" width="180" height="180" viewBox="0 0 180 180"></svg>
+    </div>
+    <div id="subject-pie-legend" style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:10px;font-size:0.82rem;font-weight:800"></div>
+
     <div class="fs-section-title">Progress by Subject</div>
     <div id="subjects-container"></div>
   </div>
@@ -579,8 +585,8 @@ const SUBJECTS = [
     chapters:{counting:'Counting',addsubt:'Add & Subtract',multiply:'Multiplication',fractions:'Fractions',decimals:'Decimals',percent:'Percentages',algebra:'Algebra',geometry:'Geometry',wordprob:'Word Problems',measurement:'Measurement'} },
   { key:'engTopicGames', label:'English', icon:'📖',
     chapters:{vocab:'Vocabulary',spelling:'Spelling',grammar:'Grammar',punctuation:'Punctuation',reading:'Comprehension',synonyms:'Synonyms',antonyms:'Antonyms',figurative:'Figurative Language',prefixes:'Prefixes & Suffixes',sentences:'Sentences'} },
-//  { key:'sciTopicGames', label:'Science', icon:'🔬',
-//     chapters:{biology:'Biology',chemistry:'Chemistry',physics:'Physics',earth:'Earth Science',space:'Space',humanbody:'Human Body'} },
+  { key:'sciTopicGames', label:'Science', icon:'🔬',
+    chapters:{biology:'Biology',chemistry:'Chemistry',physics:'Physics',earth:'Earth Science',space:'Space',humanbody:'Human Body'} },
 ];
 
 // topicGames[topic][difficulty].q1 = count of games played at that
@@ -1041,6 +1047,14 @@ function openActivity(username) {
   document.getElementById('activity-games').textContent = '🎮 ' + k.games;
   document.getElementById('activity-streak').textContent = '🔥 ' + k.streak;
 
+  const subjectTotals = SUBJECTS.map(subj => {
+    const topicGames = prog[subj.key] || {};
+    const total = Object.keys(subj.chapters).reduce((s, chKey) =>
+      s + gamesPlayedAt(topicGames, chKey, 'easy') + gamesPlayedAt(topicGames, chKey, 'medium') + gamesPlayedAt(topicGames, chKey, 'hard'), 0);
+    return { label: subj.label, icon: subj.icon, total };
+  });
+  renderSubjectPie(subjectTotals);
+
   const container = document.getElementById('subjects-container');
   container.innerHTML = SUBJECTS.map((subj, si) => {
     const topicGames = prog[subj.key] || {};
@@ -1083,6 +1097,30 @@ function toggleSubject(i) {
 }
 function closeActivity() {
   document.getElementById('activity-view').classList.remove('open');
+}
+
+function renderSubjectPie(data){
+  const colors=['#3F51B5','#43A047','#FF7043'];
+  const total=data.reduce((s,d)=>s+d.total,0);
+  const svg=document.getElementById('subject-pie');
+  const legend=document.getElementById('subject-pie-legend');
+  if(!total){
+    svg.innerHTML='<circle cx="90" cy="90" r="80" fill="#F0F0F0"/><text x="90" y="95" text-anchor="middle" fill="#B0BEC5" font-size="13" font-weight="700">No data yet</text>';
+    legend.innerHTML='';
+    return;
+  }
+  let angle=-90, paths='';
+  data.forEach((d,i)=>{
+    if(!d.total) return;
+    const slice=(d.total/total)*360;
+    const x1=90+80*Math.cos(angle*Math.PI/180), y1=90+80*Math.sin(angle*Math.PI/180);
+    angle+=slice;
+    const x2=90+80*Math.cos(angle*Math.PI/180), y2=90+80*Math.sin(angle*Math.PI/180);
+    const large=slice>180?1:0;
+    paths+=`<path d="M90,90 L${x1},${y1} A80,80 0 ${large} 1 ${x2},${y2} Z" fill="${colors[i%colors.length]}"/>`;
+  });
+  svg.innerHTML=paths;
+  legend.innerHTML=data.map((d,i)=>`<span style="color:${colors[i%colors.length]}">${d.icon} ${d.label}: ${d.total}</span>`).join('');
 }
 
 function askDelete(username, display) {
