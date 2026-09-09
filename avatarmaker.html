@@ -26,6 +26,7 @@
     --ink-soft: #5B6494;
   }
 
+
   *{ box-sizing: border-box; }
   html, body{ margin:0; padding:0; height:100%; font-family:'Nunito', sans-serif; color: var(--ink); }
   h1,h2,h3,button,.game-font{ font-family:'Baloo 2', sans-serif; }
@@ -87,6 +88,17 @@
   }
   .coin-hud .count{ font-size:22px; font-weight:800; color: var(--navy-deep); }
   .coin-hud .label{ font-size:11px; font-weight:700; color:#8A6A00; text-transform:uppercase; letter-spacing:0.6px; }
+
+  /* ---- nav links ---- */
+  .nav-links{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .nav-link{
+    background:rgba(255,255,255,0.85); border:3px solid var(--navy-deep); border-radius:999px;
+    padding:8px 16px; color:var(--navy-deep); font-weight:800; font-size:13px;
+    text-decoration:none; display:inline-flex; align-items:center; gap:6px;
+    box-shadow:0 3px 0 var(--navy-deep); transition:transform .1s ease;
+  }
+  .nav-link:hover{ transform:translateY(-2px); }
+  .nav-link:active{ transform:translateY(1px); box-shadow:0 1px 0 var(--navy-deep); }
 
   /* ---- earn panel ---- */
   .earn-panel{
@@ -294,6 +306,12 @@
           <div class="count" id="starCount">0</div>
           <div class="label">Coins</div>
         </div>
+      </div>
+      <div class="nav-links">
+        <a href="math.html" class="nav-link">🚀 Math</a>
+        <a href="english.html" class="nav-link">📖 English</a>
+        <a href="science.html" class="nav-link">🔬 Science</a>
+        <a href="arcade.html" class="nav-link">🎮 Arcade</a>
       </div>
     </div>
 
@@ -901,4 +919,4 @@ svg += `<path d="M120 38 q34 0 42 30 q5 17 3 32 q-2 15 -9 26 q-8 14 -17 20 q-9 7
 })();
 </script>
 </body>
-</html>
+</html> 
